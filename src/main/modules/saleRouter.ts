@@ -1,0 +1,29 @@
+import fs from 'fs'
+import getConfig from './pathData'
+
+const { pathToPublic } = getConfig()
+
+const shopfilepath = `${pathToPublic}/data/sale.json`
+
+export const setSale = (sale): string => {
+  if (!isNaN(Number(sale))) {
+    try {
+      const oldShopDataString = fs.readFileSync(shopfilepath, 'utf8')
+      const oldShopObject = JSON.parse(oldShopDataString)
+      const newShopData = { ...oldShopObject, sale: Number(sale) }
+      fs.writeFileSync(shopfilepath, JSON.stringify(newShopData))
+      return JSON.stringify({ message: 'Updated Sale!' })
+    } catch (err) {
+      console.log(err)
+      return JSON.stringify({ message: 'Sale update failed.' })
+    }
+  } else {
+    return JSON.stringify({ message: 'You must fill out all fields.' })
+  }
+}
+
+export const getSale = (): string => {
+  const shopData = fs.readFileSync(shopfilepath, 'utf8')
+  const shop = JSON.parse(shopData)
+  return JSON.stringify({ sale: shop.sale })
+}
