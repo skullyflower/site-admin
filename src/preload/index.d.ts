@@ -1,44 +1,6 @@
 import { ElectronAPI } from '@electron-toolkit/preload'
+import { AdminConfig, BlogInfo, BlogResponse, SiteInfo, ApiMessageResponse } from '../shared/types'
 
-export interface AdminConfig {
-  pathToSite: string
-}
-export interface BlogInfo {
-  page_title: string
-  page_description: string
-  page_content: string
-}
-
-export interface BlogEntry {
-  id: string
-  title: string
-  heading: string
-  date: string
-  image: string
-  imagealt: string
-}
-
-interface BlogResponse {
-  page_title: string
-  page_description: string
-  page_content: string
-  entries: BlogEntry[]
-  message?: string
-}
-export interface pageInfo {
-  page_title: string
-  page_description: string
-  page_content: string
-}
-export interface SiteInfo extends pageInfo {
-  company_name: string
-  site_theme: string
-  live_site_url: string
-  sitelogo: string
-}
-export interface ApiMessageResponse {
-  message: string
-}
 export interface Api {
   getAdminConfig: () => Promise<ApiMessageResponse | AdminConfig>
   updateAdminConfig: (config: AdminConfig) => Promise<ApiMessageResponse>
@@ -49,6 +11,10 @@ export interface Api {
   updateBlogInfo: (values: BlogInfo) => Promise<ApiMessageResponse>
   submitBlogEntry: (id: string, formData: FormData) => Promise<ApiMessageResponse>
   deleteBlogEntry: (id: string) => Promise<ApiMessageResponse>
+  getGalleries: () => Promise<ApiMessageResponse | GalleryResponse>
+  getGallery: (gallery_id: string) => Promise<ApiMessageResponse | Gallery>
+  updateGallery: (gallery: Gallery) => Promise<ApiMessageResponse>
+  resetGallery: (gallery: Gallery) => Promise<ApiMessageResponse>
 }
 
 declare global {
@@ -56,10 +22,4 @@ declare global {
     electron: ElectronAPI
     api: Api
   }
-  type AdminConfig = AdminConfig
-  type SiteInfo = SiteInfo
-  type BlogInfo = BlogInfo
-  type BlogEntry = BlogEntry
-  type BlogResponse = BlogResponse
-  type ApiMessageResponse = ApiMessageResponse
 }

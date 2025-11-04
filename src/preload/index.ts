@@ -59,6 +59,10 @@ const api = {
     const response = await ipcRenderer.invoke('update-gallery', gallery)
     return JSON.parse(response)
   },
+  getGallery: async (gallery_id: string) => {
+    const response = await ipcRenderer.invoke('get-gallery', gallery_id)
+    return response
+  },
   resetGallery: async (gallery: string) => {
     const response = await ipcRenderer.invoke('reset-gallery', gallery)
     return JSON.parse(response)

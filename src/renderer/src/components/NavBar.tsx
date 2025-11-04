@@ -7,9 +7,9 @@ interface NavButtonProps extends React.HTMLAttributes<HTMLButtonElement> {
 const NavButton = ({ path, children }: NavButtonProps): React.ReactNode => {
   return (
     <Button
+      as={Link}
       size="xs"
       border={0}
-      as={Link}
       to={path}
       backgroundColor={useMatch(path) ? 'blue.500' : 'gray.500'}
     >

@@ -1,18 +1,16 @@
 import fs from 'fs'
-import { configfilepath } from './pathData'
-
-interface ConfigData {
-  pathToSite: string
-}
-
+import { checkFile, checkPath, configfilepath } from './pathData'
+import { AdminConfig } from '../../shared/types'
 interface ConfigResponse {
   message: string
 }
 
-export const updateAdminConfig = (config: ConfigData): string => {
+export const updateAdminConfig = (config: AdminConfig): string => {
   if (config.pathToSite) {
+    checkPath(configfilepath)
+    checkFile(configfilepath, config)
     try {
-      const configData: ConfigData = config
+      const configData: AdminConfig = config as AdminConfig
       fs.writeFileSync(configfilepath, JSON.stringify(configData))
       const response: ConfigResponse = { message: 'Updated Config page data!' }
       return JSON.stringify(response)
@@ -28,9 +26,11 @@ export const updateAdminConfig = (config: ConfigData): string => {
 }
 
 export const getAdminConfig = (): string => {
+  checkPath(configfilepath)
+  checkFile(configfilepath, { pathToSite: '' })
   try {
     const configDataString: string = fs.readFileSync(configfilepath, 'utf8')
-    const configDataObject: ConfigData = JSON.parse(configDataString)
+    const configDataObject: AdminConfig = JSON.parse(configDataString)
     return JSON.stringify(configDataObject)
   } catch (err: unknown) {
     console.log(err)

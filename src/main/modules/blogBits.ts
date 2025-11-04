@@ -1,3 +1,4 @@
+import { BlogInfo, BlogEntry, BlogResponse } from '../../shared/types'
 import fs from 'fs'
 import processRss from './processBlogRSS.js'
 import processFile from './imageProcessor'
@@ -29,7 +30,7 @@ export const updateBlogInfo = (blogInfo): string => {
   if (blogInfo) {
     try {
       const oldpageDataString = fs.readFileSync(blogfilepath)
-      const oldpageObject = JSON.parse(oldpageDataString.toString())
+      const oldpageObject: BlogInfo = JSON.parse(oldpageDataString.toString()) as BlogInfo
       const newpageData = { ...oldpageObject, ...blogInfo }
       fs.writeFileSync(blogfilepath, JSON.stringify(newpageData))
       fs.copyFileSync(blogfilepath, blogfilepath_build)
@@ -45,10 +46,10 @@ export const updateBlogInfo = (blogInfo): string => {
 
 export const updateBlogPost = (entry, files): string => {
   const blogPostData = fs.readFileSync(blogfilepath)
-  const blogEntries = JSON.parse(blogPostData.toString())
+  const blogEntries: BlogResponse = JSON.parse(blogPostData.toString()) as BlogResponse
   if (entry) {
     try {
-      const update = JSON.parse(entry)
+      const update: BlogEntry = JSON.parse(entry) as BlogEntry
       const updateIndex = blogEntries.entries.findIndex(
         (entry) => entry.id === update.id || entry.title === update.title
       )
@@ -110,16 +111,18 @@ export const updateBlogPost = (entry, files): string => {
 
 export const deletEntry = (blogid: string): string => {
   try {
-    const blogEntrieData = fs.readFileSync(blogfilepath)
-    const blogEntries = JSON.parse(blogEntrieData.toString())
-    const entryToDelete = blogid
-    const entryIndex = blogEntries.entries.findIndex((entry) => entry.id === entryToDelete)
-    const removedEntry = blogEntries.entries.splice(entryIndex, 1)
-    const newblogEntries = blogEntries
-    fs.writeFileSync(blogfilepath, JSON.stringify(newblogEntries))
+    const blogJSONString = fs.readFileSync(blogfilepath)
+    const blogData: BlogResponse = JSON.parse(blogJSONString.toString()) as BlogResponse
+    const entryToDelete = blogData.entries.find((entry) => entry.id === blogid)
+    if (!entryToDelete) {
+      return JSON.stringify({ message: `Entry not found: ${blogid}` })
+    }
+    const newblogEntries = blogData.entries.filter((entry) => entry.id !== blogid)
+    const newblogData: BlogResponse = { ...blogData, entries: newblogEntries }
+    fs.writeFileSync(blogfilepath, JSON.stringify(newblogData))
     const RSS = processRss(newblogEntries)
     fs.writeFileSync(blogRSSpath, RSS)
-    return JSON.stringify({ message: `Removed entry: ${removedEntry.title}` })
+    return JSON.stringify({ message: `Removed entry: ${entryToDelete?.title}` })
   } catch (error) {
     console.log(error)
     return JSON.stringify({ message: `Failed to remove entry: ${blogid}` })

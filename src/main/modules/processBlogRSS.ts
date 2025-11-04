@@ -1,4 +1,4 @@
-import { BlogInfo } from '../models/blog.js'
+import { BlogInfo } from './../../shared/types.d'
 import getConfig from './pathData.js'
 import fs from 'fs'
 

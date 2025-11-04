@@ -5,6 +5,7 @@ import UploadInput from '../components/upload-input'
 import { useState } from 'react'
 import StyledInput from '@renderer/components/StyledInput'
 import { buttonRecipe } from '@renderer/themeRecipes'
+import { SiteInfo } from 'src/shared/types'
 
 const HomePageForm = ({
   pageData,

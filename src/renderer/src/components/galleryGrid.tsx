@@ -1,3 +1,4 @@
+import { GalleryImage } from 'src/shared/types'
 import { GalleryGridImage } from '../forms/GalleryGridImage'
 import { Flex } from '@chakra-ui/react'
 
@@ -13,9 +14,7 @@ interface GalleryGridProps {
   gallery: {
     path: string
   }
-  images: {
-    imgfile: string
-  }[]
+  images: GalleryImage[]
   deleteImage: (imageurl: string) => () => void
   updateImage: (imageurl: string, date: string, name: string) => () => void
 }

@@ -1,5 +1,6 @@
 import { readFileSync, readdirSync, writeFileSync } from 'fs'
 import getConfig from './pathData'
+import { ApiMessageResponse, Gallery, GalleryImages } from '../../shared/types'
 
 const { pathToPublic } = getConfig()
 const galleries_json = `${pathToPublic}/data/galleries_list.json`
@@ -14,7 +15,7 @@ export function getImages(path): string[] | string {
   }
 }
 
-function resetImages(gallery): string {
+function resetImages(gallery: Gallery): string {
   const { json_path, path, isStory } = gallery
   const public_file = `${pathToPublic}${json_path}`
   const build_file = public_file.replace('public', 'build')
@@ -72,9 +73,8 @@ export const getGalleries = (): string => {
 
 export const updateGallery = (gallery): string => {
   if (gallery) {
-    const all = getGalleries()
-    const galleries = all
-    if (!Array.isArray(galleries)) {
+    const galleries = getGalleries()
+    if (!Array.isArray(galleries) || galleries.length === 0) {
       throw new Error('Cannot Get Galleries')
     }
     const { id, title, json_path, path } = gallery
@@ -95,7 +95,7 @@ export const updateGallery = (gallery): string => {
   return JSON.stringify({ message: 'No gallery to update.' })
 }
 
-export const getGallery = (galleryId): string => {
+export const getGallery = (galleryId): GalleryImages | ApiMessageResponse => {
   try {
     const galleries = getGalleries()
     if (!Array.isArray(galleries)) {
@@ -108,23 +108,23 @@ export const getGallery = (galleryId): string => {
 
     const galleryFile = gallery?.json_path ?? galleries[0].json_path
     const gallery_json = readFileSync(`${pathToPublic}${galleryFile}`, 'utf8')
-    return JSON.stringify(JSON.parse(gallery_json))
+    return JSON.parse(gallery_json) as GalleryImages
   } catch (err) {
-    return JSON.stringify({
+    return {
       message: `Couldn't read file for ${galleryId} ${err}`
-    })
+    }
   }
 }
 
-export const resetGallery = (gallery): string => {
+export const resetGallery = (gallery): ApiMessageResponse => {
   if (gallery) {
     let images = 0
-    images = resetImages(gallery).length
+    images = Object.keys(resetImages(gallery)).length
     if (images) {
-      return JSON.stringify({ message: 'Success!' })
+      return { message: 'Success!' }
     } else {
-      return JSON.stringify({ message: 'FAIL!!!' })
+      return { message: 'FAIL!!!' }
     }
   }
-  return JSON.stringify({ message: 'No gallery to reset.' })
+  return { message: 'No gallery to reset.' }
 }

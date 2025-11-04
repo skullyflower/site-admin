@@ -36,6 +36,7 @@ export const checkFile = (path, defaultVal): void => {
     console.log(`No file found at ${path}. Creating one with default
       values
       `)
+    checkPath(path)
     fs.writeFileSync(path, JSON.stringify(defaultVal ?? {}))
   }
 }
