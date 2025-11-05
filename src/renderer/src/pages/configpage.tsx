@@ -1,24 +1,21 @@
 import { useEffect, useState } from 'react'
-import { useForm } from 'react-hook-form'
 import PageLayout from '../components/PageLayout'
 import { Button, Center, Field, HStack, Stack } from '@chakra-ui/react'
 import InfoBubble from '../components/info-bubble'
 import { buttonRecipe } from '@renderer/themeRecipes'
+import { AdminConfig, ApiMessageResponse } from 'src/shared/types'
 
-interface Config {
-  pathToSite: string
-}
 const getConfig = (
-  setConfig: (config: Config | null) => void,
+  setConfig: (config: AdminConfig | null) => void,
   setMessages: (message: string) => void
 ): void => {
   window.api
     .getAdminConfig()
-    .then((data: ApiMessageResponse | Config) => {
+    .then((data: ApiMessageResponse | AdminConfig) => {
       if (typeof data === 'object' && 'message' in data) {
         setMessages(data.message as string)
       } else {
-        setConfig(data as Config)
+        setConfig(data as AdminConfig)
       }
     })
     .catch((err: Error) => {
@@ -27,7 +24,7 @@ const getConfig = (
 }
 
 const ConfigPage = (): React.ReactNode => {
-  const [config, setConfig] = useState<Config | null>(null)
+  const [config, setConfig] = useState<AdminConfig | null>(null)
   const [messages, setMessages] = useState<string | null>(null)
 
   useEffect(() => {
@@ -55,8 +52,9 @@ const ConfigPage = (): React.ReactNode => {
       button={{ action: onSubmit, text: 'Update', value: '' }}
     >
       <ConfigForm
-        formData={config as Config}
-        onSubmit={(values: Config) => onSubmit(values.pathToSite)}
+        formData={config as AdminConfig}
+        setValue={(value: string) => setConfig({ pathToSite: value } as AdminConfig)}
+        onSubmit={() => onSubmit(config?.pathToSite || '')}
       />
     </PageLayout>
   )
@@ -64,21 +62,17 @@ const ConfigPage = (): React.ReactNode => {
 
 const ConfigForm = ({
   formData,
+  setValue,
   onSubmit
 }: {
-  formData: Config | null
-  onSubmit: (values: Config) => void
+  formData: AdminConfig | null
+  setValue: (value: string) => void
+  onSubmit: () => void
 }): React.ReactNode => {
-  const {
-    handleSubmit,
-    setValue,
-    formState: { errors }
-  } = useForm({ defaultValues: formData as Config, mode: 'onChange' })
-
   return (
     <Stack gap={4}>
       <div>Current Config: {formData?.pathToSite || 'No config found'}</div>
-      <Field.Root p={4} invalid={errors.pathToSite ? true : false}>
+      <Field.Root p={4}>
         <HStack alignItems="center">
           <Field.Label w={48}>
             Site Folder Path: <InfoBubble message="Relative path to the site you are editing" />
@@ -87,9 +81,9 @@ const ConfigForm = ({
             onClick={() => {
               window.api
                 .selectSiteDirectory()
-                .then((data: string[] | undefined) => {
-                  if (data && data.length > 0) {
-                    setValue('pathToSite', data[0] || '')
+                .then((data: string | unknown) => {
+                  if (data && typeof data === 'string') {
+                    setValue(data)
                   } else {
                     alert('No directory selected')
                   }
@@ -105,7 +99,7 @@ const ConfigForm = ({
       </Field.Root>
       <Center>
         <HStack gap={4}>
-          <Button recipe={buttonRecipe} onClick={handleSubmit(onSubmit)}>
+          <Button recipe={buttonRecipe} onClick={() => onSubmit()}>
             Submit Changes
           </Button>
         </HStack>
