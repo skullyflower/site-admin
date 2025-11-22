@@ -1,4 +1,4 @@
-import { Alert, Button, Card, Heading, HStack, Stack } from '@chakra-ui/react'
+import { Alert, Button, Card, Heading, HStack, ScrollArea, Stack } from '@chakra-ui/react'
 import { buttonRecipe } from '@renderer/themeRecipes'
 
 interface PageLayoutProps {
@@ -23,7 +23,7 @@ const PageLayout = ({ messages, title, button, children }: PageLayoutProps): Rea
       backgroundColor="gray.800"
       color="slate.100"
       w={['100%', '100%', '95%', '95%', '95%']}
-      maxHeight={'88vh'}
+      height={'82vh'}
       overflowY={'auto'}
       marginInline={'auto'}
     >
@@ -47,7 +47,16 @@ const PageLayout = ({ messages, title, button, children }: PageLayoutProps): Rea
           {messages && <Alert.Root status="info">{messages}</Alert.Root>}
         </Stack>
       </Card.Header>
-      <Card.Body>{children}</Card.Body>
+      <Card.Body>
+        <ScrollArea.Root height="inherit">
+          <ScrollArea.Viewport>
+            <ScrollArea.Content>{children}</ScrollArea.Content>
+          </ScrollArea.Viewport>
+          <ScrollArea.Scrollbar>
+            <ScrollArea.Thumb />
+          </ScrollArea.Scrollbar>
+        </ScrollArea.Root>
+      </Card.Body>
     </Card.Root>
   )
 }

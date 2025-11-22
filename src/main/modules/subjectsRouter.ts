@@ -1,9 +1,9 @@
 import fs from 'fs'
-import getConfig from './pathData'
+import getPathsFromConfig, { checkFile } from './pathData'
 
-const { pathToPublic } = getConfig()
+const { pathToPublic } = getPathsFromConfig()
 
-const shopfilepath = `${pathToPublic}/data/subjects.json`
+const subjectFilePath = `${pathToPublic}/data/subjects.json`
 import processFile from './imageProcessor.js'
 
 export const updateSubject = async (subject, files): Promise<string> => {
@@ -33,7 +33,9 @@ export const updateSubject = async (subject, files): Promise<string> => {
           }
         }
       }
-      const oldShopDataString = fs.readFileSync(shopfilepath, 'utf8')
+      checkFile(subjectFilePath, { designs: [] })
+      checkFile(subjectFilePath.replace('public', 'build'), { designs: [] })
+      const oldShopDataString = fs.readFileSync(subjectFilePath, 'utf8')
       const oldShopObject = JSON.parse(oldShopDataString)
       //categories:[]
       const newCategories = [...oldShopObject.designs]
@@ -45,8 +47,8 @@ export const updateSubject = async (subject, files): Promise<string> => {
         newCategories.unshift(subject)
       }
       const newShopData = { designs: newCategories }
-      fs.writeFileSync(shopfilepath, JSON.stringify(newShopData))
-      fs.writeFileSync(shopfilepath.replace('public', 'build'), JSON.stringify(newShopData))
+      fs.writeFileSync(subjectFilePath, JSON.stringify(newShopData))
+      fs.writeFileSync(subjectFilePath.replace('public', 'build'), JSON.stringify(newShopData))
       return JSON.stringify({ message: 'Updated Shop Subjects!' })
     } catch (err) {
       console.log(err)
@@ -58,7 +60,8 @@ export const updateSubject = async (subject, files): Promise<string> => {
 }
 
 export const getSubjects = (): string => {
-  const shopData = fs.readFileSync(shopfilepath, 'utf8')
+  checkFile(subjectFilePath, { designs: [] })
+  const shopData = fs.readFileSync(subjectFilePath, 'utf8')
   const shop = JSON.parse(shopData)
   if (shop.designs) {
     return JSON.stringify(shop.designs)
@@ -70,7 +73,8 @@ export const getSubjects = (): string => {
 export const deleteSubject = (catId): string => {
   try {
     const catToDelete = catId
-    const shopData = fs.readFileSync(shopfilepath, 'utf8')
+    checkFile(subjectFilePath, { designs: [] })
+    const shopData = fs.readFileSync(subjectFilePath, 'utf8')
     const shop = JSON.parse(shopData)
     if (
       shop.categories &&
@@ -80,7 +84,7 @@ export const deleteSubject = (catId): string => {
       const newCategoryData = allcategories.filter((cats) => cats.id !== catToDelete)
       const newShopObj = { ...shop, categories: newCategoryData }
       const newShopData = JSON.stringify(newShopObj)
-      fs.writeFileSync(shopfilepath, newShopData)
+      fs.writeFileSync(subjectFilePath, newShopData)
       return JSON.stringify({ message: `Successfully deleted ${catToDelete}` })
     }
     return JSON.stringify({ message: `Couldn't find ${catId} in the list.` })

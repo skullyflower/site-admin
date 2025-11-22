@@ -1,7 +1,7 @@
 import fs from 'fs'
-import getConfig from './pathData'
+import getPathsFromConfig, { checkFile } from './pathData'
 
-const { pathToPublic } = getConfig()
+const { pathToPublic } = getPathsFromConfig()
 
 const shopfilepath = `${pathToPublic}/data/products.json`
 import processFile from './imageProcessor'
@@ -41,6 +41,8 @@ export const updateProduct = async (product, files): Promise<string> => {
           }
         }
       }
+      checkFile(shopfilepath, { products: [] })
+      checkFile(shopfilepath.replace('public', 'build'), { products: [] })
       const oldShopDataString = fs.readFileSync(shopfilepath, 'utf8')
       const oldShopData = JSON.parse(oldShopDataString)
       const productArray = oldShopData.products
@@ -65,6 +67,7 @@ export const updateProduct = async (product, files): Promise<string> => {
 }
 
 export const getProducts = (): string => {
+  checkFile(shopfilepath, { products: [] })
   const shopData = fs.readFileSync(shopfilepath, 'utf8')
   const shop = JSON.parse(shopData)
   if (shop.products) {
@@ -76,6 +79,7 @@ export const getProducts = (): string => {
 export const deleteProduct = (prodId): string => {
   try {
     const prodToDelete = prodId
+    checkFile(shopfilepath, { products: [] })
     const shopData = fs.readFileSync(shopfilepath, 'utf8')
     const shop = JSON.parse(shopData)
     const allproducts = shop.products

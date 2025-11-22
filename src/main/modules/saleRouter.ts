@@ -1,13 +1,14 @@
 import fs from 'fs'
-import getConfig from './pathData'
+import getPathsFromConfig, { checkFile } from './pathData'
 
-const { pathToPublic } = getConfig()
+const { pathToPublic } = getPathsFromConfig()
 
 const shopfilepath = `${pathToPublic}/data/sale.json`
 
 export const setSale = (sale): string => {
   if (!isNaN(Number(sale))) {
     try {
+      checkFile(shopfilepath, { sale: 0 })
       const oldShopDataString = fs.readFileSync(shopfilepath, 'utf8')
       const oldShopObject = JSON.parse(oldShopDataString)
       const newShopData = { ...oldShopObject, sale: Number(sale) }
@@ -23,6 +24,7 @@ export const setSale = (sale): string => {
 }
 
 export const getSale = (): string => {
+  checkFile(shopfilepath, { sale: 0 })
   const shopData = fs.readFileSync(shopfilepath, 'utf8')
   const shop = JSON.parse(shopData)
   return JSON.stringify({ sale: shop.sale })

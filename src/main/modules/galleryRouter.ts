@@ -1,12 +1,13 @@
 import { readFileSync, readdirSync, writeFileSync } from 'fs'
-import getConfig from './pathData'
+import getPathsFromConfig, { checkFile, checkPath } from './pathData'
 import { ApiMessageResponse, Gallery, GalleryImages } from '../../shared/types'
 
-const { pathToPublic } = getConfig()
+const { pathToPublic } = getPathsFromConfig()
 const galleries_json = `${pathToPublic}/data/galleries_list.json`
 
 export function getImages(path): string[] | string {
   const files_path = `${pathToPublic}/${path}`
+  checkPath(files_path)
   const all_files = readdirSync(files_path)
   if (Array.isArray(all_files) && all_files.length) {
     return all_files
@@ -64,6 +65,7 @@ function resetImages(gallery: Gallery): string {
 
 export const getGalleries = (): string => {
   try {
+    checkFile(galleries_json, { galleries: [] })
     const gallerData = readFileSync(galleries_json, 'utf8')
     return JSON.parse(gallerData)
   } catch (err) {
@@ -107,6 +109,7 @@ export const getGallery = (galleryId): GalleryImages | ApiMessageResponse => {
     }
 
     const galleryFile = gallery?.json_path ?? galleries[0].json_path
+    checkFile(`${pathToPublic}${galleryFile}`, {})
     const gallery_json = readFileSync(`${pathToPublic}${galleryFile}`, 'utf8')
     return JSON.parse(gallery_json) as GalleryImages
   } catch (err) {

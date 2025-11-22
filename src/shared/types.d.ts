@@ -18,7 +18,7 @@ export interface BlogEntry {
   imagelink: string
   imgcaption: string
   text: string
-  newImage: File[]
+  tags?: string[]
 }
 
 export interface BlogResponse {
@@ -52,11 +52,22 @@ export interface CategoryResponse {
   categories: Category[]
   message?: string
 }
+export interface Subject {
+  id: string
+  name: string
+  description: string
+  subcat: string[]
+}
+export interface SubjectResponse {
+  subjects: Subject[]
+  message?: string
+}
 export interface Gallery {
   id: string
   json_path: string
   path: string
   title: string
+  content?: string
   linked_prod: string
   isStory: boolean
 }
@@ -74,4 +85,29 @@ export interface GalleryImages extends Record<string, GalleryImage> {}
 
 export interface ApiMessageResponse {
   message: string
+}
+export interface Product {
+  id: string
+  name: string
+  price: number
+  img: string
+  altimgs: string[]
+  desc: string
+  desc_long: string
+  cat: string[]
+  weight: number
+  handling: number
+  soldout: boolean
+  design: string[]
+  externalLink: string
+  date: string
+}
+
+export interface fileObject {
+  filename: string
+  path: string
+  previewUrls: string
+}
+export interface fileObjectList {
+  fileObjects: fileObject[]
 }

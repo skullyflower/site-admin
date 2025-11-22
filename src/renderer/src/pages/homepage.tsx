@@ -3,6 +3,7 @@ import { Skeleton, Stack } from '@chakra-ui/react'
 import PageLayout from '../components/PageLayout'
 import HomePageForm from '../forms/homepageForm'
 import HomePagePreview from '../forms/homepagePreview'
+import { SiteInfo, ApiMessageResponse } from 'src/shared/types'
 
 const getSiteData = async (
   setLoading: (loading: boolean) => void,
@@ -26,6 +27,15 @@ const getSiteData = async (
   setLoading(false)
 }
 
+const emptySiteInfo: SiteInfo = {
+  page_title: '',
+  page_description: '',
+  page_content: '',
+  company_name: '',
+  site_theme: '',
+  live_site_url: '',
+  sitelogo: ''
+}
 export default function HomePage(): React.JSX.Element {
   const [messages, setMessages] = useState<string | null>(null)
   const [pageData, setPageData] = useState<SiteInfo | null>(null)
@@ -33,10 +43,8 @@ export default function HomePage(): React.JSX.Element {
   const [showForm, setShowForm] = useState(false)
 
   useEffect(() => {
-    if (!pageData && !messages) {
-      getSiteData(setLoading, setMessages, setPageData)
-    }
-  }, [pageData, messages])
+    getSiteData(setLoading, setMessages, setPageData)
+  }, [])
 
   const onSubmit = async (values: SiteInfo & { newsitelogo: File[] }): Promise<void> => {
     setMessages(null)
@@ -68,8 +76,11 @@ export default function HomePage(): React.JSX.Element {
           <Skeleton height="50px" />
           <Skeleton height="50px" />
         </Stack>
-      ) : showForm ? (
-        <HomePageForm pageData={pageData} onSubmit={onSubmit} />
+      ) : showForm || !pageData ? (
+        <HomePageForm
+          pageData={pageData || (emptySiteInfo as SiteInfo)}
+          onSubmit={(values: SiteInfo) => onSubmit(values as SiteInfo & { newsitelogo: File[] })}
+        />
       ) : (
         <HomePagePreview pageData={pageData as SiteInfo} />
       )}

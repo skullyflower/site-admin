@@ -158,11 +158,9 @@ export default function EditCategory({
               .map((c) => {
                 return (
                   <Box key={c.id} p={2}>
-                    <span>
-                      <Checkbox {...register(`subcat`)} value={c.id}>
-                        {c.id}
-                      </Checkbox>
-                    </span>
+                    <Checkbox.Root {...register(`subcat`)} value={c.id}>
+                      {c.id}
+                    </Checkbox.Root>
                   </Box>
                 )
               })}

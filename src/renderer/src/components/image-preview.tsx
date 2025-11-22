@@ -1,5 +1,20 @@
 import { CloseButton, HStack, Image } from '@chakra-ui/react'
 
+const PreviewImage = ({
+  image,
+  deleteImage
+}: {
+  image: string
+  deleteImage: (image: string) => void
+}): React.ReactNode => {
+  return (
+    <HStack align={'start'}>
+      <Image className="image" src={image} alt={'Image'} width={150} style={{ padding: '10px' }} />
+      <CloseButton size={'sm'} onClick={() => deleteImage(image)} />
+    </HStack>
+  )
+}
+
 interface ImagePreviewProps {
   images: string[]
   updateImages: (images: string[]) => void
@@ -11,10 +26,7 @@ const ImagePreview = ({ images, updateImages }: ImagePreviewProps): React.ReactN
   return (
     <>
       {images.map((image, i) => (
-        <HStack align={'start'} key={`${image}${i}`}>
-          <Image className="image" src={image} alt="" width={150} style={{ padding: '10px' }} />
-          <CloseButton size={'sm'} onClick={() => deleteImage(image)} />
-        </HStack>
+        <PreviewImage key={`${image}${i}`} image={image} deleteImage={deleteImage} />
       ))}
     </>
   )

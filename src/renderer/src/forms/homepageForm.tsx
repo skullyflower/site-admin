@@ -6,6 +6,7 @@ import { useState } from 'react'
 import StyledInput from '@renderer/components/StyledInput'
 import { buttonRecipe } from '@renderer/themeRecipes'
 import { SiteInfo } from 'src/shared/types'
+import imageLoading from '@renderer/assets/image-loading.svg'
 
 const HomePageForm = ({
   pageData,
@@ -116,7 +117,7 @@ const HomePageForm = ({
                   src={`http://localhost:3000/${pageData.sitelogo}`}
                   boxSize="100px"
                   onError={(e) => {
-                    e.currentTarget.src = 'http://localhost:3000/images/image-loading.svg'
+                    e.currentTarget.src = imageLoading
                   }}
                 />
               </HStack>

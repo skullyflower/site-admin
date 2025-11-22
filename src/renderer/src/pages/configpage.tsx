@@ -1,8 +1,6 @@
 import { useEffect, useState } from 'react'
 import PageLayout from '../components/PageLayout'
-import { Button, Center, Field, HStack, Stack } from '@chakra-ui/react'
-import InfoBubble from '../components/info-bubble'
-import { buttonRecipe } from '@renderer/themeRecipes'
+import ConfigForm from '@renderer/forms/configeditor'
 import { AdminConfig, ApiMessageResponse } from 'src/shared/types'
 
 const getConfig = (
@@ -34,8 +32,12 @@ const ConfigPage = (): React.ReactNode => {
   }, [config, messages, setConfig, setMessages])
 
   const onSubmit = (pathToSite: string): void => {
+    if (!pathToSite) {
+      setMessages('You must fill out all fields.')
+      return
+    }
     window.api
-      .updateAdminConfig({ pathToSite: pathToSite })
+      .setAdminConfig({ pathToSite: pathToSite })
       .then((data: ApiMessageResponse) => {
         setMessages(data.message as string)
         getConfig(setConfig, setMessages)
@@ -49,7 +51,7 @@ const ConfigPage = (): React.ReactNode => {
     <PageLayout
       messages={messages}
       title="Set Config"
-      button={{ action: onSubmit, text: 'Update', value: '' }}
+      button={{ action: () => onSubmit(config?.pathToSite || ''), text: 'Update', value: '' }}
     >
       <ConfigForm
         formData={config as AdminConfig}
@@ -60,51 +62,4 @@ const ConfigPage = (): React.ReactNode => {
   )
 }
 
-const ConfigForm = ({
-  formData,
-  setValue,
-  onSubmit
-}: {
-  formData: AdminConfig | null
-  setValue: (value: string) => void
-  onSubmit: () => void
-}): React.ReactNode => {
-  return (
-    <Stack gap={4}>
-      <div>Current Config: {formData?.pathToSite || 'No config found'}</div>
-      <Field.Root p={4}>
-        <HStack alignItems="center">
-          <Field.Label w={48}>
-            Site Folder Path: <InfoBubble message="Relative path to the site you are editing" />
-          </Field.Label>
-          <Button
-            onClick={() => {
-              window.api
-                .selectSiteDirectory()
-                .then((data: string | unknown) => {
-                  if (data && typeof data === 'string') {
-                    setValue(data)
-                  } else {
-                    alert('No directory selected')
-                  }
-                })
-                .catch((err: Error) => {
-                  alert(err.message || 'Failed to select directory')
-                })
-            }}
-          >
-            Select Site Directory
-          </Button>
-        </HStack>
-      </Field.Root>
-      <Center>
-        <HStack gap={4}>
-          <Button recipe={buttonRecipe} onClick={() => onSubmit()}>
-            Submit Changes
-          </Button>
-        </HStack>
-      </Center>
-    </Stack>
-  )
-}
 export default ConfigPage

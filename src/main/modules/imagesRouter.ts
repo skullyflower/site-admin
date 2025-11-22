@@ -1,18 +1,37 @@
 import fs from 'fs'
-import processFile from './imageProcessor'
-import getConfig from './pathData'
+import path from 'path'
+import { app } from 'electron'
+import processFile, { ProcessedImage } from './imageProcessor'
+import getPathsFromConfig, { checkPath } from './pathData'
 
-const { pathToPublic, pathToBuild } = getConfig()
+const { pathToPublic, pathToBuild } = getPathsFromConfig()
+const tempPath = path.join(pathToPublic, 'temp')
 
-const checkPath = (path): void => {
-  if (!fs.existsSync(path)) {
-    fs.mkdirSync(path, { recursive: true })
+export const getPreviewImages = async (files: string[]): Promise<string[]> => {
+  checkPath(tempPath)
+  if (files.length > 0) {
+    console.log('files', files)
+    try {
+      const newFilePaths = await Promise.all(
+        files.map(async (file) => {
+          const newFilePath = `${tempPath}/${file.split('/').pop()}`
+          fs.copyFileSync(file, newFilePath)
+          return newFilePath.replace(pathToPublic, 'http://localhost:3000/')
+        })
+      )
+      return newFilePaths
+    } catch (err) {
+      console.error('Failed to get preview images:', err)
+      return []
+    }
   }
+  return []
 }
 
 // path from skullyflower/admin/
-const bigSourcePath = './public/files/big/'
-const smallSourcePath = './public/files/small/'
+const bigSourcePath = tempPath
+const smallSourcePath = path.join(tempPath, 'small')
+
 const publicPath = `${pathToPublic}/`
 const buildPath = `${pathToBuild}/`
 
@@ -43,6 +62,8 @@ const getDestinationPaths = (
 
 export const getStagedImages = (): string => {
   try {
+    checkPath(bigSourcePath)
+    checkPath(smallSourcePath)
     const files = fs.readdirSync(bigSourcePath)
     if (files) {
       const filtered = files.filter(
@@ -77,6 +98,7 @@ export const moveImages = (filesToMove, toplevel, secondLevels): string => {
     let message = ''
     let smallfiles: string[] = []
     try {
+      checkPath(smallSourcePath)
       smallfiles = fs.readdirSync(smallSourcePath, 'utf8')
     } catch (err) {
       console.log(`Cannot read small dir: ${smallSourcePath}: ${err}`)
@@ -216,6 +238,7 @@ export const deleteImage = (imageurl): string => {
 export const getFolderImages = (toplevel): string => {
   const topLeveDestination = toplevel
   const dirpattern = /^[^.]*$/
+  checkPath(`${pathToBuild}/${topLeveDestination}`)
   fs.readdir(`${pathToBuild}/${topLeveDestination}`, (err, files) => {
     if (err) {
       console.log(err)
@@ -228,6 +251,98 @@ export const getFolderImages = (toplevel): string => {
     return JSON.stringify('No Files to get.')
   })
   return JSON.stringify({ message: "Can't get the subirectories." })
+}
+
+/**
+ * Process uploaded images for preview - saves files from renderer to temp location and returns preview URLs
+ */
+export const processUploadedImages = async (
+  fileDataArray: Array<{ name: string; data: ArrayBuffer }>
+): Promise<string> => {
+  if (!fileDataArray || fileDataArray.length === 0) {
+    return JSON.stringify([])
+  }
+
+  const tempDir = path.join(app.getPath('temp'), 'site-admin-uploads')
+  checkPath(tempDir)
+  const previewUrls: string[] = []
+  const filePaths: string[] = []
+
+  for (const fileData of fileDataArray) {
+    try {
+      // Save file to temp directory
+      const tempPath = path.join(tempDir, fileData.name)
+      const buffer = Buffer.from(fileData.data)
+      fs.writeFileSync(tempPath, buffer)
+
+      // Store the path for later use
+      filePaths.push(tempPath)
+
+      // Create a file:// URL for preview
+      previewUrls.push(`file://${tempPath}`)
+    } catch (err) {
+      console.error(`Failed to process file ${fileData.name}:`, err)
+    }
+  }
+
+  return JSON.stringify({ previewUrls, filePaths })
+}
+
+/**
+ * Upload and process a blog image - resize and move to blog directory, return relative URL
+ */
+export const uploadBlogImage = async (
+  filePath: string,
+  destination: string = 'blog'
+): Promise<string> => {
+  if (!filePath) {
+    return JSON.stringify({ error: 'No file path provided' })
+  }
+
+  try {
+    const { pathToPublic, pathToBuild } = getPathsFromConfig()
+    const bigDestPath = `${pathToPublic}/images/${destination}/`
+    const smallDestPath = `${pathToPublic}/images/${destination}/smaller/`
+    const bigDestPathBuild = `${pathToBuild}/images/${destination}/`
+    const smallDestPathBuild = `${pathToBuild}/images/${destination}/smaller/`
+
+    // Process the image - create big and small versions
+    const bigResult = await processFile(filePath, 850, bigDestPath)
+    const smallResult = await processFile(filePath, 450, smallDestPath)
+
+    if (typeof bigResult === 'string' || typeof smallResult === 'string') {
+      return JSON.stringify({ error: bigResult || smallResult })
+    }
+
+    const bigImage = bigResult as ProcessedImage
+    const smallImage = smallResult as ProcessedImage
+
+    // Copy to build directories
+    try {
+      checkPath(bigDestPathBuild)
+      checkPath(smallDestPathBuild)
+      fs.copyFileSync(
+        path.join(bigDestPath, bigImage.filename),
+        path.join(bigDestPathBuild, bigImage.filename)
+      )
+      fs.copyFileSync(
+        path.join(smallDestPath, smallImage.filename),
+        path.join(smallDestPathBuild, smallImage.filename)
+      )
+    } catch (err) {
+      console.error('Failed to copy to build directories:', err)
+    }
+
+    // Return the relative URL for the big image (used in blog entries)
+    return JSON.stringify({
+      relativeUrl: bigImage.relativeUrl,
+      filename: bigImage.filename,
+      message: 'Image uploaded successfully'
+    })
+  } catch (err) {
+    console.error('Failed to upload blog image:', err)
+    return JSON.stringify({ error: `Failed to upload image: ${err}` })
+  }
 }
 
 export const uploadImages = async (dest: string, files): Promise<string> => {

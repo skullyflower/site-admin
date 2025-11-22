@@ -1,5 +1,5 @@
 import fs from 'fs'
-import getConfig, { checkPath } from './pathData'
+import getPathsFromConfig, { checkFile } from './pathData'
 
 export interface pageInfo {
   page_title: string
@@ -23,13 +23,13 @@ const defaultValues: SiteInfo = {
   sitelogo: ''
 }
 
-const { pathToPublic } = getConfig()
+const { pathToPublic } = getPathsFromConfig()
 
 const homefilepath = `${pathToPublic}/data/site-data.json`
 
 export const getSiteInfo = (): string => {
   try {
-    checkPath(homefilepath)
+    checkFile(homefilepath, defaultValues)
     const homeData = fs.readFileSync(homefilepath, 'utf8') || JSON.stringify(defaultValues)
     return homeData
   } catch (err) {
@@ -42,6 +42,8 @@ export const updateSiteInfo = (siteInfo): string => {
   if (JSON.parse(siteInfo)) {
     const values = JSON.parse(siteInfo)
     try {
+      checkFile(homefilepath, defaultValues)
+
       const oldHomeDataString = fs.readFileSync(homefilepath, 'utf8')
       const oldHomeObject = JSON.parse(oldHomeDataString)
       const newHomeData = { ...oldHomeObject, ...values }

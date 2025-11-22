@@ -1,15 +1,22 @@
 import { BlogInfo } from './../../shared/types.d'
-import getConfig from './pathData.js'
+import getPathsFromConfig, { checkFile } from './pathData.js'
+import { defaultSiteData } from '../../shared/constants.d'
 import fs from 'fs'
 
-const { pathToPublic } = getConfig()
+const { pathToPublic } = getPathsFromConfig()
 
 const htmlEncodeString = (string): string =>
   string.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
 
 const year = new Date().getUTCFullYear()
 
+checkFile(`${pathToPublic}/data/site-data.json`, defaultSiteData)
 const sitedata = JSON.parse(fs.readFileSync(`${pathToPublic}/data/site-data.json`).toString())
+checkFile(`${pathToPublic}/data/blog-data.json`, {
+  page_title: '',
+  page_description: '',
+  page_content: ''
+})
 const blog_data = JSON.parse(fs.readFileSync(`${pathToPublic}/data/blog-data.json`).toString())
 
 // TODO

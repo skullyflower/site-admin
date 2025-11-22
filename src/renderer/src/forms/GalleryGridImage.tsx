@@ -1,9 +1,5 @@
 import {
   Accordion,
-  AccordionItem,
-  AccordionButton,
-  AccordionPanel,
-  AccordionIcon,
   Box,
   Button,
   Image,
@@ -15,14 +11,28 @@ import {
 } from '@chakra-ui/react'
 import ConfirmDelete from '../components/ConfirmDelete'
 import { useState } from 'react'
+import { buttonRecipe } from '@renderer/themeRecipes'
+import { GalleryImage } from 'src/shared/types'
 
-export const GalleryGridImage = ({ oneImage, imgDir, deleteImage, updateImage }) => {
+interface GalleryGridImageProps {
+  oneImage: GalleryImage
+  imgDir: string
+  deleteImage: (imageurl: string) => () => void
+  updateImage: (imageurl: string, date: string, name: string) => () => void
+}
+
+export const GalleryGridImage = ({
+  oneImage,
+  imgDir,
+  deleteImage,
+  updateImage
+}: GalleryGridImageProps): React.ReactNode => {
   const [title, setTitle] = useState(oneImage.imgtitle)
   const [date, setDate] = useState(oneImage.imgfile.substr(0, 8))
   const imageurl = `${imgDir}/${oneImage.imgfile}`
 
   const imagePath = imageurl.replace('http://localhost:3000/', '')
-  const { isOpen, onOpen, onClose } = useDisclosure()
+  const { open, onOpen: onOpenDelete, onClose: onCloseDelete } = useDisclosure()
 
   return (
     <>
@@ -36,28 +46,23 @@ export const GalleryGridImage = ({ oneImage, imgDir, deleteImage, updateImage })
         _hover={{ background: 'blackAlpha.500' }}
       >
         <Stack alignItems="stretch" gap={2}>
-          <Button alignSelf="right" variant="ghost" size={'sm'} onClick={onOpen}>
+          <Button alignSelf="right" variant="ghost" size={'sm'} onClick={onOpenDelete}>
             delete
           </Button>
-          <Image
-            src={`${imageurl}`}
-            alt={oneImage.imgtitle}
-            boxSize={48}
-            fallbackSrc="http://localhost:3000/images/rain.svg"
-          />
-          <Text size={'xs'}>
+          <Image src={`${imageurl}`} alt={oneImage.imgtitle} boxSize={48} />
+          <Text fontSize={'xs'}>
             {oneImage.imgtitle}
             <span className="smaller"> {' ©' + oneImage.imgyear}</span>
           </Text>
-          <Accordion allowToggle>
-            <AccordionItem>
-              <AccordionButton>
+          <Accordion.Root>
+            <Accordion.Item value="1">
+              <Accordion.ItemTrigger>
                 <Box as="span" flex="1" textAlign="left">
                   Edit
                 </Box>
-                <AccordionIcon />
-              </AccordionButton>
-              <AccordionPanel>
+                <Accordion.ItemIndicator />
+              </Accordion.ItemTrigger>
+              <Accordion.ItemContent>
                 <Stack justifyContent="stretch">
                   <Input
                     value={title}
@@ -75,22 +80,22 @@ export const GalleryGridImage = ({ oneImage, imgDir, deleteImage, updateImage })
                   />
                   <Button
                     alignSelf="right"
-                    variant="primary"
+                    recipe={buttonRecipe}
                     size={'sm'}
                     onClick={updateImage(imagePath, date, title)}
                   >
                     Rename
                   </Button>
                 </Stack>
-              </AccordionPanel>
-            </AccordionItem>
-          </Accordion>
+              </Accordion.ItemContent>
+            </Accordion.Item>
+          </Accordion.Root>
         </Stack>
         <ConfirmDelete
-          which={oneImage.imgfile}
+          what={oneImage.imgfile}
           action={deleteImage(imagePath)}
-          isOpen={isOpen}
-          onClose={onClose}
+          isOpen={open}
+          onClose={onCloseDelete}
         />
       </Box>
       <Spacer />

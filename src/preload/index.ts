@@ -15,6 +15,10 @@ const api = {
     const response = await ipcRenderer.invoke('select-site-directory')
     return (response as string) || undefined
   },
+  previewUploadedImages: async (images: string[]) => {
+    const response = await ipcRenderer.invoke('preview-uploaded-images', images)
+    return JSON.parse(response)
+  },
   // Site Info API functions
   getSiteInfo: async () => {
     const response = await ipcRenderer.invoke('get-site-info')
@@ -93,6 +97,9 @@ const api = {
   }
 }
 
+ipcRenderer.on('file-content', (_event, data) => {
+  console.log('File content received:', data)
+})
 // Process file "uploads"
 // const newPath = webUtils.getPathForFile(document.querySelector('input').files[0]) grabs path so you can move files??
 

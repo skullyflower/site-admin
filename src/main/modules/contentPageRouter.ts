@@ -1,16 +1,18 @@
 import { readdirSync, readFileSync, writeFileSync } from 'fs'
-import getConfig from './pathData'
+import getPathsFromConfig, { checkFile, checkPath } from './pathData'
 
-const { pathToPublic } = getConfig()
+const { pathToPublic } = getPathsFromConfig()
 const rootdir = `${pathToPublic}/data`
 
 export const getPages = (): string => {
+  checkPath(rootdir)
   const files = readdirSync(rootdir)
   return JSON.stringify({ files: files })
 }
 
 export const getPage = (page): string => {
   const pagefilepath = `${rootdir}/${page}-data.json`
+  checkFile(pagefilepath, { page_title: '', page_description: '', page_content: '' })
   const pageDataJson = readFileSync(pagefilepath, 'utf8')
   const pageData = JSON.parse(pageDataJson)
   if (pageData) {
@@ -23,6 +25,7 @@ export const updatePage = (page, body): string => {
   const pagefilepath = `${rootdir}/${page}-data.json`
   if (body) {
     try {
+      checkFile(pagefilepath, { page_title: '', page_description: '', page_content: '' })
       const oldpageDataString = readFileSync(pagefilepath, 'utf8')
       const oldpageObject = JSON.parse(oldpageDataString)
       const newpageData = { ...oldpageObject, ...body }

@@ -1,4 +1,5 @@
-import { Dialog, Portal } from '@chakra-ui/react'
+import { Button, Dialog, Portal } from '@chakra-ui/react'
+import { buttonRecipe } from '@renderer/themeRecipes'
 
 interface FloatingFormWrapperProps {
   isOpen: boolean
@@ -13,7 +14,7 @@ const FloatingFormWrapper = ({
   return (
     <Dialog.Root
       placement="center"
-      size="4xl"
+      size="lg"
       open={isOpen}
       onOpenChange={(e) => {
         if (!e.open) {
@@ -34,6 +35,11 @@ const FloatingFormWrapper = ({
             overflow={'auto'}
             className="content"
           >
+            <Dialog.CloseTrigger asChild>
+              <Button recipe={buttonRecipe} onClick={onClose}>
+                Never mind
+              </Button>
+            </Dialog.CloseTrigger>
             <Dialog.Body>{children}</Dialog.Body>
           </Dialog.Content>
         </Dialog.Positioner>

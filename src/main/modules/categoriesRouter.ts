@@ -1,8 +1,8 @@
 import fs from 'fs'
-import getConfig from './pathData'
+import getPathsFromConfig, { checkFile } from './pathData'
 import processFile from './imageProcessor'
 
-const { pathToPublic } = getConfig()
+const { pathToPublic } = getPathsFromConfig()
 const shopfilepath = `${pathToPublic}/data/categories.json`
 
 export const updateShopCategories = (category, files): string => {
@@ -34,6 +34,8 @@ export const updateShopCategories = (category, files): string => {
           }
         }
       }
+      checkFile(shopfilepath, { categories: [] })
+      checkFile(shopfilepath.replace('public', 'build'), { categories: [] })
       const oldShopDataString = fs.readFileSync(shopfilepath)
       const oldShopObject = JSON.parse(oldShopDataString.toString())
       //categories:[]
@@ -59,6 +61,7 @@ export const updateShopCategories = (category, files): string => {
 }
 
 export const getAllCategories = (): string => {
+  checkFile(shopfilepath, { categories: [] })
   const shopData = fs.readFileSync(shopfilepath)
   const shop = JSON.parse(shopData.toString())
   if (shop.categories) {
@@ -71,6 +74,7 @@ export const getAllCategories = (): string => {
 export const deleteCategory = (catId): string => {
   try {
     const catToDelete = catId
+    checkFile(shopfilepath, { categories: [] })
     const shopData = fs.readFileSync(shopfilepath)
     const shop = JSON.parse(shopData.toString())
     if (

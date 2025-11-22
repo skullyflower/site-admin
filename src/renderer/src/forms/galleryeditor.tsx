@@ -12,7 +12,7 @@ import {
   Heading
 } from '@chakra-ui/react'
 import FloatingFormWrapper from '../components/floatingformwrap'
-import { useForm } from 'react-hook-form'
+import { useForm, useWatch } from 'react-hook-form'
 import { newGalleryId } from '../pages/galleriespage'
 import { Gallery } from 'src/shared/types'
 import StyledInput from '@renderer/components/StyledInput'
@@ -36,7 +36,7 @@ export default function EditGallery({
     register,
     handleSubmit,
     formState: { errors },
-    watch,
+    control,
     setValue
   } = useForm({ defaultValues: selectedGallery, mode: 'onChange' })
 
@@ -45,33 +45,22 @@ export default function EditGallery({
     setWysiwygText(newText)
   }
 
-  const path = watch('path')
+  const path = useWatch({ control, name: 'path' })
   useEffect(() => {
     if (path) {
       setValue('json_path', `/data/${path}.json`)
     }
   }, [path, setValue])
 
-  const onSubmit = (data) => {
-    fetch('http://localhost:4242/api/galleries', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ gallery: data })
-    })
-      .then((res) => res.json())
-      .then(() => {
-        toggleForm()
-      })
-      .catch((err) => {
-        console.log(err)
-      })
-  }
+  // const onSubmit = (data) => {
+  //   window.api.updateGallery(data).then(() => {
+  //     toggleForm()
+  //   })
+  // }
 
   return (
     <FloatingFormWrapper isOpen={isOpen} onClose={toggleForm}>
-      <Box size="xl">
+      <Box>
         <Flex justifyContent="space-between">
           <Heading size="md">Add/Edit Gallery Information</Heading>
           <Button onClick={toggleForm}>Never mind</Button>
@@ -140,7 +129,7 @@ export default function EditGallery({
               className="content"
             >
               <StyledInput
-                value={wysiwygText}
+                value={wysiwygText || ''}
                 onChange={handleTextChange()}
                 placeholder="Add Content Here..."
               />
@@ -161,7 +150,7 @@ export default function EditGallery({
             <Field.Label w={40}>
               Sort Old to new: <InfoBubble message={`Optional, mostly for comic stories.`} />
             </Field.Label>
-            <Checkbox {...register('isStory')} />
+            <Checkbox.Root {...register('isStory')} />
           </HStack>
         </Field.Root>
         <Center>

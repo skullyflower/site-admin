@@ -1,13 +1,14 @@
-import { useState } from 'react'
-import { useForm } from 'react-hook-form'
+import { useForm, useWatch } from 'react-hook-form'
 import { convertDate } from '../components/datetimebit'
 import UploadInput from '../components/upload-input'
 import InfoBubble from '../components/info-bubble'
-import { Box, Button, Field, Image, Input, HStack, Center, Heading, Stack } from '@chakra-ui/react'
+import { Box, Button, Field, Input, HStack, Center, Heading, Stack, Image } from '@chakra-ui/react'
 import FloatingFormWrapper from '../components/floatingformwrap'
 import StyledInput from '@renderer/components/StyledInput'
 import { buttonRecipe } from '@renderer/themeRecipes'
-import { BlogEntry } from 'src/shared/types'
+import { BlogEntry, SiteInfo } from 'src/shared/types'
+import imageLoading from '@renderer/assets/image-loading.svg'
+import TagSelector from '@renderer/components/TagSelector'
 
 const today = new Date()
 
@@ -21,58 +22,64 @@ const newblog = {
   imgcaption: '',
   heading: '',
   text: '',
-  newImage: []
-}
+  tags: []
+} as BlogEntry
 
 const EditBlogEntry = ({
   blogid,
   blogEntries,
   isOpen,
   toggleForm,
-  onSubmit
+  onSubmit,
+  sitedata
 }: {
   blogid: string
   blogEntries: BlogEntry[]
   isOpen: boolean
   toggleForm: () => void
   onSubmit: (data: BlogEntry) => void
+  sitedata: SiteInfo
 }): React.JSX.Element => {
   const thisEntry = blogEntries.find((blog) => blog.id === blogid) || newblog
-  const [wysiwygText, setWysiwygText] = useState(thisEntry.text)
 
   if (blogid !== 'newentry' && thisEntry) {
     const ms = Date.parse(thisEntry.date)
     const entrydate = new Date(ms)
     thisEntry.date = convertDate(entrydate, 'input')
   }
+
   const {
+    control,
     register,
     handleSubmit,
     formState: { errors },
     getValues,
-    setValue,
-    watch
+    setValue
   } = useForm({ defaultValues: thisEntry, mode: 'onChange' })
 
   const handleImageFocus = (input) => () => {
-    if (!getValues(input)) setValue(input, 'https://www.skullyflower.com/...')
+    if (!getValues(input)) setValue(input, `${sitedata?.live_site_url}/images/...`)
   }
 
-  const handleTextChange = () => (newText) => {
+  const handleImageUpload = (paths: string[]): void => {
+    if (paths.length > 0) {
+      const blogImage = `${sitedata?.live_site_url}/images/blog/${paths[0].split('/').pop()}`
+      setValue('image', blogImage)
+    }
+  }
+
+  const handleTextChange = (newText: string): void => {
     setValue('text', newText)
-    setWysiwygText(newText)
   }
 
-  const thumb = watch('image')
+  const thumb = useWatch({ control: control, name: 'image' }) || ''
+
   return (
     <FloatingFormWrapper isOpen={isOpen} onClose={toggleForm}>
       <Stack justifyContent="space-between">
-        <HStack w="100%" justifyContent="space-between">
-          <Heading textAlign="center" size="md">
-            Add/Edit Blog Entries
-          </Heading>
-          <Button onClick={toggleForm}>Never mind</Button>
-        </HStack>
+        <Heading textAlign="center" size="md">
+          Add/Edit Blog Entries
+        </Heading>
         <Field.Root p={4} invalid={errors.id ? true : false}>
           <HStack>
             <Field.Label w={40}>
@@ -92,7 +99,7 @@ const EditBlogEntry = ({
           </HStack>
         </Field.Root>
         <Field.Root p={4} invalid={errors.title ? true : false}>
-          <HStack alignItems="center">
+          <HStack alignItems="center" width={'100%'}>
             <Field.Label w={40}>Entry Title:</Field.Label>
             <Input
               _invalid={{ borderColor: 'red.300' }}
@@ -102,60 +109,59 @@ const EditBlogEntry = ({
           </HStack>
         </Field.Root>
         <Field.Root p={4}>
-          <HStack alignItems="top">
-            <Field.Label w={40}>Blog Image:</Field.Label>
-            <Box
-              width={'100%'}
-              flexGrow={3}
-              borderWidth={1}
-              borderStyle="solid"
-              borderRadius={4}
-              p={5}
-            >
-              <Field.Root>
-                <HStack alignItems="top">
-                  <Field.Label w={40}>
-                    Upload New Image{' '}
-                    <InfoBubble
-                      message={`This Image will need to be uploaded to the server. All blog entries require absolute urls.`}
-                    />
-                  </Field.Label>
-                  <UploadInput name="newImage" multiple={false} register={register} />
-                </HStack>
-              </Field.Root>
-              <Field.Root p={4} invalid={errors.image ? true : false}>
-                <HStack alignItems="center">
-                  <Field.Label w={40}>
-                    Or edit image url:{' '}
-                    <InfoBubble message=" (This value will be overwritten if you select a new image to upload.)" />
-                  </Field.Label>
-                  <Input
-                    _invalid={{ borderColor: 'red.300' }}
-                    placeholder="https://www.skullyflower.com/images/..."
-                    onFocus={handleImageFocus('image')}
-                    type="text"
-                    {...register('image')}
+          <Field.Label>Blog Image:</Field.Label>
+          <Box
+            width={'100%'}
+            flexGrow={3}
+            borderWidth={1}
+            borderStyle="solid"
+            borderRadius={4}
+            borderColor="gray.300"
+            p={5}
+          >
+            <Field.Root>
+              <HStack alignItems="top">
+                <Field.Label w={40}>
+                  Upload New Image{' '}
+                  <InfoBubble
+                    message={`Select an image to upload. It will be resized and saved automatically.`}
                   />
-                  <Image
-                    src={`${thumb}`}
-                    boxSize="100px"
-                    onError={(e) => {
-                      e.currentTarget.src = 'http://localhost:3000/images/image-loading.svg'
-                    }}
-                  />
-                </HStack>
-              </Field.Root>
-            </Box>
-          </HStack>
+                </Field.Label>
+                <UploadInput multiple={false} onUpload={handleImageUpload} />
+              </HStack>
+            </Field.Root>
+            <Field.Root p={4} invalid={errors.image ? true : false}>
+              <HStack alignItems="center">
+                <Field.Label w={40}>
+                  Or edit image url:{' '}
+                  <InfoBubble message=" (This value will be overwritten if you select a new image to upload.)" />
+                </Field.Label>
+                <Input
+                  _invalid={{ borderColor: 'red.300' }}
+                  placeholder={`${sitedata?.live_site_url}/images/blog/...`}
+                  onFocus={handleImageFocus('image')}
+                  type="text"
+                  {...register('image')}
+                />
+                <Image
+                  src={thumb.replace(sitedata?.live_site_url || '', 'http://localhost:3000')}
+                  boxSize="100px"
+                  onError={(e) => {
+                    e.currentTarget.src = imageLoading
+                  }}
+                />
+              </HStack>
+            </Field.Root>
+          </Box>
         </Field.Root>
         <Field.Root p={4} invalid={errors.imagealt ? true : false}>
-          <HStack alignItems="center">
+          <HStack alignItems="center" width={'100%'}>
             <Field.Label w={40}>Alt Text:</Field.Label>
             <Input _invalid={{ borderColor: 'red.300' }} type="text" {...register('imagealt')} />
           </HStack>
         </Field.Root>
         <Field.Root p={4}>
-          <HStack alignItems="center">
+          <HStack alignItems="center" width={'100%'}>
             <Field.Label w={40}>Content Link:</Field.Label>
             <Input
               className={errors.imagelink ? 'is-invalid' : ''}
@@ -166,7 +172,7 @@ const EditBlogEntry = ({
           </HStack>
         </Field.Root>
         <Field.Root p={4}>
-          <HStack alignItems="center">
+          <HStack alignItems="center" width={'100%'}>
             <Field.Label w={40}>Image Caption:</Field.Label>
             <Input
               className={errors.imgcaption ? 'is-invalid' : ''}
@@ -176,7 +182,7 @@ const EditBlogEntry = ({
           </HStack>
         </Field.Root>
         <Field.Root p={4} invalid={errors.heading ? true : false}>
-          <HStack alignItems="center">
+          <HStack alignItems="center" width={'100%'}>
             <Field.Label w={40}>Heading:</Field.Label>
             <Input
               _invalid={{ borderColor: 'red.300' }}
@@ -186,11 +192,11 @@ const EditBlogEntry = ({
           </HStack>
         </Field.Root>
         <Field.Root p={4}>
-          <HStack alignItems="top">
+          <HStack alignItems="top" width="100%">
             <Field.Label w={40}>Blog Content:</Field.Label>
             <Box width="100%" minH={2} border="1px solid gray" borderRadius={5} className="content">
               <StyledInput
-                value={wysiwygText}
+                value={getValues('text')}
                 onChange={handleTextChange}
                 placeholder="Add Content Here..."
               />
@@ -198,11 +204,20 @@ const EditBlogEntry = ({
           </HStack>
         </Field.Root>
         <div>
-          <label>Tags</label>
-          TODO: add tags for filtering.
+          <TagSelector
+            value={thisEntry?.tags || []}
+            onChange={(values: string[]) => setValue('tags', values)}
+            allowCustomValue
+          />
         </div>
         <Center>
-          <Button recipe={buttonRecipe} onClick={handleSubmit(onSubmit)}>
+          <Button
+            recipe={buttonRecipe}
+            paddingBlock={2}
+            onClick={handleSubmit(async (data) => {
+              onSubmit(data)
+            })}
+          >
             Submit Changes
           </Button>
         </Center>

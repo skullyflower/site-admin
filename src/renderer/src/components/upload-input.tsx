@@ -1,68 +1,69 @@
 import { useState } from 'react'
-import { Box, HStack, Input } from '@chakra-ui/react'
+import { HStack, Input, Stack } from '@chakra-ui/react'
 import ImagePreview from './image-preview'
-import { UseFormRegister } from 'react-hook-form'
+import backgroundImage from '@renderer/assets/image-loading.svg'
 
 interface UploadInputProps {
-  name: string
   setImageCount?: (count: number) => void
   multiple: boolean
-  register: UseFormRegister<any> // eslint-disable-line @typescript-eslint/no-explicit-any
+  onUpload: (filePaths: string[]) => void
 }
 const UploadInput = ({
-  name,
   setImageCount,
-  register,
+  onUpload,
   multiple = true
 }: UploadInputProps): React.ReactNode => {
   const [previewImages, setPreviewImages] = useState<string[]>([])
 
   const addMultipleImages = (e: React.ChangeEvent<HTMLInputElement>): void => {
     if (e.target.files) {
-      const imageArray = Array.from(e.target.files).map((file) => URL.createObjectURL(file))
-      if (!multiple) {
-        setPreviewImages([])
-      }
-      setPreviewImages(imageArray)
-      if (setImageCount) {
-        setImageCount(imageArray.length)
-      }
+      const imageArray = Array.from(e.target.files).map((file: File) => file)
+      window.api.getPreviewImages(imageArray).then((result) => {
+        setPreviewImages(result)
+        onUpload(result)
+        if (setImageCount) {
+          setImageCount(result.length)
+        }
+      })
     }
   }
 
   return (
-    <Box>
-      <Input
-        {...register(name)}
-        type="file"
-        accept="image/*"
-        multiple={multiple}
-        width={350}
-        height={previewImages?.length > 0 ? 50 : 150}
-        paddingTop={previewImages?.length > 0 ? 2 : 10}
-        paddingLeft={10}
-        backgroundImage={'/images/image-loading.svg'}
-        borderColor={'slate.800'}
-        borderWidth={2}
-        borderStyle={'solid'}
-        _before={
-          previewImages?.length > 0
-            ? {
-                content: '"Remove and Select New"',
-                display: 'block',
-                lineHeight: 2,
-                fontWeight: 700
-              }
-            : undefined
-        }
-        onChange={addMultipleImages}
-      />
+    <Stack width="100%" height="150px">
       <HStack>
-        {previewImages?.length > 0 && (
-          <ImagePreview images={previewImages} updateImages={setPreviewImages} />
+        {previewImages?.length > 0 ? (
+          <ImagePreview
+            images={previewImages}
+            updateImages={(images: string[]) => setPreviewImages(images)}
+          />
+        ) : (
+          <Input
+            type="file"
+            accept="image/*"
+            multiple={multiple}
+            width={350}
+            height={previewImages?.length > 0 ? 50 : 150}
+            paddingTop={previewImages?.length > 0 ? 2 : 10}
+            paddingLeft={10}
+            backgroundImage={backgroundImage}
+            borderColor={'slate.800'}
+            borderWidth={2}
+            borderStyle={'solid'}
+            _before={
+              previewImages?.length > 0
+                ? {
+                    content: '"Remove and Select New"',
+                    display: 'block',
+                    lineHeight: 2,
+                    fontWeight: 700
+                  }
+                : undefined
+            }
+            onChange={addMultipleImages}
+          />
         )}
       </HStack>
-    </Box>
+    </Stack>
   )
 }
 export default UploadInput
