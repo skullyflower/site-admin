@@ -1,48 +1,29 @@
 import fs from 'fs'
 import getPathsFromConfig, { checkFile } from './pathData'
-
-export interface pageInfo {
-  page_title: string
-  page_description: string
-  page_content: string
-}
-export interface SiteInfo extends pageInfo {
-  company_name: string
-  site_theme: string
-  live_site_url: string
-  sitelogo: string
-}
-
-const defaultValues: SiteInfo = {
-  page_title: '',
-  page_description: '',
-  page_content: '',
-  company_name: '',
-  site_theme: '',
-  live_site_url: '',
-  sitelogo: ''
-}
+import { siteFile, defaultSiteData } from '../../shared/constants.d'
 
 const { pathToPublic } = getPathsFromConfig()
 
-const homefilepath = `${pathToPublic}/data/site-data.json`
-
 export const getSiteInfo = (): string => {
+  const homefilepath = pathToPublic ? `${pathToPublic}/data/${siteFile}` : null
   try {
-    checkFile(homefilepath, defaultValues)
-    const homeData = fs.readFileSync(homefilepath, 'utf8') || JSON.stringify(defaultValues)
+    if (!homefilepath) throw new Error('No path to site found.')
+    checkFile(homefilepath, defaultSiteData)
+    const homeData = fs.readFileSync(homefilepath, 'utf8') || JSON.stringify(defaultSiteData)
     return homeData
   } catch (err) {
     console.log(err)
-    return JSON.stringify(defaultValues)
+    return JSON.stringify(defaultSiteData)
   }
 }
 
 export const updateSiteInfo = (siteInfo): string => {
+  const homefilepath = pathToPublic ? `${pathToPublic}/data/${siteFile}` : null
+  if (!homefilepath) throw new Error('No path to site found.')
   if (JSON.parse(siteInfo)) {
     const values = JSON.parse(siteInfo)
     try {
-      checkFile(homefilepath, defaultValues)
+      checkFile(homefilepath, defaultSiteData)
 
       const oldHomeDataString = fs.readFileSync(homefilepath, 'utf8')
       const oldHomeObject = JSON.parse(oldHomeDataString)

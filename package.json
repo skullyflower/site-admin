@@ -1,10 +1,11 @@
 {
   "name": "site-admin",
+  "productName": "WebSite Config",
   "version": "1.0.0",
-  "description": "An Electron application with React and TypeScript",
+  "description": "An application to manage small websites.",
   "main": "./out/main/index.js",
-  "author": "example.com",
-  "homepage": "https://electron-vite.org",
+  "author": "skullyflower.com",
+  "homepage": "https://www.skullyflower.com",
   "scripts": {
     "format": "prettier --write .",
     "lint": "eslint --cache .",

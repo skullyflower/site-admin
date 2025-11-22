@@ -1,6 +1,6 @@
 import { BlogInfo } from './../../shared/types.d'
 import getPathsFromConfig, { checkFile } from './pathData.js'
-import { defaultSiteData } from '../../shared/constants.d'
+import { blogFile, defaultBlogInfo, defaultSiteData, siteFile } from '../../shared/constants.d'
 import fs from 'fs'
 
 const { pathToPublic } = getPathsFromConfig()
@@ -10,18 +10,22 @@ const htmlEncodeString = (string): string =>
 
 const year = new Date().getUTCFullYear()
 
-checkFile(`${pathToPublic}/data/site-data.json`, defaultSiteData)
-const sitedata = JSON.parse(fs.readFileSync(`${pathToPublic}/data/site-data.json`).toString())
-checkFile(`${pathToPublic}/data/blog-data.json`, {
-  page_title: '',
-  page_description: '',
-  page_content: ''
-})
-const blog_data = JSON.parse(fs.readFileSync(`${pathToPublic}/data/blog-data.json`).toString())
-
-// TODO
-// need to Grab title from site-data.json file and inject it.
 const processRss = (blogData: BlogInfo): string => {
+  if (pathToPublic) {
+    checkFile(`${pathToPublic}/data/${siteFile}`, defaultSiteData)
+    checkFile(`${pathToPublic}/data/${blogFile}`, defaultBlogInfo)
+  } else {
+    throw new Error('No path to site or blog data found.')
+  }
+  const sitedata = pathToPublic
+    ? JSON.parse(fs.readFileSync(`${pathToPublic}/data/${siteFile}`).toString())
+    : null
+
+  const blog_data = pathToPublic
+    ? JSON.parse(fs.readFileSync(`${pathToPublic}/data/${blogFile}`).toString())
+    : null
+
+  if (!blog_data || !sitedata) throw new Error('No blog data or site data found.')
   let rssString = `<?xml version="1.0" encoding="UTF-8"?>
   <rss xmlns:dc="http://purl.org/dc/elements/1.1/" version="2.0"
   xmlns:atom="http://www.w3.org/2005/Atom"

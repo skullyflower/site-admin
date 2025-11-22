@@ -1,5 +1,6 @@
 import { Box, Image, HStack, Text, Stack } from '@chakra-ui/react'
 import ReactMarkdown from 'react-markdown'
+import { SiteInfo } from 'src/shared/types'
 
 function HomePagePreview({ pageData }: { pageData: SiteInfo }): React.JSX.Element {
   if (!pageData) {
@@ -7,7 +8,7 @@ function HomePagePreview({ pageData }: { pageData: SiteInfo }): React.JSX.Elemen
   }
   return (
     <Box p={5}>
-      <Stack gap={4}>
+      <Stack gap={4} width="100%" alignItems="stretch">
         <HStack alignItems="center" gap={4}>
           <Text fontWeight="bold" w={48}>
             Home Page Title:{' '}

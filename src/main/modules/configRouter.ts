@@ -8,14 +8,13 @@ interface ConfigResponse {
 export const updateAdminConfig = (config: AdminConfig): string => {
   if (config.pathToSite) {
     try {
-      checkFile(configfilepath, { pathToSite: '' })
+      checkFile(configfilepath, { pathToSite: config.pathToSite })
       const configData: AdminConfig = config as AdminConfig
       fs.writeFileSync(configfilepath, JSON.stringify(configData))
       const response: ConfigResponse = { message: 'Updated Config page data!' }
       return JSON.stringify(response)
     } catch (err: unknown) {
-      console.log(err)
-      const response: ConfigResponse = { message: 'Config page data update failed.' }
+      const response: ConfigResponse = { message: `Config page data update failed. ${err}` }
       return JSON.stringify(response)
     }
   } else {
@@ -27,13 +26,13 @@ export const updateAdminConfig = (config: AdminConfig): string => {
 export const getAdminConfig = (): string => {
   checkFile(configfilepath, { pathToSite: '' })
   try {
-    checkFile(configfilepath, { pathToSite: '' })
     const configDataString: string = fs.readFileSync(configfilepath, 'utf8')
     const configDataObject: AdminConfig = JSON.parse(configDataString)
+    if (!configDataObject.pathToSite) throw new Error('No path to site found.')
     return JSON.stringify(configDataObject)
   } catch (err: unknown) {
     console.log(err)
-    const response: ConfigResponse = { message: 'Config page data retrieval failed.' }
+    const response: ConfigResponse = { message: `Config page data retrieval failed. ${err}` }
     return JSON.stringify(response)
   }
 }

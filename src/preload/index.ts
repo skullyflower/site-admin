@@ -1,5 +1,6 @@
-import { contextBridge, ipcRenderer } from 'electron'
+import { contextBridge, ipcRenderer, webUtils } from 'electron'
 import { electronAPI /* , WebUtils */ } from '@electron-toolkit/preload'
+import { BlogEntry } from '../shared/types'
 
 // Custom APIs for renderer
 const api = {
@@ -14,10 +15,6 @@ const api = {
   selectSiteDirectory: async () => {
     const response = await ipcRenderer.invoke('select-site-directory')
     return (response as string) || undefined
-  },
-  previewUploadedImages: async (images: string[]) => {
-    const response = await ipcRenderer.invoke('preview-uploaded-images', images)
-    return JSON.parse(response)
   },
   // Site Info API functions
   getSiteInfo: async () => {
@@ -37,8 +34,7 @@ const api = {
     const response = await ipcRenderer.invoke('update-blog-info', values)
     return JSON.parse(response)
   },
-
-  updateBlogPost: async (entry, files) => {
+  updateBlogPost: async (entry: BlogEntry, files: FileList) => {
     const response = await ipcRenderer.invoke('update-blog-post', entry, files)
     return JSON.parse(response)
   },
@@ -47,6 +43,7 @@ const api = {
     const response = await ipcRenderer.invoke('delete-entry', id)
     return JSON.parse(response)
   },
+  // Shop API functions
   getSale: async () => {
     const response = await ipcRenderer.invoke('get-sale')
     return JSON.parse(response)
@@ -55,6 +52,31 @@ const api = {
     const response = await ipcRenderer.invoke('set-sale', sale)
     return JSON.parse(response)
   },
+  getProducts: async () => {
+    const response = await ipcRenderer.invoke('get-products')
+    return JSON.parse(response)
+  },
+  updateProduct: async (product: string) => {
+    const response = await ipcRenderer.invoke('update-product', product)
+    return JSON.parse(response)
+  },
+  getSubjects: async () => {
+    const response = await ipcRenderer.invoke('get-subjects')
+    return JSON.parse(response)
+  },
+  updateSubject: async (subject: string) => {
+    const response = await ipcRenderer.invoke('update-subject', subject)
+    return JSON.parse(response)
+  },
+  getCategories: async () => {
+    const response = await ipcRenderer.invoke('get-categories')
+    return JSON.parse(response)
+  },
+  updateCategory: async (category: string) => {
+    const response = await ipcRenderer.invoke('update-category', category)
+    return JSON.parse(response)
+  },
+  // Gallery API functions
   getGalleries: async () => {
     const response = await ipcRenderer.invoke('get-galleries')
     return JSON.parse(response)
@@ -71,8 +93,22 @@ const api = {
     const response = await ipcRenderer.invoke('reset-gallery', gallery)
     return JSON.parse(response)
   },
+  // Image API functions
   getStagedImages: async () => {
     const response = await ipcRenderer.invoke('get-staged-images')
+    return JSON.parse(response)
+  },
+  getPreviewImages: async (files: File[]) => {
+    const fileArray = files.map((file) => webUtils.getPathForFile(file))
+    const response = await ipcRenderer.invoke('get-preview-images', fileArray)
+    return response as string[]
+  },
+  processUploadedImages: async (fileDataArray: Array<{ name: string; data: ArrayBuffer }>) => {
+    const response = await ipcRenderer.invoke('process-uploaded-images', fileDataArray)
+    return JSON.parse(response)
+  },
+  uploadBlogImage: async (filePath: string, destination: string) => {
+    const response = await ipcRenderer.invoke('upload-blog-image', filePath, destination)
     return JSON.parse(response)
   },
   moveImages: async (filesToMove: string, toplevel: string, secondLevels: string) => {
@@ -91,14 +127,14 @@ const api = {
     const response = await ipcRenderer.invoke('get-folder-images', toplevel)
     return JSON.parse(response)
   },
-  uploadImages: async (dest: string, files: string) => {
+  uploadImages: async (dest: string, files: string[]) => {
     const response = await ipcRenderer.invoke('upload-images', dest, files)
     return JSON.parse(response)
   }
 }
 
 ipcRenderer.on('file-content', (_event, data) => {
-  console.log('File content received:', data)
+  return data
 })
 // Process file "uploads"
 // const newPath = webUtils.getPathForFile(document.querySelector('input').files[0]) grabs path so you can move files??

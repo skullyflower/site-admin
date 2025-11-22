@@ -3,20 +3,20 @@ import fs from 'fs'
 import processRss from './processBlogRSS.js'
 import processFile from './imageProcessor'
 import getPathsFromConfig, { checkFile } from './pathData.js'
-import { emptyBlogInfo } from '../../shared/constants.d'
+import { blogFile, blogRSSFile, defaultBlogInfo } from '../../shared/constants.d'
 import path from 'path'
 
 const { pathToPublic, pathToBuild } = getPathsFromConfig()
 
 const tempPath = path.join(pathToPublic, 'temp')
-const blogfilepath = `${pathToPublic}/data/blog_data.json`
-const blogfilepath_build = `${pathToBuild}/data/blog_data.json`
-const blogRSSpath = `${pathToPublic}/data/blog.rss`
-const blogRSSpath_build = `${pathToBuild}/data/blog.rss`
+const blogfilepath = `${pathToPublic}/data/${blogFile}`
+const blogfilepath_build = `${pathToBuild}/data/${blogFile}`
+const blogRSSpath = `${pathToPublic}/data/${blogRSSFile}`
+const blogRSSpath_build = `${pathToBuild}/data/${blogRSSFile}`
 
 export const getBlogs = (): string => {
   try {
-    checkFile(blogfilepath, { page_title: '', page_description: '', page_content: '', entries: [] })
+    checkFile(blogfilepath, defaultBlogInfo)
     const blogData = fs.readFileSync(blogfilepath)
     const blogObject: BlogInfo = JSON.parse(blogData.toString()) as BlogInfo
     if (blogObject) {
@@ -33,7 +33,7 @@ export const getBlogs = (): string => {
 export const updateBlogInfo = (blogInfo): string => {
   if (blogInfo) {
     try {
-      checkFile(blogfilepath, emptyBlogInfo)
+      checkFile(blogfilepath, defaultBlogInfo)
       const oldpageDataString = fs.readFileSync(blogfilepath)
       const oldpageObject: BlogInfo = JSON.parse(oldpageDataString.toString()) as BlogInfo
       const newpageData = { ...oldpageObject, ...blogInfo }
@@ -52,7 +52,7 @@ export const updateBlogInfo = (blogInfo): string => {
 export const updateBlogPost = (entry: BlogEntry): string => {
   if (entry) {
     try {
-      checkFile(blogfilepath, emptyBlogInfo)
+      checkFile(blogfilepath, defaultBlogInfo)
       const blogInfoData = fs.readFileSync(blogfilepath)
       const blogObject: BlogInfo = JSON.parse(blogInfoData.toString()) as BlogInfo
 
@@ -102,7 +102,7 @@ export const updateBlogPost = (entry: BlogEntry): string => {
 
 export const deletEntry = (blogid: string): string => {
   try {
-    checkFile(blogfilepath, emptyBlogInfo)
+    checkFile(blogfilepath, defaultBlogInfo)
     const blogJSONString = fs.readFileSync(blogfilepath)
     const blogData: BlogInfo = JSON.parse(blogJSONString.toString()) as BlogInfo
     const entryToDelete = blogData.entries.find((entry) => entry.id === blogid)

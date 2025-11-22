@@ -1,7 +1,7 @@
 import { app, shell, BrowserWindow, ipcMain, dialog, OpenDialogReturnValue } from 'electron'
 import path, { join } from 'path'
 import { electronApp, optimizer } from '@electron-toolkit/utils'
-import icon from '../../resources/icon.png?asset'
+import icon from '../../resources/SiteAdmin.png?asset'
 
 import { getBlogs, updateBlogInfo, updateBlogPost, deletEntry } from './modules/blogRouter'
 import { getSiteInfo, updateSiteInfo } from './modules/homeRouter'
@@ -112,9 +112,7 @@ ipcMain.handle('select-site-directory', () => {
 // Blog API functions
 ipcMain.handle('get-blogs', getBlogs)
 ipcMain.handle('update-blog-info', updateBlogInfo)
-ipcMain.handle('update-blog-post', (_event, entry: BlogEntry, files: FileLike[]) =>
-  updateBlogPost(entry, files)
-)
+ipcMain.handle('update-blog-post', (_event, entry: BlogEntry) => updateBlogPost(entry))
 ipcMain.handle('delete-entry', (_event, blogid: string) => deletEntry(blogid))
 // Site Info API functions
 ipcMain.handle('get-site-info', getSiteInfo)

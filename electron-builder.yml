@@ -1,5 +1,5 @@
 appId: com.electron.app
-productName: site-admin
+productName: WebSite Config
 directories:
   buildResources: build
 files:
@@ -12,7 +12,7 @@ files:
 asarUnpack:
   - resources/**
 win:
-  executableName: site-admin
+  executableName: WebSite Config
 nsis:
   artifactName: ${name}-${version}-setup.${ext}
   shortcutName: ${productName}

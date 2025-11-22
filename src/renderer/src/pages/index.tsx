@@ -19,15 +19,17 @@ const WelcomePage = (): React.JSX.Element => {
     })
   }, [])
   useEffect(() => {
-    window.api.getSiteInfo().then((response: ApiMessageResponse | SiteInfo) => {
-      if (typeof response === 'object' && 'sitename' in response) {
-        setSitename(response.sitename as string)
-      } else {
-        setSitename('Spa-Shop')
-        setMessages((response as ApiMessageResponse).message as string)
-      }
-    })
-  }, [])
+    if (pathToSite) {
+      window.api.getSiteInfo().then((response: ApiMessageResponse | SiteInfo) => {
+        if (typeof response === 'object' && 'sitename' in response) {
+          setSitename(response.sitename as string)
+        } else {
+          setSitename('Spa-Shop')
+          setMessages((response as ApiMessageResponse).message as string)
+        }
+      })
+    }
+  }, [pathToSite])
 
   if (pathToSite) {
     return (

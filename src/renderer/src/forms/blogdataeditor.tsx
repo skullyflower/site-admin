@@ -2,19 +2,10 @@
 //import { modules, formats } from '../components/quillbits'
 import { useForm, UseFormReturn } from 'react-hook-form'
 import InfoBubble from '../components/info-bubble'
-import {
-  Accordion,
-  Box,
-  Button,
-  Field,
-  Input,
-  HStack,
-  Center,
-  Heading,
-  Textarea
-} from '@chakra-ui/react'
+import { Accordion, Box, Button, Field, Input, HStack, Center, Heading } from '@chakra-ui/react'
 import { buttonRecipe } from '@renderer/themeRecipes/button.recipe'
 import { BlogInfo } from 'src/shared/types'
+import StyledInput from '@renderer/components/StyledInput'
 
 const EditBlogData = ({
   blogInfo,
@@ -30,8 +21,9 @@ const EditBlogData = ({
     register,
     reset,
     handleSubmit,
-    formState
-    //setValue
+    formState,
+    getValues,
+    setValue
   }: UseFormReturn<BlogInfo, unknown, BlogInfo> = useForm({
     defaultValues: blogInfo,
     mode: 'onChange'
@@ -39,14 +31,13 @@ const EditBlogData = ({
 
   const { errors } = formState
 
-  // const handleTextChange = (formfield: keyof BlogInfo) => (newText: string) => {
-  //   setValue(formfield, newText)
-  //   setWysiwygText(newText)
-  // }
+  const handleTextChange = (formfield: keyof BlogInfo) => (newText: string) => {
+    setValue(formfield, newText)
+  }
 
   return (
     <Box p={5}>
-      <Accordion.Root>
+      <Accordion.Root collapsible>
         <Accordion.Item value="1">
           <Accordion.ItemTrigger>
             <Heading size="md" as="span" flex="1" textAlign="left">
@@ -94,13 +85,10 @@ const EditBlogData = ({
                   borderRadius={5}
                   className="content"
                 >
-                  <Textarea
-                    id="wysi_one"
-                    _invalid={{ borderColor: 'red.300' }}
-                    {...register('page_content', {
-                      required: true,
-                      validate: (value) => value !== ''
-                    })}
+                  <StyledInput
+                    value={getValues('page_content')}
+                    onChange={handleTextChange('page_content')}
+                    placeholder="Add Content Here..."
                   />
                 </Box>
               </HStack>
