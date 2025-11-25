@@ -1,4 +1,4 @@
-import { Box, Image, HStack, Text, Stack } from '@chakra-ui/react'
+import { Box, Image, HStack, Text, Stack, List, Heading, Link } from '@chakra-ui/react'
 import ReactMarkdown from 'react-markdown'
 import { SiteInfo } from 'src/shared/types'
 
@@ -60,7 +60,51 @@ function HomePagePreview({ pageData }: { pageData: SiteInfo }): React.JSX.Elemen
             Home Page Top Content:
           </Text>
           <Box flexGrow={3} minH={2} borderWidth={1} borderStyle="solid" borderRadius={5} p={4}>
-            <ReactMarkdown>{pageData?.page_content}</ReactMarkdown>
+            <ReactMarkdown
+              components={{
+                h1: ({ children }) => (
+                  <Heading as="h1" fontSize="2xl">
+                    {children}
+                  </Heading>
+                ),
+                h2: ({ children }) => (
+                  <Heading as="h2" fontSize="xl">
+                    {children}
+                  </Heading>
+                ),
+                h3: ({ children }) => (
+                  <Heading as="h3" fontSize="lg">
+                    {children}
+                  </Heading>
+                ),
+                h4: ({ children }) => (
+                  <Heading as="h4" fontSize="md">
+                    {children}
+                  </Heading>
+                ),
+                h5: ({ children }) => (
+                  <Heading as="h5" fontSize="sm">
+                    {children}
+                  </Heading>
+                ),
+                h6: ({ children }) => (
+                  <Heading as="h6" fontSize="xs">
+                    {children}
+                  </Heading>
+                ),
+                p: ({ children }) => <Text>{children}</Text>,
+                ul: ({ children }) => <List.Root>{children}</List.Root>,
+                ol: ({ children }) => <List.Root>{children}</List.Root>,
+                li: ({ children }) => <List.Item>{children}</List.Item>,
+                a: ({ children, href }) => (
+                  <Link color="blue.500" href={href} target="_blank">
+                    {children}
+                  </Link>
+                )
+              }}
+            >
+              {pageData?.page_content}
+            </ReactMarkdown>
           </Box>
         </HStack>
       </Stack>

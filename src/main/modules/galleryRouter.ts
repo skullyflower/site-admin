@@ -39,17 +39,19 @@ function resetImages(gallery: Gallery): string {
 
           const imagebits = breakdownpattern.exec(onefile)
           if (imagebits && imagebits[2]) {
-            img_files[imagename]['imgtitle'] = imagebits[2]
-              .replace(/([A-Z])/g, ' $1')
-              .replace(/_/g, ' ')
-              .trim()
+            img_files[imagename]['imgtitle'] =
+              imagebits[2]
+                ?.replace(/([A-Z])/g, ' $1')
+                ?.replace(/_/g, ' ')
+                ?.trim() ?? ''
             // grab just the year part of the date.
             img_files[imagename]['imgyear'] = imagebits[1].slice(0, 4)
           } else {
-            img_files[imagename]['imgtitle'] = imagename
-              .replace(/([A-Z])/g, ' $1')
-              .replace(/_/g, ' ')
-              .trim()
+            img_files[imagename]['imgtitle'] =
+              imagename
+                ?.replace(/([A-Z])/g, ' $1')
+                ?.replace(/_/g, ' ')
+                ?.trim() ?? ''
             img_files[imagename]['imgyear'] = 2007
           }
         }

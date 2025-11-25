@@ -9,6 +9,7 @@ import { buttonRecipe } from '@renderer/themeRecipes'
 import { BlogEntry, SiteInfo } from 'src/shared/types'
 import imageLoading from '@renderer/assets/image-loading.svg'
 import TagSelector from '@renderer/components/TagSelector'
+import { useMemo } from 'react'
 
 const today = new Date()
 
@@ -40,13 +41,11 @@ const EditBlogEntry = ({
   onSubmit: (data: BlogEntry) => void
   sitedata: SiteInfo
 }): React.JSX.Element => {
-  const thisEntry = blogEntries.find((blog) => blog.id === blogid) || newblog
+  const thisEntry = (blogEntries && blogEntries.find((blog) => blog.id === blogid)) || newblog
 
-  if (blogid !== 'newentry' && thisEntry) {
-    const ms = Date.parse(thisEntry.date)
-    const entrydate = new Date(ms)
-    thisEntry.date = convertDate(entrydate, 'input')
-  }
+  const thisEntryDate = useMemo<Date>(() => {
+    return thisEntry?.date ? new Date(thisEntry.date) : new Date()
+  }, [thisEntry])
 
   const {
     control,
@@ -55,7 +54,10 @@ const EditBlogEntry = ({
     formState: { errors },
     getValues,
     setValue
-  } = useForm({ defaultValues: thisEntry, mode: 'onChange' })
+  } = useForm({
+    defaultValues: { ...thisEntry, date: convertDate(thisEntryDate, 'input') },
+    mode: 'onChange'
+  })
 
   const handleImageFocus = (input) => () => {
     if (!getValues(input)) setValue(input, `${sitedata?.live_site_url}/images/...`)

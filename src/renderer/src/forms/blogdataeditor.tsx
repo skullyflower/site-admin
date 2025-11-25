@@ -14,9 +14,6 @@ const EditBlogData = ({
   blogInfo: BlogInfo
   onSubmit: (data: BlogInfo) => void
 }): React.JSX.Element => {
-  //const { page_content } = blogInfo
-  //const [wysiwygText, setWysiwygText] = useState(page_content)
-
   const {
     register,
     reset,

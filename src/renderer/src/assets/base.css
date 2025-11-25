@@ -41,11 +41,15 @@
   margin: 0;
   font-weight: normal;
 }
-
-ul {
-  list-style: none;
+ul, ol {
+  padding-left: 20px;
 }
-
+ul li {
+  list-style: disc;
+}
+ol li {
+  list-style: decimal;
+}
 body {
   min-height: 100vh;
   color: var(--color-text);

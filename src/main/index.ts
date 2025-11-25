@@ -1,7 +1,7 @@
 import { app, shell, BrowserWindow, ipcMain, dialog, OpenDialogReturnValue } from 'electron'
 import path, { join } from 'path'
 import { electronApp, optimizer } from '@electron-toolkit/utils'
-import icon from '../../resources/SiteAdmin.png?asset'
+import icon from '../../resources/icon.png?asset'
 
 import { getBlogs, updateBlogInfo, updateBlogPost, deletEntry } from './modules/blogRouter'
 import { getSiteInfo, updateSiteInfo } from './modules/homeRouter'
