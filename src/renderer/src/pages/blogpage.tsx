@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import EditBlogEntry from '../forms/blogentryeditor'
 import EditBlogData from '../forms/blogdataeditor'
-import { Box, Button, HStack, Heading, Image, Stack } from '@chakra-ui/react'
+import { Box, Button, Card, HStack, Heading, Image, Stack } from '@chakra-ui/react'
 import PageLayout from '../components/PageLayout'
 import { buttonRecipe } from '@renderer/themeRecipes/button.recipe'
 import { BlogEntry, BlogInfo, SiteInfo } from 'src/shared/types'
@@ -100,74 +100,90 @@ const BlogPage = (): React.JSX.Element => {
       button={{ action: toggleForm, text: 'Add a new one', value: 'newentry' }}
     >
       <div className="content">
-        {blogInfo && <EditBlogData blogInfo={blogInfo} onSubmit={onUpdateInfo} />}
-        {showForm && (
-          <EditBlogEntry
-            sitedata={sitedata as SiteInfo}
-            isOpen={showForm}
-            blogid={activeBlog as string}
-            blogEntries={blogEntries as BlogEntry[]}
-            toggleForm={toggleForm}
-            onSubmit={(values: BlogEntry) => onSubmit(values as BlogEntry)}
-          />
-        )}
-        <Box p={5}>
-          <Stack>
-            {blogEntries?.length ? (
-              blogEntries.map(
-                (blog) =>
-                  blog && (
-                    <HStack
-                      key={blog.id}
-                      p={5}
-                      border="1px solid"
-                      borderRadius={5}
-                      w="100%"
-                      alignItems="flex-start"
-                      justifyContent="space-between"
-                      gap={4}
-                    >
-                      <Image
-                        src={blog.image.replace(
-                          sitedata?.live_site_url || '',
-                          'http://localhost:3000/'
-                        )}
-                        boxSize="120px"
-                        alt={blog.imagealt}
-                      />
-                      <Stack flexGrow={1}>
-                        <Heading size="md">{blog.title}</Heading>
-                        <div>
-                          <a
-                            href={`http://localhost:3000/blogentry/${blog.id}`}
-                            target="blogwindow"
+        {showForm ? (
+          <Card.Root
+            variant="outline"
+            backgroundColor="slate.800"
+            borderWidth={2}
+            borderStyle="solid"
+            borderColor="slate.500"
+          >
+            <Card.Body>
+              <EditBlogEntry
+                sitedata={sitedata as SiteInfo}
+                blogid={activeBlog as string}
+                blogEntries={blogEntries as BlogEntry[]}
+                toggleForm={toggleForm}
+                onSubmit={(values: BlogEntry) => onSubmit(values as BlogEntry)}
+              />
+            </Card.Body>
+          </Card.Root>
+        ) : (
+          <Box p={5}>
+            {blogInfo && <EditBlogData blogInfo={blogInfo} onSubmit={onUpdateInfo} />}
+
+            <Stack>
+              {blogEntries?.length ? (
+                blogEntries.map(
+                  (blog) =>
+                    blog && (
+                      <HStack
+                        key={blog.id}
+                        p={5}
+                        border="1px solid"
+                        borderRadius={5}
+                        w="100%"
+                        alignItems="flex-start"
+                        justifyContent="space-between"
+                        gap={4}
+                      >
+                        <Image
+                          src={blog.image.replace(
+                            sitedata?.live_site_url || '',
+                            'http://localhost:3000/'
+                          )}
+                          boxSize="120px"
+                          alt={blog.imagealt}
+                        />
+                        <Stack flexGrow={1}>
+                          <Heading size="md">{blog.title}</Heading>
+                          <div>
+                            <a
+                              href={`http://localhost:3000/blogentry/${blog.id}`}
+                              target="blogwindow"
+                            >
+                              {blog.heading}
+                            </a>
+                            <p>{blog.date}</p>
+                          </div>
+                        </Stack>
+                        <HStack gap={4}>
+                          <Button
+                            size="sm"
+                            recipe={buttonRecipe}
+                            value={blog.id}
+                            onClick={doDelete}
                           >
-                            {blog.heading}
-                          </a>
-                          <p>{blog.date}</p>
-                        </div>
-                      </Stack>
-                      <HStack gap={4}>
-                        <Button size="sm" recipe={buttonRecipe} value={blog.id} onClick={doDelete}>
-                          X
-                        </Button>
-                        <Button
-                          size="sm"
-                          recipe={buttonRecipe}
-                          value={blog.id}
-                          onClick={() => toggleForm(blog.id)}
-                        >
-                          Edit
-                        </Button>
+                            X
+                          </Button>
+                          <Button
+                            size="sm"
+                            recipe={buttonRecipe}
+                            value={blog.id}
+                            onClick={() => toggleForm(blog.id)}
+                          >
+                            Edit
+                          </Button>
+                        </HStack>
                       </HStack>
-                    </HStack>
-                  )
-              )
-            ) : (
-              <p className="centered">no blog entries yet</p>
-            )}
-          </Stack>
-        </Box>
+                    )
+                )
+              ) : (
+                <p className="centered">no blog entries yet</p>
+              )}
+            </Stack>
+          </Box>
+        )}
       </div>
     </PageLayout>
   )

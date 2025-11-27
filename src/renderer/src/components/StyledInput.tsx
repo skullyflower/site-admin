@@ -9,6 +9,7 @@ import {
   imagePlugin,
   InsertThematicBreak,
   listsPlugin,
+  linkPlugin,
   linkDialogPlugin,
   quotePlugin,
   thematicBreakPlugin,
@@ -49,8 +50,21 @@ const StyledInput = ({
         placeholder={placeholder}
         className="dark-theme dark-editor"
         plugins={[
+          headingsPlugin(),
+          listsPlugin(),
+          linkPlugin(),
+          linkDialogPlugin({
+            linkAutocompleteSuggestions: [
+              'https://skullyflowers.com/',
+              'https://rarr-recoveru.org/'
+            ],
+            showLinkTitleField: false
+          }),
+          quotePlugin(),
+          thematicBreakPlugin(),
+          imagePlugin(),
+          markdownShortcutPlugin(),
           toolbarPlugin({
-            toolbarClassName: 'my-classname',
             toolbarContents: () => (
               <>
                 <BlockTypeSelect />
@@ -62,14 +76,7 @@ const StyledInput = ({
                 <UndoRedo />
               </>
             )
-          }),
-          headingsPlugin(),
-          imagePlugin(),
-          listsPlugin(),
-          linkDialogPlugin(),
-          quotePlugin(),
-          thematicBreakPlugin(),
-          markdownShortcutPlugin()
+          })
         ]}
       />
     </Box>

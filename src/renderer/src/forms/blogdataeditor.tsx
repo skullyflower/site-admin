@@ -2,7 +2,17 @@
 //import { modules, formats } from '../components/quillbits'
 import { useForm, UseFormReturn } from 'react-hook-form'
 import InfoBubble from '../components/info-bubble'
-import { Accordion, Box, Button, Field, Input, HStack, Center, Heading } from '@chakra-ui/react'
+import {
+  Accordion,
+  Box,
+  Button,
+  Field,
+  Input,
+  HStack,
+  Center,
+  Heading,
+  Stack
+} from '@chakra-ui/react'
 import { buttonRecipe } from '@renderer/themeRecipes/button.recipe'
 import { BlogInfo } from 'src/shared/types'
 import StyledInput from '@renderer/components/StyledInput'
@@ -25,7 +35,6 @@ const EditBlogData = ({
     defaultValues: blogInfo,
     mode: 'onChange'
   })
-
   const { errors } = formState
 
   const handleTextChange = (formfield: keyof BlogInfo) => (newText: string) => {
@@ -44,7 +53,7 @@ const EditBlogData = ({
           </Accordion.ItemTrigger>
           <Accordion.ItemContent>
             <Field.Root p={4} invalid={errors.page_title ? true : false}>
-              <HStack alignItems="center">
+              <HStack alignItems="center" width={'100%'}>
                 <Field.Label w={48}>
                   Page Title:{' '}
                   <InfoBubble message={`This is the SEO page title for the blog page.`} />
@@ -57,7 +66,7 @@ const EditBlogData = ({
               </HStack>
             </Field.Root>
             <Field.Root p={4} invalid={errors.page_description ? true : false}>
-              <HStack alignItems="center">
+              <HStack alignItems="center" width={'100%'}>
                 <Field.Label w={48}>
                   Blog SEO Page Description:{' '}
                   <InfoBubble message="Short description that will show in Google searches. " />
@@ -73,7 +82,7 @@ const EditBlogData = ({
               </HStack>
             </Field.Root>
             <Field.Root p={4} invalid={errors.page_content ? true : false}>
-              <HStack alignItems="top">
+              <Stack gap={2} justifyContent={'stretch'} width={'100%'}>
                 <Field.Label w={40}>Blog page Content:</Field.Label>
                 <Box
                   minW="100%"
@@ -88,14 +97,11 @@ const EditBlogData = ({
                     placeholder="Add Content Here..."
                   />
                 </Box>
-              </HStack>
+              </Stack>
             </Field.Root>
             <Center>
               <HStack gap={4}>
-                <Button
-                  _invalid={{ borderColor: 'red.300' }}
-                  onClick={() => reset({ page_content: blogInfo.page_content })}
-                >
+                <Button _invalid={{ borderColor: 'red.300' }} onClick={() => reset()}>
                   Never mind
                 </Button>
                 <Button recipe={buttonRecipe} onClick={handleSubmit(onSubmit)}>
