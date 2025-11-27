@@ -14,7 +14,7 @@ const FloatingFormWrapper = ({
   return (
     <Dialog.Root
       placement="center"
-      size="lg"
+      size="cover"
       open={isOpen}
       onOpenChange={(e) => {
         if (!e.open) {
@@ -35,7 +35,7 @@ const FloatingFormWrapper = ({
             overflow={'auto'}
             className="content"
           >
-            <Dialog.CloseTrigger asChild>
+            <Dialog.CloseTrigger asChild position="fixed" top={4} right={4}>
               <Button recipe={buttonRecipe} onClick={onClose}>
                 Never mind
               </Button>

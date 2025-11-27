@@ -125,6 +125,7 @@ const BlogPage = (): React.JSX.Element => {
                       w="100%"
                       alignItems="flex-start"
                       justifyContent="space-between"
+                      gap={4}
                     >
                       <Image
                         src={blog.image.replace(
@@ -134,13 +135,18 @@ const BlogPage = (): React.JSX.Element => {
                         boxSize="120px"
                         alt={blog.imagealt}
                       />
-                      <Heading size="md">{blog.title}</Heading>
-                      <div>
-                        <a href={`http://localhost:3000/blogentry/${blog.id}`} target="blogwindow">
-                          {blog.heading}
-                        </a>
-                        <p>{blog.date}</p>
-                      </div>
+                      <Stack flexGrow={1}>
+                        <Heading size="md">{blog.title}</Heading>
+                        <div>
+                          <a
+                            href={`http://localhost:3000/blogentry/${blog.id}`}
+                            target="blogwindow"
+                          >
+                            {blog.heading}
+                          </a>
+                          <p>{blog.date}</p>
+                        </div>
+                      </Stack>
                       <HStack gap={4}>
                         <Button size="sm" recipe={buttonRecipe} value={blog.id} onClick={doDelete}>
                           X

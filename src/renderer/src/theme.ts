@@ -94,6 +94,13 @@ const config = defineConfig({
       fontFamily: '"Pangolin", "Comic Sans MS"',
       bg: 'blackAlpha.900',
       color: '#efefef'
+    },
+    a: {
+      fontFamily: 'Slackey',
+      color: 'green.500',
+      _hover: {
+        color: 'orange.600'
+      }
     }
   }
 })
