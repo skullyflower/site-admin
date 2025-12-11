@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import EditBlogEntry from '../forms/blogentryeditor'
 import EditBlogData from '../forms/blogdataeditor'
-import { Box, Button, Card, HStack, Heading, Image, Stack } from '@chakra-ui/react'
+import { Box, Button, HStack, Heading, Image, Stack } from '@chakra-ui/react'
 import PageLayout from '../components/PageLayout'
 import { buttonRecipe } from '@renderer/themeRecipes/button.recipe'
 import { BlogEntry, BlogInfo, SiteInfo } from 'src/shared/types'
@@ -101,23 +101,25 @@ const BlogPage = (): React.JSX.Element => {
     >
       <div className="content">
         {showForm ? (
-          <Card.Root
-            variant="outline"
+          <Box
+            w={['95vw', '93vw', '88vw', '85vw', '1000px']}
+            marginInline={'auto'}
+            overflow={'auto'}
             backgroundColor="slate.800"
             borderWidth={2}
             borderStyle="solid"
             borderColor="slate.500"
+            p={5}
+            borderRadius={5}
           >
-            <Card.Body>
-              <EditBlogEntry
-                sitedata={sitedata as SiteInfo}
-                blogid={activeBlog as string}
-                blogEntries={blogEntries as BlogEntry[]}
-                toggleForm={toggleForm}
-                onSubmit={(values: BlogEntry) => onSubmit(values as BlogEntry)}
-              />
-            </Card.Body>
-          </Card.Root>
+            <EditBlogEntry
+              sitedata={sitedata as SiteInfo}
+              blogid={activeBlog as string}
+              blogEntries={blogEntries as BlogEntry[]}
+              toggleForm={toggleForm}
+              onSubmit={(values: BlogEntry) => onSubmit(values as BlogEntry)}
+            />
+          </Box>
         ) : (
           <Box p={5}>
             {blogInfo && <EditBlogData blogInfo={blogInfo} onSubmit={onUpdateInfo} />}

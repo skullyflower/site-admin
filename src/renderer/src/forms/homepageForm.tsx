@@ -104,7 +104,7 @@ const HomePageForm = ({
           </HStack>
         </Field.Root>
         <Field.Root p={4}>
-          <HStack alignItems="top" width="100%">
+          <Stack gap={2} alignItems="stretch" width="100%">
             <label>Site Logo:</label>
             <Box
               flexGrow={3}
@@ -145,7 +145,7 @@ const HomePageForm = ({
                 </HStack>
               </Field.Root>
             </Box>
-          </HStack>
+          </Stack>
         </Field.Root>
         <Field.Root p={4}>
           <Stack gap={2} justifyContent={'stretch'} width={'100%'}>

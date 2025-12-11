@@ -18,9 +18,10 @@ import { FieldArrayPath, useFieldArray, useForm, useWatch } from 'react-hook-for
 import { convertDate } from '../components/datetimebit'
 import { buttonRecipe } from '@renderer/themeRecipes'
 const today = new Date()
-import { Product, Category, Subject } from 'src/shared/types'
+import { Product, CategoryType, Subject } from 'src/shared/types'
 import StyledInput from '@renderer/components/StyledInput'
 import TagSelector from '@renderer/components/TagSelector'
+import imageLoading from '@renderer/assets/image-loading.svg'
 
 const newprodId = 'new-prod-id'
 const newproduct = {
@@ -42,9 +43,9 @@ interface EditProductProps {
   isOpen: boolean
   prodId: string
   products: Product[]
-  categories: Category[]
+  categories: CategoryType[]
   subjects: Subject[]
-  toggleForm: () => void
+  toggleForm: (productId: string | null) => void
   onSubmit: (data: Product) => void
 }
 export default function EditProduct({
@@ -56,22 +57,23 @@ export default function EditProduct({
   toggleForm,
   onSubmit
 }: EditProductProps): React.JSX.Element {
-  const selectedProduct =
-    products.find((prod) => prod.id === prodId.replace('-copy', '')) || newproduct
-  if (selectedProduct?.id !== newprodId) {
-    const ms = Date.parse(selectedProduct.date)
-    const prodAdddate = new Date(ms)
-    selectedProduct.date = convertDate(prodAdddate, 'input')
-  }
+  const prodToLoan = !prodId
+    ? null
+    : prodId.endsWith('-copy')
+      ? prodId.replace('-copy', '')
+      : prodId
+  const selectedProduct = !prodToLoan
+    ? newproduct
+    : products.find((prod) => prod.id === prodToLoan) || newproduct
   const [wysiwygText, setWysiwygText] = useState(selectedProduct.desc)
   const [wysiwygText2, setWysiwygText2] = useState(selectedProduct.desc_long)
-
   const {
     control,
     register,
     handleSubmit,
     formState: { errors },
-    setValue
+    setValue,
+    getValues
   } = useForm<Product>({ defaultValues: selectedProduct, mode: 'onChange' })
 
   const { fields, append, remove } = useFieldArray({
@@ -89,6 +91,21 @@ export default function EditProduct({
     }
   }
 
+  const handleImageUpload =
+    (key: keyof Product) =>
+    (paths: string[]): void => {
+      if (paths.length > 0) {
+        if (key === 'img') {
+          const prodImage = `/shop/${paths[0].split('/').pop()}`
+          setValue('img', prodImage)
+        } else {
+          const altimgs = getValues('altimgs')
+          const newAltImgs = paths.map((path) => `/shop/${path.split('/').pop()}`)
+          setValue('altimgs', [...altimgs, ...newAltImgs])
+        }
+      }
+    }
+
   useEffect(() => {
     if (prodId?.endsWith('-copy')) {
       setValue('id', prodId)
@@ -98,10 +115,10 @@ export default function EditProduct({
   }, [prodId, setValue])
 
   return (
-    <FloatingFormWrapper isOpen={isOpen} onClose={toggleForm}>
+    <FloatingFormWrapper isOpen={isOpen} onClose={() => toggleForm(null)}>
       <HStack justifyContent="space-between">
         <Heading size="md">Add/Edit Product</Heading>
-        <Button recipe={buttonRecipe} onClick={toggleForm}>
+        <Button recipe={buttonRecipe} onClick={() => toggleForm(null)}>
           Never mind
         </Button>
       </HStack>
@@ -166,7 +183,7 @@ export default function EditProduct({
             <Field.Root>
               <HStack alignItems="top">
                 <Field.Label w={40}>Upload New Image</Field.Label>
-                <UploadInput name="newImage" multiple={false} register={register} />
+                <UploadInput multiple={false} onUpload={handleImageUpload('img')} />
               </HStack>
             </Field.Root>
             <Field.Root p={4} invalid={errors.img ? true : false}>
@@ -180,7 +197,7 @@ export default function EditProduct({
                   src={`http://localhost:3000/shop/${thumb}`}
                   boxSize="100px"
                   onError={(e) => {
-                    e.currentTarget.src = 'http://localhost:3000/images/image-loading.svg'
+                    e.currentTarget.src = imageLoading
                   }}
                 />
               </HStack>
@@ -191,6 +208,7 @@ export default function EditProduct({
       <Field.Root p={4}>
         <HStack alignItems="center">
           <Field.Label w={40}>Alt Images:</Field.Label>
+          <UploadInput multiple={true} onUpload={handleImageUpload('altimgs')} />
           {fields.map((field, index) => (
             <span key={field.id}>
               <InputGroup
@@ -255,15 +273,6 @@ export default function EditProduct({
               value={prodCategories}
               defaultOptions={categories.map((c) => c.id)}
             />
-            {/*categories?.map((c) => {
-              return (
-                <Box key={c.id} p={2}>
-                  <Checkbox.Root {...register(`cat`)} value={c.id}>
-                    {c.id}
-                  </Checkbox.Root>
-                </Box>
-              )
-            })*/}
           </HStack>
         </HStack>
       </Field.Root>

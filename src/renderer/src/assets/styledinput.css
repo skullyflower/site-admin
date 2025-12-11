@@ -1,0 +1,7 @@
+a {
+  font-family: 'Slackey';
+  color: green.500;
+  &:hover {
+    color: orange.600;  
+  }
+}

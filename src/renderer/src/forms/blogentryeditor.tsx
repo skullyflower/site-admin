@@ -10,7 +10,7 @@ import { BlogEntry, SiteInfo } from 'src/shared/types'
 import imageLoading from '@renderer/assets/image-loading.svg'
 import TagSelector from '@renderer/components/TagSelector'
 import { useMemo } from 'react'
-
+// TODO: fix the image upload and url generation. localhost for admin display, / for save, live_site_url for RSS only.
 const today = new Date()
 
 const newblog = {
@@ -87,7 +87,7 @@ const EditBlogEntry = ({
         </Button>
       </HStack>
       <Field.Root p={4} invalid={errors.id ? true : false}>
-        <HStack>
+        <HStack width={'100%'}>
           <Field.Label w={40}>
             Id: <InfoBubble message={`Blog ids are based on the date"`} />
           </Field.Label>
@@ -198,7 +198,7 @@ const EditBlogEntry = ({
         </HStack>
       </Field.Root>
       <Field.Root p={4}>
-        <HStack alignItems="top" width="100%">
+        <Stack gap={2} justifyContent={'stretch'} width={'100%'}>
           <Field.Label w={40}>Blog Content:</Field.Label>
           <Box width="100%" minH={2} border="1px solid gray" borderRadius={5} className="content">
             <StyledInput
@@ -207,15 +207,15 @@ const EditBlogEntry = ({
               placeholder="Add Content Here..."
             />
           </Box>
-        </HStack>
+        </Stack>
       </Field.Root>
-      <div>
+      <Field.Root p={4}>
         <TagSelector
           value={thisEntry?.tags || []}
           onChange={(values: string[]) => setValue('tags', values)}
           allowCustomValue
         />
-      </div>
+      </Field.Root>
       <Center>
         <Button
           recipe={buttonRecipe}

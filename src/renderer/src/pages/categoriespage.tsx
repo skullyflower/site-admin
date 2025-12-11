@@ -1,20 +1,26 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Box, Button, Center, HStack, Heading, Image, Skeleton, Stack } from '@chakra-ui/react'
-
 import EditCategory from '../forms/categoryeditor'
 import PageLayout from '../components/PageLayout'
+import { ApiMessageResponse, CategoryType } from 'src/shared/types'
+import { buttonRecipe } from '@renderer/themeRecipes'
+import imageLoading from '@renderer/assets/image-loading.svg'
 
-const getCategories = (setCategories, setMessages, setLoading) => {
+const getCategories = (
+  setCategories: (categories: CategoryType[]) => void,
+  setMessages: (message: string) => void,
+  setLoading: (loading: boolean) => void
+): void => {
   setLoading(true)
   setCategories([])
-  fetch('http://localhost:4242/api/categories')
-    .then((data) => data.json())
-    .then((json) => {
-      if (Array.isArray(json)) {
-        setCategories(json)
+  window.api
+    .getCategories()
+    .then((response: ApiMessageResponse | CategoryType[]) => {
+      if (Array.isArray(response)) {
+        setCategories(response)
       } else {
         setCategories([])
-        setMessages(json.message)
+        setMessages(response.message as string)
       }
       setLoading(false)
     })
@@ -23,61 +29,45 @@ const getCategories = (setCategories, setMessages, setLoading) => {
     })
 }
 
-const Categories = () => {
-  const [categories, setCategories] = useState(null)
-  const [messages, setMessages] = useState(null)
-  const [showCatForm, setShowCatForm] = useState(false)
-  const [activeCat, setActiveCat] = useState(null)
+const CategoriesPage = (): React.JSX.Element => {
+  const [categories, setCategories] = useState<CategoryType[] | null>(null)
+  const [messages, setMessages] = useState<string | null>(null)
+  const [showCatForm, setShowForm] = useState(false)
+  const [activeCat, setActiveCat] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
 
-  const onSubmit = (values) => {
+  const onSubmit = (values: CategoryType): void => {
     setLoading(true)
-    const imagesArr = Array.from(values.newImage)
-    var formData = new FormData()
-    formData.append('category', JSON.stringify(values))
-
-    formData.append('date', Date.now().toString())
-    for (var file of imagesArr) {
-      formData.append('newImage', file)
-    }
-
-    fetch('http://localhost:4242/api/categories', {
-      method: 'POST',
-      body: formData
-    })
-      .then((data) => data.json())
-      .then((json) => {
-        setMessages(json.message)
+    window.api
+      .updateCategory(values)
+      .then((response: ApiMessageResponse) => {
+        setMessages(response.message as string)
         getCategories(setCategories, setMessages, setLoading)
-        toggleCatForm()
+        toggleCatForm(null)
       })
-      .catch((err) => {
-        setMessages(err.message || 'there was a problem.')
+      .catch((err: Error) => {
+        setMessages((err.message as string) || 'there was a problem.')
       })
   }
 
-  const doDelete = useCallback((e) => {
+  const doDelete = (catid: string): void => {
     if (window.confirm('Are you sure you want to do this?')) {
-      const category = e.target.value
-      fetch(`http://localhost:4242/api/categories/${category}`, {
-        method: 'DELETE'
-      })
-        .then((data) => data.json())
-        .then((json) => {
-          setMessages(json.message)
+      window.api
+        .deleteCategory(catid)
+        .then((response: ApiMessageResponse) => {
+          setMessages(response.message as string)
           getCategories(setCategories, setMessages, setLoading)
         })
+        .catch((err: Error) => {
+          setMessages((err.message as string) || 'there was a problem.')
+        })
     }
-  }, [])
+  }
 
-  const toggleCatForm = useCallback(
-    (e) => {
-      const category = e && e.target.value ? e.target.value : null
-      setActiveCat(category)
-      setShowCatForm(!!category)
-    },
-    [setActiveCat, setShowCatForm]
-  )
+  const toggleCatForm = (catid: string | null): void => {
+    setActiveCat(catid)
+    setShowForm(!!catid)
+  }
 
   useEffect(() => {
     if (!categories && !messages) {
@@ -101,9 +91,9 @@ const Categories = () => {
           {showCatForm && (
             <EditCategory
               isOpen={showCatForm}
-              catid={activeCat}
-              categories={categories}
-              toggleCatForm={toggleCatForm}
+              catid={activeCat as string}
+              categories={categories as CategoryType[]}
+              toggleCatForm={() => toggleCatForm(null)}
               onSubmit={onSubmit}
             />
           )}
@@ -124,7 +114,9 @@ const Categories = () => {
                   src={`http://localhost:3000/${cat.img}`}
                   boxSize="75px"
                   alt={`${cat.name} - http://localhost:3000/${cat.img}`}
-                  fallbackSrc="http://localhost:3001/images/image-loading.svg"
+                  onError={(e) => {
+                    e.currentTarget.src = imageLoading
+                  }}
                 />
                 <Heading size="sm" lineHeight={2}>
                   {cat.name}
@@ -140,17 +132,22 @@ const Categories = () => {
                 dangerouslySetInnerHTML={{ __html: cat.description }}
               />
               <HStack gap={4}>
-                <Button variant="ghost" size="sm" value={cat.id} onClick={doDelete}>
+                <Button variant="ghost" size="sm" value={cat.id} onClick={() => doDelete(cat.id)}>
                   X
                 </Button>
-                <Button variant="shopButt" size="sm" value={cat.id} onClick={toggleCatForm}>
+                <Button
+                  recipe={buttonRecipe}
+                  size="sm"
+                  value={cat.id}
+                  onClick={() => toggleCatForm(cat.id)}
+                >
                   Edit
                 </Button>
               </HStack>
             </HStack>
           ))}
           <Center>
-            <Button variant="shopButt" value="newcat" onClick={toggleCatForm}>
+            <Button recipe={buttonRecipe} value="newcat" onClick={() => toggleCatForm(null)}>
               {showCatForm ? 'Never mind' : 'Add a new one'}
             </Button>
           </Center>
@@ -159,4 +156,4 @@ const Categories = () => {
     </PageLayout>
   )
 }
-export default Categories
+export default CategoriesPage

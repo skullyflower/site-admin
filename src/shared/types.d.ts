@@ -40,7 +40,7 @@ export interface SiteInfo extends pageInfo {
   sitelogo: string
 }
 
-export interface Category {
+export interface CategoryType {
   id: string
   name: string
   img: string
@@ -49,7 +49,7 @@ export interface Category {
   newImage: File[]
 }
 export interface CategoryResponse {
-  categories: Category[]
+  categories: CategoryType[]
   message?: string
 }
 export interface Subject {

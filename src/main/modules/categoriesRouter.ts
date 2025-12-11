@@ -1,39 +1,40 @@
 import fs from 'fs'
 import getPathsFromConfig, { checkFile } from './pathData'
-import processFile from './imageProcessor'
+//import processFile from './imageProcessor'
+import { CategoryType } from '../../shared/types'
 
 const { pathToPublic } = getPathsFromConfig()
 const shopfilepath = `${pathToPublic}/data/categories.json`
 
-export const updateShopCategories = (category, files): string => {
+export const updateCategories = (category: CategoryType): string => {
   //upload('newImage', 1)
   if (category) {
-    const bigDestPath = `${pathToPublic}/shop/categories/${category.id}/`
-    //check for path. if it doesn't exist create it.
-    const smallDestPath = `${pathToPublic}/shop/categories/smaller/${category.id}/`
+    // const bigDestPath = `${pathToPublic}/shop/categories/${category.id}/`
+    // //check for path. if it doesn't exist create it.
+    // const smallDestPath = `${pathToPublic}/shop/categories/smaller/${category.id}/`
     //check for path. if it doesn't exitst, create it.
     try {
-      if (files) {
-        for (const file of files) {
-          try {
-            processFile(file, 850, bigDestPath)
-            processFile(file, 450, smallDestPath)
-            // skullyflower only for copying to the local build
-            fs.copyFileSync(
-              `${smallDestPath}${file.filename}`,
-              `${smallDestPath.replace('public', 'build')}`
-            )
-            fs.copyFileSync(
-              `${bigDestPath}${file.filename}`,
-              `${bigDestPath.replace('public', 'build')}`
-            )
+      // if (files) {
+      //   for (const file of files) {
+      //     try {
+      //       processFile(file, 850, bigDestPath)
+      //       processFile(file, 450, smallDestPath)
+      //       // skullyflower only for copying to the local build
+      //       fs.copyFileSync(
+      //         `${smallDestPath}${file.filename}`,
+      //         `${smallDestPath.replace('public', 'build')}`
+      //       )
+      //       fs.copyFileSync(
+      //         `${bigDestPath}${file.filename}`,
+      //         `${bigDestPath.replace('public', 'build')}`
+      //       )
 
-            category.img = `${bigDestPath.replace(pathToPublic, '')}${file.filename}`
-          } catch (err) {
-            console.log(`Failed: file upload: ${err}`)
-          }
-        }
-      }
+      //       category.img = `${bigDestPath.replace(pathToPublic, '')}${file.filename}`
+      //     } catch (err) {
+      //       console.log(`Failed: file upload: ${err}`)
+      //     }
+      //   }
+      // }
       checkFile(shopfilepath, { categories: [] })
       checkFile(shopfilepath.replace('public', 'build'), { categories: [] })
       const oldShopDataString = fs.readFileSync(shopfilepath)

@@ -31,18 +31,15 @@ export interface Api {
 
   // Shop API functions
   getProducts: () => Promise<ApiMessageResponse | ProductResponse>
-
   updateProduct: (product: Product) => Promise<ApiMessageResponse>
-
   deleteProduct: (prodid: string) => Promise<ApiMessageResponse>
-
   getSubjects: () => Promise<ApiMessageResponse | SubjectResponse>
-
   updateSubject: (subject: Subject) => Promise<ApiMessageResponse>
-
   getCategories: () => Promise<ApiMessageResponse | CategoryResponse>
-
   updateCategory: (category: Category) => Promise<ApiMessageResponse>
+  deleteCategory: (catid: string) => Promise<ApiMessageResponse>
+  getSale: () => Promise<ApiMessageResponse | number>
+  setSale: (sale: number) => Promise<ApiMessageResponse>
 
   // Gallery API functions
   getGalleries: () => Promise<ApiMessageResponse | GalleryResponse>

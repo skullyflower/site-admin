@@ -1,6 +1,6 @@
 import { contextBridge, ipcRenderer, webUtils } from 'electron'
 import { electronAPI /* , WebUtils */ } from '@electron-toolkit/preload'
-import { BlogEntry } from '../shared/types'
+import { BlogEntry, CategoryType } from '../shared/types'
 
 // Custom APIs for renderer
 const api = {
@@ -72,8 +72,12 @@ const api = {
     const response = await ipcRenderer.invoke('get-categories')
     return JSON.parse(response)
   },
-  updateCategory: async (category: string) => {
+  updateCategory: async (category: CategoryType) => {
     const response = await ipcRenderer.invoke('update-category', category)
+    return JSON.parse(response)
+  },
+  deleteCategory: async (catid: string) => {
+    const response = await ipcRenderer.invoke('delete-category', catid)
     return JSON.parse(response)
   },
   // Gallery API functions

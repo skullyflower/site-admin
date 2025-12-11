@@ -16,18 +16,25 @@ import {
   Heading
 } from '@chakra-ui/react'
 
-import { Category } from 'src/shared/types'
+import { CategoryType } from 'src/shared/types'
 import StyledInput from '@renderer/components/StyledInput'
 import { buttonRecipe } from '@renderer/themeRecipes'
 
-const newcat: Category = { id: '', name: '', img: '', description: '', subcat: [], newImage: [] }
+const newcat: CategoryType = {
+  id: '',
+  name: '',
+  img: '',
+  description: '',
+  subcat: [],
+  newImage: []
+}
 
 interface EditCategoryProps {
   catid: string
-  categories: Category[]
+  categories: CategoryType[]
   isOpen: boolean
   toggleCatForm: () => void
-  onSubmit: (data: Category) => void
+  onSubmit: (data: CategoryType) => void
 }
 export default function EditCategory({
   catid,
@@ -49,6 +56,13 @@ export default function EditCategory({
   const handleTextChange = (formfield) => (newText) => {
     setValue(formfield, newText)
     setWysiwygText(newText)
+  }
+
+  const handleImageUpload = (paths: string[]): void => {
+    if (paths.length > 0) {
+      const catImage = `/shop/categories/${paths[0].split('/').pop()}`
+      setValue('img', catImage)
+    }
   }
 
   return (
@@ -94,7 +108,7 @@ export default function EditCategory({
             <Field.Root>
               <HStack alignItems="top">
                 <Field.Label w={40}>Upload New Image</Field.Label>
-                <UploadInput name="newImage" multiple={false} register={register} />
+                <UploadInput multiple={false} onUpload={handleImageUpload} />
               </HStack>
             </Field.Root>
             <Field.Root p={4} invalid={errors.img ? true : false}>

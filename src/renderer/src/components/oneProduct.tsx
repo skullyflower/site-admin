@@ -13,7 +13,7 @@ interface OneProductProps {
     soldout: boolean
     price: number
   }
-  toggleForm: () => void
+  toggleForm: (productId: string | null) => void
   doDelete: () => void
 }
 const OneProduct = ({ product, toggleForm, doDelete }: OneProductProps): React.ReactNode => {
@@ -63,10 +63,21 @@ const OneProduct = ({ product, toggleForm, doDelete }: OneProductProps): React.R
         >
           <RiDeleteBin6Line />
         </IconButton>
-        <Button size="sm" recipe={buttonRecipe} value={product.id} onClick={toggleForm}>
+        <Button
+          size="sm"
+          recipe={buttonRecipe}
+          value={product.id}
+          onClick={() => toggleForm(product.id)}
+        >
           Edit
         </Button>
-        <Button size="sm" recipe={buttonRecipe} name="copy" value={product.id} onClick={toggleForm}>
+        <Button
+          size="sm"
+          recipe={buttonRecipe}
+          name="copy"
+          value={product.id}
+          onClick={() => toggleForm(`${product.id}-copy`)}
+        >
           copy
         </Button>
       </HStack>

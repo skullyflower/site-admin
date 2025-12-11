@@ -3,6 +3,8 @@ import BlogPage from '@renderer/pages/blogpage'
 import ConfigPage from '@renderer/pages/configpage'
 import WelcomePage from '@renderer/pages'
 import ProductsPage from '@renderer/pages/productspage'
+import CategoriesPage from '@renderer/pages/categoriespage'
+//import SalePage from '@renderer/pages/salepage'
 import { Route } from 'react-router-dom'
 import { Router } from '@renderer/../../lib/electron-router-dom'
 import SiteLayout from './SiteLayout'
@@ -38,8 +40,8 @@ export default function SiteRoutes(): React.JSX.Element {
           <Route path="/gallery" element={<GalleryPage />} />
           <Route path="/images" element={<ImagesPage />} />*/}
           <Route path="/products" element={<ProductsPage />} />
-          {/*<Route path="/categories" element={<CategoriesPage />} />
-          <Route path="/sale" element={<SalePage />} />*/}
+          <Route path="/categories" element={<CategoriesPage />} />
+          {/*<Route path="/sale" element={<SalePage />} />*/}
           <Route path="/config" element={<ConfigPage />} />
           <Route path="*" element={<WelcomePage />} />
         </Route>
