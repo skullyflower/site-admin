@@ -3,22 +3,13 @@ import { useForm } from 'react-hook-form'
 import FloatingFormWrapper from '../components/floatingformwrap'
 import UploadInput from '../components/upload-input'
 import InfoBubble from '../components/info-bubble'
-
-import {
-  Box,
-  Button,
-  Checkbox,
-  Field,
-  Image,
-  Input,
-  HStack,
-  Center,
-  Heading
-} from '@chakra-ui/react'
+import imageLoading from '@renderer/assets/image-loading.svg'
+import { Box, Button, Field, Image, Input, HStack, Center, Heading } from '@chakra-ui/react'
 
 import { CategoryType } from 'src/shared/types'
 import StyledInput from '@renderer/components/StyledInput'
 import { buttonRecipe } from '@renderer/themeRecipes'
+import TagSelector from '@renderer/components/TagSelector'
 
 const newcat: CategoryType = {
   id: '',
@@ -71,8 +62,8 @@ export default function EditCategory({
         <Heading size="md">Add/Edit Product Categories</Heading>
         <Button onClick={toggleCatForm}>Never mind</Button>
       </HStack>
-      <Field.Root p={4} invalid={errors.id ? true : false}>
-        <HStack alignItems="center">
+      <Field.Root p={1} invalid={errors.id ? true : false}>
+        <HStack alignItems="center" width={'100%'}>
           <Field.Label w={40}>
             Id:{' '}
             <InfoBubble message='Ids must be unique, and should be descriptive. Example: "widgets"' />
@@ -81,48 +72,56 @@ export default function EditCategory({
             _invalid={{ borderColor: 'red.300' }}
             type="text"
             {...register('id', { required: true, validate: (value) => value !== '' })}
+            width={'100%'}
           />
         </HStack>
       </Field.Root>
-      <Field.Root p={4} invalid={errors.name ? true : false}>
-        <HStack alignItems="center">
+      <Field.Root p={1} invalid={errors.name ? true : false}>
+        <HStack alignItems="center" width={'100%'}>
           <Field.Label w={40}>Category Name:</Field.Label>
           <Input
             _invalid={{ borderColor: 'red.300' }}
             type="text"
             {...register('name', { required: true })}
+            width={'100%'}
           />
         </HStack>
       </Field.Root>
-      <Field.Root p={4}>
-        <HStack alignItems="top">
-          <Field.Label w={40}>Category Image:</Field.Label>
+      <Field.Root p={1}>
+        <Field.Label w={40}>Category Image:</Field.Label>
+        <HStack alignItems="top" width={'100%'}>
           <Box
             width={'100%'}
             flexGrow={3}
             borderWidth={1}
             borderStyle="solid"
             borderRadius={4}
+            borderColor="gray.300"
             p={5}
           >
             <Field.Root>
-              <HStack alignItems="top">
+              <HStack alignItems="top" width={'100%'}>
                 <Field.Label w={40}>Upload New Image</Field.Label>
                 <UploadInput multiple={false} onUpload={handleImageUpload} />
               </HStack>
             </Field.Root>
-            <Field.Root p={4} invalid={errors.img ? true : false}>
-              <HStack alignItems="center">
+            <Field.Root p={1} invalid={errors.img ? true : false}>
+              <HStack alignItems="center" width={'100%'}>
                 <Field.Label w={40}>
                   Or edit image url:{' '}
                   <InfoBubble message="You can edit the image url to be a different image you have uploaded in the past. You can also use an image from a different website. (This value will be overwritten if you select an image to upload.)" />
                 </Field.Label>
-                <Input _invalid={{ borderColor: 'red.300' }} type="text" {...register('img')} />
+                <Input
+                  _invalid={{ borderColor: 'red.300' }}
+                  type="text"
+                  {...register('img')}
+                  width={'100%'}
+                />
                 <Image
                   src={`http://localhost:3000/shop/GROUPS/${cat.img}`}
                   boxSize="100px"
                   onError={(e) => {
-                    e.currentTarget.src = 'http://localhost:3000/images/image-loading.svg'
+                    e.currentTarget.src = imageLoading
                   }}
                 />
               </HStack>
@@ -130,9 +129,9 @@ export default function EditCategory({
           </Box>
         </HStack>
       </Field.Root>
-      <Field.Root p={4}>
-        <HStack alignItems="top">
-          <Field.Label w={40}>Description:</Field.Label>
+      <Field.Root p={1}>
+        <Field.Label w={40}>Description:</Field.Label>
+        <HStack alignItems="top" width={'100%'}>
           <Box
             width={'100%'}
             flexGrow={3}
@@ -150,35 +149,19 @@ export default function EditCategory({
           </Box>
         </HStack>
       </Field.Root>
-      <Field.Root p={4}>
-        <HStack alignItems="top">
-          <Field.Label w={40}>
-            Sub-Categories:{' '}
-            <InfoBubble
-              message="Do not select anything here unless you want to make this category a container for
+      <Field.Root p={1}>
+        <HStack alignItems="top" width={'100%'}>
+          <InfoBubble
+            message="Do not select anything here unless you want to make this category a container for
                   other categories. Example: 'Stationary' might contain 'Pens' and 'Papers'."
-            />
-          </Field.Label>
-          <HStack
-            width={'100%'}
-            borderWidth={1}
-            borderStyle="solid"
-            p={5}
-            borderRadius={5}
-            wrap="wrap"
-          >
-            {categories
-              .filter((c) => c.id !== cat.id)
-              .map((c) => {
-                return (
-                  <Box key={c.id} p={2}>
-                    <Checkbox.Root {...register(`subcat`)} value={c.id}>
-                      {c.id}
-                    </Checkbox.Root>
-                  </Box>
-                )
-              })}
-          </HStack>
+          />
+          <TagSelector
+            label="Sub-Categories:"
+            defaultOptions={categories.filter((c) => c.id !== cat.id).map((c) => c.id)}
+            value={cat.subcat}
+            onChange={(values: string[]) => setValue('subcat', values)}
+            allowCustomValue
+          />
         </HStack>
       </Field.Root>
       <Center>

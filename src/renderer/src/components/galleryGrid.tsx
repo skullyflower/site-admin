@@ -2,21 +2,13 @@ import { GalleryImage } from 'src/shared/types'
 import { GalleryGridImage } from '../forms/GalleryGridImage'
 import { Flex } from '@chakra-ui/react'
 
-const isBigger = (): boolean => {
-  let bigger = false
-  if (window.innerWidth > 700) {
-    bigger = true
-  }
-  return bigger
-}
-
 interface GalleryGridProps {
   gallery: {
     path: string
   }
   images: GalleryImage[]
-  deleteImage: (imageurl: string) => () => void
-  updateImage: (imageurl: string, date: string, name: string) => () => void
+  deleteImage: (imageurl: string) => void
+  updateImage: (imageurl: string, date: string, name: string) => void
 }
 
 const GalleryGrid = ({
@@ -26,7 +18,6 @@ const GalleryGrid = ({
   updateImage
 }: GalleryGridProps): React.ReactNode => {
   const dir = gallery.path
-  const bigger = isBigger()
   const imgDir = `http://localhost:3000/${dir}`
 
   if (images?.length > 0) {
@@ -37,7 +28,6 @@ const GalleryGrid = ({
             key={oneImage.imgfile}
             imgDir={imgDir}
             oneImage={oneImage}
-            bigger={bigger}
             deleteImage={deleteImage}
             updateImage={updateImage}
           />

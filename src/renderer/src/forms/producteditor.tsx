@@ -4,21 +4,21 @@ import InfoBubble from '../components/info-bubble'
 import {
   Box,
   Button,
-  Checkbox,
   Field,
   Image,
   Input,
   InputGroup,
   HStack,
   Center,
-  Heading
+  Heading,
+  Switch
 } from '@chakra-ui/react'
 import FloatingFormWrapper from '../components/floatingformwrap'
 import { FieldArrayPath, useFieldArray, useForm, useWatch } from 'react-hook-form'
 import { convertDate } from '../components/datetimebit'
 import { buttonRecipe } from '@renderer/themeRecipes'
 const today = new Date()
-import { Product, CategoryType, Subject } from 'src/shared/types'
+import { ProductType, CategoryType, Subject } from 'src/shared/types'
 import StyledInput from '@renderer/components/StyledInput'
 import TagSelector from '@renderer/components/TagSelector'
 import imageLoading from '@renderer/assets/image-loading.svg'
@@ -42,11 +42,11 @@ const newproduct = {
 interface EditProductProps {
   isOpen: boolean
   prodId: string
-  products: Product[]
+  products: ProductType[]
   categories: CategoryType[]
   subjects: Subject[]
   toggleForm: (productId: string | null) => void
-  onSubmit: (data: Product) => void
+  onSubmit: (data: ProductType) => void
 }
 export default function EditProduct({
   isOpen,
@@ -74,14 +74,16 @@ export default function EditProduct({
     formState: { errors },
     setValue,
     getValues
-  } = useForm<Product>({ defaultValues: selectedProduct, mode: 'onChange' })
+  } = useForm<ProductType>({ defaultValues: selectedProduct, mode: 'onChange' })
 
   const { fields, append, remove } = useFieldArray({
     control,
-    name: 'altimgs' as FieldArrayPath<Product>
+    name: 'altimgs' as FieldArrayPath<ProductType>
   })
   const thumb = useWatch({ control, name: 'img' })
+  const soldout = useWatch({ control, name: 'soldout' })
   const prodCategories = useWatch({ control, name: 'cat' })
+  const prodSubjects = useWatch({ control, name: 'design' })
   const handleTextChange = (formfield) => (newText) => {
     setValue(formfield, newText)
     if (formfield === 'desc') {
@@ -92,7 +94,7 @@ export default function EditProduct({
   }
 
   const handleImageUpload =
-    (key: keyof Product) =>
+    (key: keyof ProductType) =>
     (paths: string[]): void => {
       if (paths.length > 0) {
         if (key === 'img') {
@@ -122,8 +124,8 @@ export default function EditProduct({
           Never mind
         </Button>
       </HStack>
-      <Field.Root p={4} invalid={errors.id ? true : false}>
-        <HStack>
+      <Field.Root p={1} invalid={errors.id ? true : false}>
+        <HStack width={'100%'}>
           <Field.Label w={40}>
             Id:
             <InfoBubble
@@ -134,65 +136,75 @@ export default function EditProduct({
             _invalid={{ borderColor: 'red.300' }}
             type="text"
             {...register('id', { required: true, validate: (value) => value !== newprodId })}
+            width={'100%'}
           />
         </HStack>
       </Field.Root>
-      <Field.Root p={4} invalid={errors.date ? true : false}>
-        <HStack alignItems="center">
+      <Field.Root p={1} invalid={errors.date ? true : false}>
+        <HStack alignItems="center" width={'100%'}>
           <Field.Label w={40}>Date:</Field.Label>
           <Input
             _invalid={{ borderColor: 'red.300' }}
             type="datetime-local"
             {...register('date', { required: true })}
+            width={'100%'}
           />
         </HStack>
       </Field.Root>
-      <Field.Root p={4} invalid={errors.name ? true : false}>
-        <HStack alignItems="center">
+      <Field.Root p={1} invalid={errors.name ? true : false}>
+        <HStack alignItems="center" width={'100%'}>
           <Field.Label w={40}>Product Name:</Field.Label>
           <Input
             _invalid={{ borderColor: 'red.300' }}
             type="text"
             {...register('name', { required: true })}
+            width={'100%'}
           />
         </HStack>
       </Field.Root>
-      <Field.Root p={4} invalid={errors.price ? true : false}>
-        <HStack alignItems="center">
+      <Field.Root p={1} invalid={errors.price ? true : false}>
+        <HStack alignItems="center" width={'100%'}>
           <Field.Label w={40}>Price:</Field.Label>
           <InputGroup startAddon="$">
             <Input
               _invalid={{ borderColor: 'red.300' }}
               type="number"
               {...register('price', { required: true, pattern: /^[0-9]{0,4}[.]?[0-9]{0,2}$/ })}
+              width={'100%'}
             />
           </InputGroup>
         </HStack>
       </Field.Root>
-      <Field.Root p={4}>
-        <HStack alignItems="top">
-          <Field.Label w={40}>Product Image:</Field.Label>
+      <Field.Root p={1}>
+        <Field.Label w={40}>Product Image:</Field.Label>
+        <HStack alignItems="top" width={'100%'}>
           <Box
             width={'100%'}
             flexGrow={3}
             borderWidth={1}
             borderStyle="solid"
             borderRadius={4}
+            borderColor="gray.300"
             p={5}
           >
             <Field.Root>
-              <HStack alignItems="top">
-                <Field.Label w={40}>Upload New Image</Field.Label>
+              <Field.Label w={40}>Upload New Image</Field.Label>
+              <HStack alignItems="top" width={'100%'}>
                 <UploadInput multiple={false} onUpload={handleImageUpload('img')} />
               </HStack>
             </Field.Root>
-            <Field.Root p={4} invalid={errors.img ? true : false}>
-              <HStack alignItems="center">
+            <Field.Root p={1} invalid={errors.img ? true : false}>
+              <HStack alignItems="center" width={'100%'}>
                 <Field.Label w={40}>
                   Or edit image url:{' '}
                   <InfoBubble message="You can edit the image url to be a different image you have uploaded in the past. You can also use an image from a different website. (This value will be overwritten if you select an image to upload.)" />
                 </Field.Label>
-                <Input _invalid={{ borderColor: 'red.300' }} type="text" {...register('img')} />
+                <Input
+                  _invalid={{ borderColor: 'red.300' }}
+                  type="text"
+                  {...register('img')}
+                  width={'100%'}
+                />
                 <Image
                   src={`http://localhost:3000/shop/${thumb}`}
                   boxSize="100px"
@@ -205,8 +217,8 @@ export default function EditProduct({
           </Box>
         </HStack>
       </Field.Root>
-      <Field.Root p={4}>
-        <HStack alignItems="center">
+      <Field.Root p={1}>
+        <HStack alignItems="center" width={'100%'}>
           <Field.Label w={40}>Alt Images:</Field.Label>
           <UploadInput multiple={true} onUpload={handleImageUpload('altimgs')} />
           {fields.map((field, index) => (
@@ -229,8 +241,8 @@ export default function EditProduct({
           </div>
         </HStack>
       </Field.Root>
-      <Field.Root p={4}>
-        <HStack alignItems="top">
+      <Field.Root p={1}>
+        <HStack alignItems="top" width={'100%'}>
           <Field.Label w={40}>Description:</Field.Label>
           <Box width={'100%'} minH={2} border="1px solid gray" borderRadius={5} className="content">
             <StyledInput
@@ -241,91 +253,69 @@ export default function EditProduct({
           </Box>
         </HStack>
       </Field.Root>
-      <Field.Root p={4} invalid={errors.desc_long ? true : false}>
-        <HStack alignItems="top">
+      <Field.Root p={1} invalid={errors.desc_long ? true : false}>
+        <HStack alignItems="top" width={'100%'}>
           <Field.Label w={40}>Detail:</Field.Label>
           <Box width={'100%'} minH={2} border="1px solid gray" borderRadius={5} className="content">
             <StyledInput value={wysiwygText2} onChange={handleTextChange('desc_long')} />
           </Box>
         </HStack>
       </Field.Root>
-      <Field.Root p={4}>
-        <HStack alignItems="center">
+      <Field.Root p={1}>
+        <HStack alignItems="center" width={'100%'}>
           <Field.Label w={40}>
             External Link?: <InfoBubble message={`Used for T-Shirts and other external Products`} />
           </Field.Label>
-          <Input type="url" {...register('externalLink')} />
+          <Input type="url" {...register('externalLink')} width={'100%'} />
         </HStack>
       </Field.Root>
-      <Field.Root p={4}>
-        <HStack alignItems="top">
+      <Field.Root p={1}>
+        <HStack alignItems="top" width={'100%'}>
           <Field.Label w={40}>Categories:</Field.Label>
-          <HStack
-            width="100%"
-            borderWidth={1}
-            borderStyle="solid"
-            p={5}
-            borderRadius={5}
-            wrap="wrap"
-          >
-            <TagSelector
-              onChange={(tags: string[]) => setValue('cat', tags)}
-              value={prodCategories}
-              defaultOptions={categories.map((c) => c.id)}
-            />
-          </HStack>
-        </HStack>
-      </Field.Root>
-      <Field.Root p={4}>
-        <HStack alignItems="top">
-          <Field.Label w={40}>subjects:</Field.Label>
-          <HStack
-            width="100%"
-            borderWidth={1}
-            borderStyle="solid"
-            p={5}
-            borderRadius={5}
-            wrap="wrap"
-          >
-            {subjects?.map((c) => {
-              return (
-                <Box key={c.id} p={2}>
-                  <Checkbox.Root {...register(`design`)} value={c.id}>
-                    {c.name}
-                  </Checkbox.Root>
-                </Box>
-              )
-            })}
-          </HStack>
-        </HStack>
-      </Field.Root>
-
-      <Field.Root p={4}>
-        <HStack alignItems="center">
-          <Field.Label w={40}>Weight (oz):</Field.Label>
-          <Input
-            className={errors.weight ? 'is-invalid' : ''}
-            type="number"
-            {...register('weight', { pattern: /^[0-9]{0,4}[.]?[0-9]{0,2}$/ })}
+          <TagSelector
+            onChange={(tags: string[]) => setValue('cat', tags)}
+            value={prodCategories}
+            defaultOptions={categories.map((c) => c.id)}
           />
         </HStack>
       </Field.Root>
-      <Field.Root p={4}>
-        <HStack alignItems="center">
+      <Field.Root p={1}>
+        <HStack alignItems="top" width={'100%'} gap={2}>
+          <Field.Label w={40}>Subjects:</Field.Label>
+          <TagSelector
+            onChange={(tags: string[]) => setValue('design', tags)}
+            value={prodSubjects}
+            defaultOptions={subjects.map((c) => c.id)}
+          />
+        </HStack>
+      </Field.Root>
+      <Field.Root p={1}>
+        <HStack alignItems="center" width={'100%'}>
           <Field.Label w={40}>Extra Handling:</Field.Label>
-          <InputGroup startAddon="$" _invalid={{ borderColor: 'red.300' }}>
+          <InputGroup startAddon="$" _invalid={{ borderColor: 'red.300' }} width={'100%'}>
             <Input
               className={errors.handling ? 'is-invalid' : ''}
               type="number"
               {...register('handling', { pattern: /^[0-9]{0,4}[.]?[0-9]{0,2}$/ })}
+              width={'100%'}
             />
           </InputGroup>
         </HStack>
       </Field.Root>
-      <Field.Root p={4}>
+      <Field.Root p={1}>
         <HStack>
           <Field.Label w={40}>Sold Out?:</Field.Label>
-          <Checkbox.Root colorScheme="gray" {...register('soldout')}></Checkbox.Root>
+          <Switch.Root
+            colorPalette="slate"
+            checked={!!soldout}
+            onCheckedChange={(e) => setValue('soldout', e.checked)}
+            label="Sold Out"
+          >
+            <Switch.HiddenInput />
+            <Switch.Control bg={soldout ? 'slate.500' : 'slate.300'}>
+              <Switch.Thumb bg={soldout ? 'blue.900' : 'blue.100'} />
+            </Switch.Control>
+          </Switch.Root>
         </HStack>
       </Field.Root>
       <Center>

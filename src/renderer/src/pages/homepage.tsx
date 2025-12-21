@@ -28,6 +28,7 @@ const getSiteData = async (
 }
 
 const emptySiteInfo: SiteInfo = {
+  page_id: 'site',
   page_title: '',
   page_description: '',
   page_content: '',

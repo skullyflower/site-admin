@@ -14,21 +14,19 @@ import {
 import FloatingFormWrapper from '../components/floatingformwrap'
 import { useForm, useWatch } from 'react-hook-form'
 import { newGalleryId } from '../pages/galleriespage'
-import { Gallery } from 'src/shared/types'
+import { GalleryInfo } from 'src/shared/types'
 import StyledInput from '@renderer/components/StyledInput'
 import { buttonRecipe } from '@renderer/themeRecipes'
 
 interface EditGalleryProps {
-  selectedGallery: Gallery
+  selectedGallery: GalleryInfo
   isOpen: boolean
   toggleForm: () => void
-  onSubmit: (data: Gallery) => void
 }
 export default function EditGallery({
   selectedGallery,
   isOpen,
-  toggleForm,
-  onSubmit
+  toggleForm
 }: EditGalleryProps): React.JSX.Element {
   const [wysiwygText, setWysiwygText] = useState(selectedGallery.content)
 
@@ -52,11 +50,10 @@ export default function EditGallery({
     }
   }, [path, setValue])
 
-  // const onSubmit = (data) => {
-  //   window.api.updateGallery(data).then(() => {
-  //     toggleForm()
-  //   })
-  // }
+  const onSubmit = (data: GalleryInfo): void => {
+    window.api.updateGallery(data)
+    toggleForm()
+  }
 
   return (
     <FloatingFormWrapper isOpen={isOpen} onClose={toggleForm}>

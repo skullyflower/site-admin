@@ -77,8 +77,8 @@ const EditBlogEntry = ({
   const thumb = useWatch({ control: control, name: 'image' }) || ''
 
   return (
-    <Stack justifyContent="space-between">
-      <HStack justifyContent="space-between">
+    <Stack gap={1}>
+      <HStack justifyContent="space-between" p={1}>
         <Heading textAlign="center" size="md">
           Add/Edit Blog Entries
         </Heading>
@@ -86,7 +86,7 @@ const EditBlogEntry = ({
           Never mind
         </Button>
       </HStack>
-      <Field.Root p={4} invalid={errors.id ? true : false}>
+      <Field.Root p={1} invalid={errors.id ? true : false}>
         <HStack width={'100%'}>
           <Field.Label w={40}>
             Id: <InfoBubble message={`Blog ids are based on the date"`} />
@@ -94,8 +94,8 @@ const EditBlogEntry = ({
           <Input _invalid={{ borderColor: 'red.300' }} type="text" {...register('id')} />
         </HStack>
       </Field.Root>
-      <Field.Root p={4} invalid={errors.date ? true : false}>
-        <HStack alignItems="center">
+      <Field.Root p={1} invalid={errors.date ? true : false}>
+        <HStack alignItems="center" width={'100%'}>
           <Field.Label w={40}>Date:</Field.Label>
           <Input
             _invalid={{ borderColor: 'red.300' }}
@@ -104,7 +104,7 @@ const EditBlogEntry = ({
           />
         </HStack>
       </Field.Root>
-      <Field.Root p={4} invalid={errors.title ? true : false}>
+      <Field.Root p={1} invalid={errors.title ? true : false}>
         <HStack alignItems="center" width={'100%'}>
           <Field.Label w={40}>Entry Title:</Field.Label>
           <Input
@@ -114,7 +114,7 @@ const EditBlogEntry = ({
           />
         </HStack>
       </Field.Root>
-      <Field.Root p={4}>
+      <Field.Root p={1}>
         <Field.Label>Blog Image:</Field.Label>
         <Box
           width={'100%'}
@@ -126,7 +126,7 @@ const EditBlogEntry = ({
           p={5}
         >
           <Field.Root>
-            <HStack alignItems="top">
+            <HStack alignItems="top" width={'100%'}>
               <Field.Label w={40}>
                 Upload New Image{' '}
                 <InfoBubble
@@ -136,8 +136,8 @@ const EditBlogEntry = ({
               <UploadInput multiple={false} onUpload={handleImageUpload} />
             </HStack>
           </Field.Root>
-          <Field.Root p={4} invalid={errors.image ? true : false}>
-            <HStack alignItems="center">
+          <Field.Root p={1} invalid={errors.image ? true : false}>
+            <HStack alignItems="center" width={'100%'}>
               <Field.Label w={40}>
                 Or edit image url:{' '}
                 <InfoBubble message=" (This value will be overwritten if you select a new image to upload.)" />
@@ -160,13 +160,13 @@ const EditBlogEntry = ({
           </Field.Root>
         </Box>
       </Field.Root>
-      <Field.Root p={4} invalid={errors.imagealt ? true : false}>
+      <Field.Root p={1} invalid={errors.imagealt ? true : false}>
         <HStack alignItems="center" width={'100%'}>
           <Field.Label w={40}>Alt Text:</Field.Label>
           <Input _invalid={{ borderColor: 'red.300' }} type="text" {...register('imagealt')} />
         </HStack>
       </Field.Root>
-      <Field.Root p={4}>
+      <Field.Root p={1}>
         <HStack alignItems="center" width={'100%'}>
           <Field.Label w={40}>Content Link:</Field.Label>
           <Input
@@ -177,7 +177,7 @@ const EditBlogEntry = ({
           />
         </HStack>
       </Field.Root>
-      <Field.Root p={4}>
+      <Field.Root p={1}>
         <HStack alignItems="center" width={'100%'}>
           <Field.Label w={40}>Image Caption:</Field.Label>
           <Input
@@ -187,7 +187,7 @@ const EditBlogEntry = ({
           />
         </HStack>
       </Field.Root>
-      <Field.Root p={4} invalid={errors.heading ? true : false}>
+      <Field.Root p={1} invalid={errors.heading ? true : false}>
         <HStack alignItems="center" width={'100%'}>
           <Field.Label w={40}>Heading:</Field.Label>
           <Input
@@ -197,7 +197,7 @@ const EditBlogEntry = ({
           />
         </HStack>
       </Field.Root>
-      <Field.Root p={4}>
+      <Field.Root p={1}>
         <Stack gap={2} justifyContent={'stretch'} width={'100%'}>
           <Field.Label w={40}>Blog Content:</Field.Label>
           <Box width="100%" minH={2} border="1px solid gray" borderRadius={5} className="content">
@@ -209,7 +209,7 @@ const EditBlogEntry = ({
           </Box>
         </Stack>
       </Field.Root>
-      <Field.Root p={4}>
+      <Field.Root p={1}>
         <TagSelector
           value={thisEntry?.tags || []}
           onChange={(values: string[]) => setValue('tags', values)}

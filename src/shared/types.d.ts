@@ -28,12 +28,13 @@ export interface BlogResponse {
   entries: BlogEntry[]
   message?: string
 }
-export interface pageInfo {
+export interface PageInfo {
+  page_id: string
   page_title: string
   page_description: string
   page_content: string
 }
-export interface SiteInfo extends pageInfo {
+export interface SiteInfo extends PageInfo {
   company_name: string
   site_theme: string
   live_site_url: string
@@ -62,7 +63,7 @@ export interface SubjectResponse {
   subjects: Subject[]
   message?: string
 }
-export interface Gallery {
+export interface GalleryInfo {
   id: string
   json_path: string
   path: string
@@ -72,7 +73,7 @@ export interface Gallery {
   isStory: boolean
 }
 export interface GalleryResponse {
-  galleries: Gallery[]
+  galleries: GalleryInfo[]
   message?: string
 }
 
@@ -86,7 +87,7 @@ export interface GalleryImages extends Record<string, GalleryImage> {}
 export interface ApiMessageResponse {
   message: string
 }
-export interface Product {
+export interface ProductType {
   id: string
   name: string
   price: number

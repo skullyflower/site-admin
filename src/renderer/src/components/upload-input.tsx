@@ -15,7 +15,7 @@ const UploadInput = ({
 }: UploadInputProps): React.ReactNode => {
   const [previewImages, setPreviewImages] = useState<string[]>([])
 
-  const addMultipleImages = (e: React.ChangeEvent<HTMLInputElement>): void => {
+  const addPreviewImages = (e: React.ChangeEvent<HTMLInputElement>): void => {
     if (e.target.files) {
       const imageArray = Array.from(e.target.files).map((file: File) => file)
       window.api.getPreviewImages(imageArray).then((result) => {
@@ -41,7 +41,7 @@ const UploadInput = ({
             type="file"
             accept="image/*"
             multiple={multiple}
-            width={350}
+            width={'100%'}
             height={previewImages?.length > 0 ? 50 : 150}
             paddingTop={previewImages?.length > 0 ? 2 : 10}
             paddingLeft={10}
@@ -59,7 +59,7 @@ const UploadInput = ({
                   }
                 : undefined
             }
-            onChange={addMultipleImages}
+            onChange={addPreviewImages}
           />
         )}
       </HStack>

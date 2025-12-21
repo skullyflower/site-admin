@@ -3,7 +3,7 @@ import { Box, Button, Center, HStack, Heading, Skeleton, Stack } from '@chakra-u
 import EditProduct from '../forms/producteditor'
 import PageLayout from '../components/PageLayout'
 import OneProduct from '../components/oneProduct'
-import { ApiMessageResponse, CategoryType, Product, Subject } from 'src/shared/types'
+import { ApiMessageResponse, CategoryType, ProductType, Subject } from 'src/shared/types'
 import { buttonRecipe } from '@renderer/themeRecipes'
 
 const getProducts = (setProducts, setMessages, setLoading): void => {
@@ -11,9 +11,9 @@ const getProducts = (setProducts, setMessages, setLoading): void => {
   setProducts([])
   window.api
     .getProducts()
-    .then((response: ApiMessageResponse | Product[]) => {
+    .then((response: ApiMessageResponse | ProductType[]) => {
       if (Array.isArray(response)) {
-        setProducts(response.sort((a: Product, b: Product) => a.name.localeCompare(b.name)))
+        setProducts(response.sort((a: ProductType, b: ProductType) => a.name.localeCompare(b.name)))
       } else {
         setProducts([])
         setMessages(response.message)
@@ -64,38 +64,37 @@ const getSubjects = (
   setSubjects([])
   window.api
     .getSubjects()
-    .then((data) => data.json())
-    .then((json) => {
-      if (Array.isArray(json)) {
+    .then((response: ApiMessageResponse | Subject[]) => {
+      if (Array.isArray(response)) {
         // sort by name
         // filter out the super categories
-        const subjects: Subject[] = json.sort((a: Subject, b: Subject) =>
+        const subjects: Subject[] = response.sort((a: Subject, b: Subject) =>
           a.name.localeCompare(b.name)
         )
         setSubjects(subjects)
       } else {
         setSubjects([])
-        setMessages(json.message as string)
+        setMessages(response.message as string)
       }
       setLoading(false)
     })
     .catch((err) => {
-      setMessages((err.message as string) || "Couldn't get categories.")
+      setMessages((err.message as string) || "Couldn't get subjects.")
     })
 }
 
 const ProductsPage = (): React.JSX.Element => {
   const [loading, setLoading] = useState(false)
-  const [products, setProducts] = useState<Product[]>([])
+  const [products, setProducts] = useState<ProductType[]>([])
   const [categories, setCategories] = useState<CategoryType[]>([])
   const [subjects, setSubjects] = useState<Subject[]>([])
   const [messages, setMessages] = useState<string | null>(null)
   const [showForm, setShowForm] = useState(false)
   const [activeProd, setActiveProd] = useState<string | null>(null)
-  const [filteredFroducts, setFilteredProducts] = useState<Product[] | null>(null)
+  const [filteredFroducts, setFilteredProducts] = useState<ProductType[] | null>(null)
   const [filter, setFilter] = useState<string | null>(null)
 
-  const onSubmit = (values: Product): void => {
+  const onSubmit = (values: ProductType): void => {
     setLoading(true)
     //const imagesArr = Array.from(values.newImage)
 
@@ -121,7 +120,7 @@ const ProductsPage = (): React.JSX.Element => {
         getProducts(setProducts, setMessages, setLoading)
         if (filter) {
           setFilteredProducts(
-            products.filter((prod: Product) => prod.cat.includes(filter as string))
+            products.filter((prod: ProductType) => prod.cat.includes(filter as string))
           )
         }
         toggleForm(null)
@@ -146,7 +145,7 @@ const ProductsPage = (): React.JSX.Element => {
       setFilter(filtercat)
       setFilteredProducts(
         filtercat
-          ? products.filter((prod: Product) => prod.cat.includes(filtercat as string))
+          ? products.filter((prod: ProductType) => prod.cat.includes(filtercat as string))
           : products
       )
     },
@@ -226,11 +225,7 @@ const ProductsPage = (): React.JSX.Element => {
               ))}
             </Stack>
             <Center p={5}>
-              <Button
-                recipe={buttonRecipe}
-                value="newcat"
-                onClick={() => toggleForm(showForm ? 'newcat' : null)}
-              >
+              <Button recipe={buttonRecipe} value="newcat" onClick={() => toggleForm('newcat')}>
                 {showForm ? 'Never mind' : 'Add a new one'}
               </Button>
             </Center>

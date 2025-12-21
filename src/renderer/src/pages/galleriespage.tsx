@@ -1,31 +1,41 @@
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
-import { Button, Field, HStack, Heading, Select, Skeleton, Stack } from '@chakra-ui/react'
+import { Button, Field, HStack, Heading, NativeSelect, Skeleton, Stack } from '@chakra-ui/react'
 import UploadInput from '../components/upload-input'
 import FloatingFormWrapper from '../components/floatingformwrap'
 import GalleryGrid from '../components/galleryGrid'
 import EditGallery from '../forms/galleryeditor'
 import PageLayout from '../components/PageLayout'
-import { Gallery, GalleryImage } from 'src/shared/types'
+import { GalleryInfo, GalleryImage } from 'src/shared/types'
+import { buttonRecipe } from '@renderer/themeRecipes'
 
 export const newGalleryId = 'new-gallery'
 
 const getGalleries = (
-  setGalleries: (galleries: Gallery[]) => void,
+  setGalleries: (galleries: GalleryInfo[]) => void,
   setMessages: (message: string) => void
 ): void => {
   window.api.getGalleries().then((res) => {
-    if (typeof res === 'object' && 'galleries' in res) {
-      const galleries = res.galleries as Gallery[]
+    if (typeof res === 'object' && 'message' in res) {
+      setMessages((res.message as string) || '')
+    } else {
+      const galleries = res as GalleryInfo[]
       setGalleries(galleries)
     }
-    setMessages((res.message as string) || '')
   })
 }
 
-const getGalleryImages = async (gallery_id: string, setter: (gallery) => void): Promise<void> => {
-  window.api.getGallery(gallery_id).then((res) => {
-    setter(Object.values(res) as GalleryImage[])
+const getGalleryImages = async (
+  gallery_id: string,
+  setter: (images: GalleryImage[]) => void,
+  setMessages: (message: string) => void
+): Promise<void> => {
+  window.api.getGalleryImages(gallery_id).then((res) => {
+    if (typeof res === 'object' && 'message' in res) {
+      setMessages(res.message)
+    } else {
+      setter(Object.values(res) as GalleryImage[])
+    }
   })
 }
 
@@ -36,26 +46,27 @@ const newgallery = {
   title: '',
   linked_prod: '',
   isStory: false
-} as Gallery
+} as GalleryInfo
 
 const GalleryPage: React.FC = () => {
   const [messages, setMessages] = useState<string | null>(null)
-  const [galleries, setGalleries] = useState<Gallery[] | null>(null)
-  const [activeGallery, setActiveGallery] = useState<Gallery | null>(null)
+  const [galleries, setGalleries] = useState<GalleryInfo[] | null>(null)
+  const [activeGallery, setActiveGallery] = useState<GalleryInfo | null>(null)
   const [images, setImages] = useState<GalleryImage[]>([])
+  const [newImages, setNewImages] = useState<string[]>([])
   const [showUpload, setShowUpload] = useState(false)
   const [showAddEdit, setShowAddEdit] = useState(false)
   const [loading, setLoading] = useState(false)
-  const { register, handleSubmit } = useForm()
+  const { register } = useForm()
   const [imageCount, setImageCount] = useState(0)
 
-  const onSelect = (value: string): void => {
+  const selectGallery = (galleryId: string): void => {
     setLoading(true)
-    const gallery = galleries?.find((g) => g.id === value)
+    const gallery = galleries?.find((g) => g.id === galleryId)
     if (gallery !== undefined) {
       setActiveGallery(gallery)
       setLoading(false)
-      getGalleryImages(gallery.id, setImages)
+      getGalleryImages(gallery.id, setImages, setMessages)
     }
   }
 
@@ -66,14 +77,14 @@ const GalleryPage: React.FC = () => {
     setShowAddEdit(!showAddEdit)
   }
 
-  const doResetGallery = (gallery: Gallery): Promise<void> => {
-    return window.api
-      .resetGallery(gallery)
+  const doResetGallery = (gallery: GalleryInfo): void => {
+    window.api
+      .resetGallery(gallery.id)
       .then((res) => {
         if (typeof res === 'object' && 'message' in res) {
           setMessages(res.message)
         } else {
-          getGalleryImages(gallery.id, setImages)
+          getGalleryImages(gallery.id, setImages, setMessages)
         }
       })
       .catch((err) => {
@@ -81,63 +92,39 @@ const GalleryPage: React.FC = () => {
       })
   }
 
-  const onSubmit = (data: FormData): void => {
-    // TODO: file upload via electron api
-    const imagesArr = Array.from(data.images)
-    if (!imagesArr.length) return
-
-    var formData = new FormData()
-    formData.append('dest', activeGallery.path)
-    for (var file of imagesArr) {
-      formData.append('images', file)
+  const addGalleryImages = async (): Promise<void> => {
+    if (!activeGallery) {
+      setMessages('No gallery selected.')
+      return
     }
-    fetch('http://localhost:4242/api/imageupload', {
-      method: 'POST',
-      body: formData
-    })
-      .then((data) => data.json())
-      .then((json) => {
-        setMessages(json.message)
-      })
-      .then(() => {
-        doResetGallery(activeGallery as Gallery)()
-      })
-      .catch(() => {
-        setMessages('Failed to upload files.')
-      })
-      .finally(() => {
-        setShowUpload(false)
-      })
+    const res = await window.api.uploadImages(activeGallery?.path || 'artwork', newImages)
+    setMessages(res.message)
+    doResetGallery(activeGallery)
+    setShowUpload(false)
   }
 
-  const updateImage = (imageurl, date, name) => () => {
-    const extention = imageurl.substr(imageurl.lastIndexOf('.'))
+  const updateImage = (imageurl: string, date: string, name: string): void => {
+    const extention = imageurl.split('.').pop()
     const newName = `${date}${name.replaceAll(' ', '')}${extention}`
-    fetch(`http://localhost:4242/api/images/`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ imageurl: imageurl, newname: newName })
-    })
-      .then((data) => data.json())
-      .then((json) => {
-        setMessages(json.message)
-      })
-      .then(() => {
-        doResetGallery(activeGallery as Gallery)()
+    window.api
+      .renameImage(imageurl, newName)
+      .then((res) => {
+        setMessages(res.message)
+        doResetGallery(activeGallery as GalleryInfo)
       })
       .catch((err) => {
         setMessages(err.message || 'There was a problem.')
       })
   }
 
-  const deleteImage = (imageurl): Promise<void> => {
-    return window.api
+  const deleteImage = (imageurl): void => {
+    window.api
       .deleteImage(imageurl)
       .then((res) => {
         if (typeof res === 'object' && 'message' in res) {
           setMessages(res.message)
         } else {
-          return doResetGallery(activeGallery as Gallery)
+          return doResetGallery(activeGallery as GalleryInfo)
         }
       })
       .catch((err) => {
@@ -170,27 +157,29 @@ const GalleryPage: React.FC = () => {
             <Field.Root p={4}>
               <HStack>
                 <Field.Label w={40}>Select a gallery:</Field.Label>
-                <Select
-                  name="dest"
-                  value={activeGallery?.id || ''}
-                  placeholder="Select a gallery"
-                  onChange={(e) => onSelect(e.target.value)}
-                >
-                  {galleries.map((gallery) => (
-                    <option key={gallery.id} value={gallery.id}>
-                      {gallery.title}
-                    </option>
-                  ))}
-                </Select>
+                <NativeSelect.Root>
+                  <NativeSelect.Field
+                    placeholder="Select a gallery"
+                    {...register('dest')}
+                    onChange={(e) => selectGallery(e.target.value)}
+                  >
+                    {galleries.map((gallery) => (
+                      <option key={gallery.id} value={gallery.id}>
+                        {gallery.title}
+                      </option>
+                    ))}
+                  </NativeSelect.Field>
+                  <NativeSelect.Indicator />
+                </NativeSelect.Root>
               </HStack>
             </Field.Root>
-
+            {/* Edit images in one gallery */}
             {!!activeGallery && !loading && (
               <Stack>
                 <Heading size="sm">Update Gallery: {activeGallery.title}</Heading>
                 <HStack justifyContent="center">
                   <Button onClick={toggleShowForm}>Add Images</Button>
-                  <Button onClick={() => doResetGallery(activeGallery as Gallery)}>
+                  <Button onClick={() => doResetGallery(activeGallery as GalleryInfo)}>
                     Reset Json File
                   </Button>
                   <Button onClick={toggleShowAdd}>Edit Gallery</Button>
@@ -200,7 +189,7 @@ const GalleryPage: React.FC = () => {
                     gallery={activeGallery}
                     images={images}
                     deleteImage={deleteImage}
-                    updateImage={(imageurl, date, name) => updateImage(imageurl, date, name)()}
+                    updateImage={updateImage}
                   />
                 )}
               </Stack>
@@ -220,12 +209,12 @@ const GalleryPage: React.FC = () => {
                   </Stack>
                 ) : (
                   <>
-                    <UploadInput register={register} setImageCount={setImageCount} name="images" />
-                    <Button
-                      variant="shopButt"
-                      disabled={!imageCount}
-                      onClick={handleSubmit(onSubmit)}
-                    >
+                    <UploadInput
+                      multiple={true}
+                      onUpload={setNewImages}
+                      setImageCount={setImageCount}
+                    />
+                    <Button recipe={buttonRecipe} disabled={!imageCount} onClick={addGalleryImages}>
                       Upload and Resize
                     </Button>
                   </>
@@ -240,11 +229,6 @@ const GalleryPage: React.FC = () => {
                   toggleShowAdd()
                 }}
                 isOpen={showAddEdit}
-                onSubmit={onSubmit}
-                onCancel={() => {
-                  setActiveGallery(null)
-                  toggleShowAdd()
-                }}
               />
             )}
           </Stack>

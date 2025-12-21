@@ -52,7 +52,7 @@ const EditBlogData = ({
             <Accordion.ItemIndicator />
           </Accordion.ItemTrigger>
           <Accordion.ItemContent>
-            <Field.Root p={4} invalid={errors.page_title ? true : false}>
+            <Field.Root p={1} invalid={errors.page_title ? true : false}>
               <HStack alignItems="center" width={'100%'}>
                 <Field.Label w={48}>
                   Page Title:{' '}
@@ -65,7 +65,7 @@ const EditBlogData = ({
                 />
               </HStack>
             </Field.Root>
-            <Field.Root p={4} invalid={errors.page_description ? true : false}>
+            <Field.Root p={1} invalid={errors.page_description ? true : false}>
               <HStack alignItems="center" width={'100%'}>
                 <Field.Label w={48}>
                   Blog SEO Page Description:{' '}
@@ -81,7 +81,7 @@ const EditBlogData = ({
                 />
               </HStack>
             </Field.Root>
-            <Field.Root p={4} invalid={errors.page_content ? true : false}>
+            <Field.Root p={1} invalid={errors.page_content ? true : false}>
               <Stack gap={2} justifyContent={'stretch'} width={'100%'}>
                 <Field.Label w={40}>Blog page Content:</Field.Label>
                 <Box

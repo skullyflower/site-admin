@@ -1,43 +1,44 @@
 import fs from 'fs'
 import getPathsFromConfig, { checkFile } from './pathData'
+import { ProductType } from '../../shared/types'
 
 const { pathToPublic } = getPathsFromConfig()
 
 const shopfilepath = `${pathToPublic}/data/products.json`
 import processFile from './imageProcessor'
 
-export const updateProduct = async (product, files): Promise<string> => {
+export const updateProduct = async (product: ProductType): Promise<string> => {
   if (product) {
     try {
       const categoryId = product.cat[0]
 
       const smallDestPath = `${pathToPublic}/shop/${categoryId}/`
       const bigDestPath = `${pathToPublic}/shop/smaller/${categoryId}/`
-
-      if (files) {
-        for (const file of files) {
+      const filePaths = [product.img, ...product.altimgs]
+      if (filePaths.length) {
+        for (const filePath of filePaths) {
           try {
-            processFile(file, 850, bigDestPath)
-            processFile(file, 450, smallDestPath)
-            fs.copyFileSync(
-              `${smallDestPath}${file.filename}`,
-              `${smallDestPath.replace('public', 'build')}`
-            )
-            fs.linkSync(
-              `${smallDestPath}${file.filename}`,
-              `${smallDestPath.replace('skullyflower', 'skullyflowerTS')}${file.filename}`
-            )
-            fs.copyFileSync(
-              `${bigDestPath}${file.filename}`,
-              `${bigDestPath.replace('public', 'build')}`
-            )
-            fs.linkSync(
-              `${bigDestPath}${file.filename}`,
-              `${bigDestPath.replace('skullyflower', 'skullyflowerTS')}${file.filename}`
-            )
-            product.img = `${bigDestPath.replace('../skullyflower/public', '')}${file.filename}`
+            processFile(filePath, 850, bigDestPath)
+            processFile(filePath, 450, smallDestPath)
+            // fs.copyFileSync(
+            //   `${smallDestPath}${filePath.filename}`,
+            //   `${smallDestPath.replace('public', 'build')}`
+            // )
+            // fs.linkSync(
+            //   `${smallDestPath}${file.filename}`,
+            //   `${smallDestPath.replace('skullyflower', 'skullyflowerTS')}${file.filename}`
+            // )
+            // fs.copyFileSync(
+            //   `${bigDestPath}${file.filename}`,
+            //   `${bigDestPath.replace('public', 'build')}`
+            // )
+            // fs.linkSync(
+            //   `${bigDestPath}${file.filename}`,
+            //   `${bigDestPath.replace('skullyflower', 'skullyflowerTS')}${file.filename}`
+            // )
+            // product.img = `${bigDestPath.replace('../skullyflower/public', '')}${file.filename}`
           } catch (err) {
-            console.log(`Failed: file upload: ${err}`)
+            console.log(`Failed: file upload: ${filePath}: ${err}`)
           }
         }
       }

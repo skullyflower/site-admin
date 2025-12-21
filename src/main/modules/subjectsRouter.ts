@@ -4,35 +4,11 @@ import getPathsFromConfig, { checkFile } from './pathData'
 const { pathToPublic } = getPathsFromConfig()
 
 const subjectFilePath = `${pathToPublic}/data/subjects.json`
-import processFile from './imageProcessor.js'
+//import processFile from './imageProcessor.js'
 
-export const updateSubject = async (subject, files): Promise<string> => {
+export const updateSubject = async (subject): Promise<string> => {
   if (subject) {
-    const bigDestPath = `${pathToPublic}/shop/subjects/${subject.id}/`
-    //check for path. if it doesn't exist create it.
-    const smallDestPath = `${pathToPublic}/shop/subjects/smaller/${subject.id}/`
-    //check for path. if it doesn't exitst, create it.
     try {
-      if (files) {
-        for (const file of files) {
-          try {
-            processFile(file, 850, bigDestPath)
-            processFile(file, 450, smallDestPath)
-            // skullyflower only for copying to the local build
-            fs.copyFileSync(
-              `${smallDestPath}${file.filename}`,
-              `${smallDestPath.replace('public', 'build')}`
-            )
-            fs.copyFileSync(
-              `${bigDestPath}${file.filename}`,
-              `${bigDestPath.replace('public', 'build')}`
-            )
-            subject.img = `${bigDestPath.replace('../skullyflower/public', '')}${file.filename}`
-          } catch (err) {
-            console.log(`Failed: file upload: ${err}`)
-          }
-        }
-      }
       checkFile(subjectFilePath, { designs: [] })
       checkFile(subjectFilePath.replace('public', 'build'), { designs: [] })
       const oldShopDataString = fs.readFileSync(subjectFilePath, 'utf8')

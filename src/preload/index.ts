@@ -1,6 +1,6 @@
 import { contextBridge, ipcRenderer, webUtils } from 'electron'
 import { electronAPI /* , WebUtils */ } from '@electron-toolkit/preload'
-import { BlogEntry, CategoryType } from '../shared/types'
+import { BlogEntry, CategoryType, PageInfo, ProductType } from '../shared/types'
 
 // Custom APIs for renderer
 const api = {
@@ -19,6 +19,27 @@ const api = {
   // Site Info API functions
   getSiteInfo: async () => {
     const response = await ipcRenderer.invoke('get-site-info')
+    return JSON.parse(response)
+  },
+  // Content Page API functions
+  getPages: async () => {
+    const response = await ipcRenderer.invoke('get-pages')
+    return JSON.parse(response)
+  },
+  getPage: async (pageId: string) => {
+    const response = await ipcRenderer.invoke('get-page', pageId)
+    return JSON.parse(response)
+  },
+  createPage: async (pageId: string) => {
+    const response = await ipcRenderer.invoke('create-page', pageId)
+    return JSON.parse(response)
+  },
+  updatePage: async (pageId: string, values: PageInfo) => {
+    const response = await ipcRenderer.invoke('update-page', pageId, values)
+    return JSON.parse(response)
+  },
+  deletePage: async (pageId: string) => {
+    const response = await ipcRenderer.invoke('delete-page', pageId)
     return JSON.parse(response)
   },
   updateSiteInfo: async (values) => {
@@ -56,7 +77,7 @@ const api = {
     const response = await ipcRenderer.invoke('get-products')
     return JSON.parse(response)
   },
-  updateProduct: async (product: string) => {
+  updateProduct: async (product: ProductType) => {
     const response = await ipcRenderer.invoke('update-product', product)
     return JSON.parse(response)
   },
@@ -66,6 +87,10 @@ const api = {
   },
   updateSubject: async (subject: string) => {
     const response = await ipcRenderer.invoke('update-subject', subject)
+    return JSON.parse(response)
+  },
+  deleteSubject: async (subjectid: string) => {
+    const response = await ipcRenderer.invoke('delete-subject', subjectid)
     return JSON.parse(response)
   },
   getCategories: async () => {
@@ -89,12 +114,12 @@ const api = {
     const response = await ipcRenderer.invoke('update-gallery', gallery)
     return JSON.parse(response)
   },
-  getGallery: async (gallery_id: string) => {
-    const response = await ipcRenderer.invoke('get-gallery', gallery_id)
-    return response
+  getGalleryImages: async (gallery_path: string) => {
+    const response = await ipcRenderer.invoke('get-gallery-images', gallery_path)
+    return JSON.parse(response)
   },
-  resetGallery: async (gallery: string) => {
-    const response = await ipcRenderer.invoke('reset-gallery', gallery)
+  resetGallery: async (galleryId: string) => {
+    const response = await ipcRenderer.invoke('reset-gallery', galleryId)
     return JSON.parse(response)
   },
   // Image API functions

@@ -5,6 +5,7 @@ import PageLayout from '../components/PageLayout'
 import { ApiMessageResponse, CategoryType } from 'src/shared/types'
 import { buttonRecipe } from '@renderer/themeRecipes'
 import imageLoading from '@renderer/assets/image-loading.svg'
+import SemiSafeContent from '../components/SemiSafeContent'
 
 const getCategories = (
   setCategories: (categories: CategoryType[]) => void,
@@ -46,7 +47,7 @@ const CategoriesPage = (): React.JSX.Element => {
         toggleCatForm(null)
       })
       .catch((err: Error) => {
-        setMessages((err.message as string) || 'there was a problem.')
+        setMessages((err.message as string) || "Couldn't update categories.")
       })
   }
 
@@ -59,7 +60,7 @@ const CategoriesPage = (): React.JSX.Element => {
           getCategories(setCategories, setMessages, setLoading)
         })
         .catch((err: Error) => {
-          setMessages((err.message as string) || 'there was a problem.')
+          setMessages((err.message as string) || "Couldn't delete category.")
         })
     }
   }
@@ -79,7 +80,7 @@ const CategoriesPage = (): React.JSX.Element => {
     <PageLayout
       title="Add, Update, Delete Categories"
       messages={messages}
-      button={{ action: toggleCatForm, text: 'Add a new one', value: 'newcat' }}
+      button={{ action: () => toggleCatForm('newcat'), text: 'Add a new one', value: 'newcat' }}
     >
       {loading ? (
         <Stack>
@@ -97,19 +98,17 @@ const CategoriesPage = (): React.JSX.Element => {
               onSubmit={onSubmit}
             />
           )}
-
-          {categories?.map((cat) => (
-            <HStack
-              key={cat.id}
-              p={5}
-              m={5}
-              border="1px solid"
-              borderRadius={5}
-              w="100%"
-              alignItems="start"
-              justifyContent="space-between"
-            >
-              <Stack>
+          <Stack>
+            {categories?.map((cat) => (
+              <HStack
+                key={cat.id}
+                p={5}
+                border="1px solid"
+                borderRadius={5}
+                w="100%"
+                alignItems="start"
+                justifyContent="space-between"
+              >
                 <Image
                   src={`http://localhost:3000/${cat.img}`}
                   boxSize="75px"
@@ -118,39 +117,33 @@ const CategoriesPage = (): React.JSX.Element => {
                     e.currentTarget.src = imageLoading
                   }}
                 />
-                <Heading size="sm" lineHeight={2}>
-                  {cat.name}
-                </Heading>
-              </Stack>
-              <div
-                style={{
-                  textAlign: 'left',
-                  display: 'inline-block',
-                  width: '60%',
-                  verticalAlign: 'top'
-                }}
-                dangerouslySetInnerHTML={{ __html: cat.description }}
-              />
-              <HStack gap={4}>
-                <Button variant="ghost" size="sm" value={cat.id} onClick={() => doDelete(cat.id)}>
-                  X
-                </Button>
-                <Button
-                  recipe={buttonRecipe}
-                  size="sm"
-                  value={cat.id}
-                  onClick={() => toggleCatForm(cat.id)}
-                >
-                  Edit
-                </Button>
+                <Stack>
+                  <Heading size="sm" lineHeight={2}>
+                    {cat.name}
+                  </Heading>
+                  <SemiSafeContent rawContent={cat.description} />
+                </Stack>
+                <HStack gap={4}>
+                  <Button variant="ghost" size="sm" value={cat.id} onClick={() => doDelete(cat.id)}>
+                    X
+                  </Button>
+                  <Button
+                    recipe={buttonRecipe}
+                    size="sm"
+                    value={cat.id}
+                    onClick={() => toggleCatForm(cat.id)}
+                  >
+                    Edit
+                  </Button>
+                </HStack>
               </HStack>
-            </HStack>
-          ))}
-          <Center>
-            <Button recipe={buttonRecipe} value="newcat" onClick={() => toggleCatForm(null)}>
-              {showCatForm ? 'Never mind' : 'Add a new one'}
-            </Button>
-          </Center>
+            ))}
+            <Center>
+              <Button recipe={buttonRecipe} value="newcat" onClick={() => toggleCatForm(null)}>
+                {showCatForm ? 'Never mind' : 'Add a new one'}
+              </Button>
+            </Center>
+          </Stack>
         </Box>
       )}
     </PageLayout>

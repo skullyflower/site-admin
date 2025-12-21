@@ -17,8 +17,8 @@ import { GalleryImage } from 'src/shared/types'
 interface GalleryGridImageProps {
   oneImage: GalleryImage
   imgDir: string
-  deleteImage: (imageurl: string) => () => void
-  updateImage: (imageurl: string, date: string, name: string) => () => void
+  deleteImage: (imageurl: string) => void
+  updateImage: (imageurl: string, date: string, name: string) => void
 }
 
 export const GalleryGridImage = ({
@@ -28,8 +28,8 @@ export const GalleryGridImage = ({
   updateImage
 }: GalleryGridImageProps): React.ReactNode => {
   const [title, setTitle] = useState(oneImage.imgtitle)
-  const [date, setDate] = useState(oneImage.imgfile.substr(0, 8))
-  const imageurl = `${imgDir}/${oneImage.imgfile}`
+  const [date, setDate] = useState(oneImage.imgfile?.substring(0, 8) ?? '')
+  const imageurl = `${imgDir}/${oneImage.imgfile ?? ''}`
 
   const imagePath = imageurl.replace('http://localhost:3000/', '')
   const { open, onOpen: onOpenDelete, onClose: onCloseDelete } = useDisclosure()
@@ -82,7 +82,7 @@ export const GalleryGridImage = ({
                     alignSelf="right"
                     recipe={buttonRecipe}
                     size={'sm'}
-                    onClick={updateImage(imagePath, date, title)}
+                    onClick={() => updateImage(imagePath, date, title)}
                   >
                     Rename
                   </Button>
@@ -93,7 +93,7 @@ export const GalleryGridImage = ({
         </Stack>
         <ConfirmDelete
           what={oneImage.imgfile}
-          action={deleteImage(imagePath)}
+          action={() => deleteImage(imagePath)}
           isOpen={open}
           onClose={onCloseDelete}
         />

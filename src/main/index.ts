@@ -1,4 +1,13 @@
-import { app, shell, BrowserWindow, ipcMain, dialog, OpenDialogReturnValue } from 'electron'
+import {
+  app,
+  shell,
+  BrowserWindow,
+  ipcMain,
+  dialog,
+  OpenDialogReturnValue,
+  MenuItem,
+  Menu
+} from 'electron'
 import path, { join } from 'path'
 import { electronApp, optimizer } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
@@ -6,7 +15,12 @@ import icon from '../../resources/icon.png?asset'
 import { getBlogs, updateBlogInfo, updateBlogPost, deletEntry } from './modules/blogRouter'
 import { getSiteInfo, updateSiteInfo } from './modules/homeRouter'
 import { getSale, setSale } from './modules/saleRouter'
-import { getGalleries, updateGallery, resetGallery } from './modules/galleryRouter'
+import {
+  getGalleries,
+  updateGallery,
+  resetGallery,
+  getGalleryImages
+} from './modules/galleryRouter'
 import {
   getStagedImages,
   moveImages,
@@ -20,9 +34,8 @@ import {
 } from './modules/imagesRouter'
 import { registerRoute } from '../lib/electron-router-dom'
 import { getAdminConfig, updateAdminConfig } from './modules/configRouter'
-import { BlogEntry, Category, Product, Subject } from '../shared/types'
-import { FileLike } from './modules/imageProcessor'
-import { getSubjects, updateSubject } from './modules/subjectsRouter'
+import { BlogEntry, CategoryType, ProductType, Subject } from '../shared/types'
+import { deleteSubject, getSubjects, updateSubject } from './modules/subjectsRouter'
 import { getProducts, updateProduct } from './modules/productsRouter'
 import { getAllCategories, updateCategories } from './modules/categoriesRouter'
 
@@ -37,7 +50,7 @@ function createWindow(): void {
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
       sandbox: false,
-      webviewTag: true
+      spellcheck: true
     }
   })
 
@@ -50,13 +63,21 @@ function createWindow(): void {
     return { action: 'deny' }
   })
 
-  // HMR for renderer base on electron-vite cli.
-  // Load the remote URL for development or the local html file for production.
-  // if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
-  //   mainWindow.loadURL(process.env['ELECTRON_RENDERER_URL'])
-  // } else {
-  //   mainWindow.loadFile(join(__dirname, '../renderer/index.html'))
-  // }
+  mainWindow.webContents.on('context-menu', (_event, params) => {
+    const menu = new Menu()
+
+    // Add each spelling suggestion
+    for (const suggestion of params.dictionarySuggestions) {
+      menu.append(
+        new MenuItem({
+          label: suggestion,
+          click: (): void => mainWindow.webContents.replaceMisspelling(suggestion)
+        })
+      )
+    }
+
+    menu.popup()
+  })
 
   registerRoute({
     id: 'main',
@@ -119,6 +140,7 @@ ipcMain.handle('get-site-info', getSiteInfo)
 ipcMain.handle('update-site-info', (_event, siteInfo: string) => updateSiteInfo(siteInfo))
 // Gallery API functions
 ipcMain.handle('get-galleries', getGalleries)
+ipcMain.handle('get-gallery-images', (_event, gallery_id: string) => getGalleryImages(gallery_id))
 ipcMain.handle('update-gallery', (_event, gallery: string) => updateGallery(gallery))
 ipcMain.handle('reset-gallery', (_event, gallery: string) => resetGallery(gallery))
 ipcMain.handle('get-staged-images', getStagedImages)
@@ -141,17 +163,18 @@ ipcMain.handle('rename-image', (_event, imageurl: string, newname: string) =>
 )
 ipcMain.handle('delete-image', (_event, imageurl: string) => deleteImage(imageurl))
 ipcMain.handle('get-folder-images', (_event, toplevel: string) => getFolderImages(toplevel))
-ipcMain.handle('upload-images', (_event, dest: string, files: string) => uploadImages(dest, files))
+ipcMain.handle('upload-images', (_event, dest: string, filePaths: string[]) =>
+  uploadImages(dest, filePaths)
+)
 // work this out, might need to get one preview at a time, we are only moving files and then displaying them.
 ipcMain.handle('get-preview-images', (_event, images: string[]) => getPreviewImages(images))
 // Shop API functions
 ipcMain.handle('get-products', getProducts)
-ipcMain.handle('update-product', (_event, product: Product, files: FileLike[]) =>
-  updateProduct(product, files)
-)
+ipcMain.handle('update-product', (_event, product: ProductType) => updateProduct(product))
 ipcMain.handle('get-subjects', getSubjects)
 ipcMain.handle('update-subject', (_event, subject: Subject) => updateSubject(subject))
+ipcMain.handle('delete-subject', (_event, subjectid: string) => deleteSubject(subjectid))
 ipcMain.handle('get-categories', getAllCategories)
-ipcMain.handle('update-category', (_event, category: Category) => updateCategories(category))
+ipcMain.handle('update-category', (_event, category: CategoryType) => updateCategories(category))
 ipcMain.handle('get-sale', getSale)
 ipcMain.handle('set-sale', (_event, sale: string) => setSale(sale))

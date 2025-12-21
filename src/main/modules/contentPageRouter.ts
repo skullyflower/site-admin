@@ -1,17 +1,25 @@
-import { readdirSync, readFileSync, writeFileSync } from 'fs'
+import { existsSync, readdirSync, readFileSync, unlinkSync, writeFileSync } from 'fs'
 import getPathsFromConfig, { checkFile, checkPath } from './pathData'
+import { ApiMessageResponse, PageInfo } from '../../shared/types'
 
 const { pathToPublic } = getPathsFromConfig()
 const rootdir = `${pathToPublic}/data`
 
-export const getPages = (): string => {
+export const getPageFiles = (): string[] => {
   checkPath(rootdir)
   const files = readdirSync(rootdir)
-  return JSON.stringify({ files: files })
+  const pageFiles = files.filter((file) => file.endsWith('-page.json'))
+  return pageFiles
 }
 
-export const getPage = (page): string => {
-  const pagefilepath = `${rootdir}/${page}-data.json`
+export const getPages = (): string => {
+  const pageFiles = getPageFiles()
+  const pages = pageFiles.map((file) => file.replace('-page.json', ''))
+  return JSON.stringify(pages)
+}
+
+export const getPage = (pageId: string): PageInfo | string => {
+  const pagefilepath = `${rootdir}/${pageId}-page.json`
   checkFile(pagefilepath, { page_title: '', page_description: '', page_content: '' })
   const pageDataJson = readFileSync(pagefilepath, 'utf8')
   const pageData = JSON.parse(pageDataJson)
@@ -40,4 +48,26 @@ export const updatePage = (page, body): string => {
   }
 }
 
+export const createPage = (pageId: string): string => {
+  const pagefilepath = `${rootdir}/${pageId}-page.json`
+  checkFile(pagefilepath, { page_title: '', page_description: '', page_content: '' })
+  const pageData: PageInfo = {
+    page_id: pageId,
+    page_title: '',
+    page_description: '',
+    page_content: ''
+  }
+  writeFileSync(pagefilepath, JSON.stringify(pageData))
+  return JSON.stringify({ message: 'Page created!' } as ApiMessageResponse)
+}
+
+export const deletePage = (pageId: string): string => {
+  const pagefilepath = `${rootdir}/${pageId}-page.json`
+  if (existsSync(pagefilepath)) {
+    unlinkSync(pagefilepath)
+    return JSON.stringify({ message: 'Page deleted!' })
+  } else {
+    return JSON.stringify({ message: 'Page not found.' })
+  }
+}
 //TODO get list of pages, create pages, delete pages as well as get and set page. I think this could be easily achieved with a pages subdirectory in data/
