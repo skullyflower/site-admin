@@ -1,36 +1,40 @@
 import { existsSync, readdirSync, readFileSync, unlinkSync, writeFileSync } from 'fs'
-import getPathsFromConfig, { checkFile, checkPath } from './pathData'
+import getPathsFromConfig, { checkFile } from './pathData'
 import { ApiMessageResponse, PageInfo } from '../../shared/types'
 
 const { pathToPublic } = getPathsFromConfig()
 const rootdir = `${pathToPublic}/data`
 
 export const getPageFiles = (): string[] => {
-  checkPath(rootdir)
-  const files = readdirSync(rootdir)
-  const pageFiles = files.filter((file) => file.endsWith('-page.json'))
-  return pageFiles
+  try {
+    const files = readdirSync(rootdir)
+    const pageFiles = files.filter((file) => file.endsWith('-page.json'))
+    return pageFiles
+  } catch (err) {
+    console.log(err)
+    return []
+  }
 }
 
 export const getPages = (): string => {
   const pageFiles = getPageFiles()
   const pages = pageFiles.map((file) => file.replace('-page.json', ''))
-  return JSON.stringify(pages)
+  return JSON.stringify(pages || [])
 }
 
 export const getPage = (pageId: string): PageInfo | string => {
   const pagefilepath = `${rootdir}/${pageId}-page.json`
   checkFile(pagefilepath, { page_title: '', page_description: '', page_content: '' })
   const pageDataJson = readFileSync(pagefilepath, 'utf8')
-  const pageData = JSON.parse(pageDataJson)
-  if (pageData) {
-    JSON.stringify(pageData)
+  //const pageData = JSON.parse(pageDataJson)
+  if (pageDataJson) {
+    return pageDataJson
   }
   return JSON.stringify({ message: 'Page not found.' })
 }
 
 export const updatePage = (page, body): string => {
-  const pagefilepath = `${rootdir}/${page}-data.json`
+  const pagefilepath = `${rootdir}/${page}-page.json`
   if (body) {
     try {
       checkFile(pagefilepath, { page_title: '', page_description: '', page_content: '' })

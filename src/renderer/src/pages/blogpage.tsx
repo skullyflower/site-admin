@@ -44,6 +44,7 @@ const BlogPage = (): React.JSX.Element => {
   const [showForm, setShowForm] = useState(false)
   const [activeBlog, setActiveBlog] = useState<string | null>(null)
   const [sitedata, setSiteData] = useState<SiteInfo | null>()
+
   const onUpdateInfo = async (values: BlogInfo): Promise<void> => {
     setMessages(null as unknown as string)
     try {

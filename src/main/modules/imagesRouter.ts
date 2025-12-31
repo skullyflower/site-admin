@@ -1,12 +1,16 @@
 import fs from 'fs'
 import path from 'path'
-import { app } from 'electron'
 import processFile, { ProcessedImage } from './imageProcessor'
 import getPathsFromConfig, { checkPath } from './pathData'
 
 const { pathToPublic, pathToBuild } = getPathsFromConfig()
 const tempPath = path.join(pathToPublic, 'temp')
-
+// TODO: rewrite so that big images are the standard size and small images are in the smaller directory, always.
+/**
+ * Moves images to the publictemp directory of the subject site for previewing.
+ * @param files - An array of file paths.
+ * @returns An array of updated file paths for previewing.
+ */
 export const getPreviewImages = async (files: string[]): Promise<string[]> => {
   checkPath(tempPath)
   if (files.length > 0) {
@@ -33,7 +37,6 @@ const bigSourcePath = tempPath
 const smallSourcePath = path.join(tempPath, 'small')
 
 const publicPath = `${pathToPublic}/`
-const buildPath = `${pathToBuild}/`
 
 const getDestinationPaths = (
   topdir,
@@ -41,25 +44,23 @@ const getDestinationPaths = (
 ): {
   pubPathBig: string
   pubPathSmall: string
-  buildPathBig: string
-  buildPathSmall: string
 } => {
   if (subdir !== 'bigger' && topdir !== 'images') {
     return {
       pubPathBig: `${publicPath}${topdir}/${subdir}/bigger/`,
-      pubPathSmall: `${publicPath}${topdir}/${subdir}/`,
-      buildPathBig: `${buildPath}${topdir}/${subdir}/bigger/`,
-      buildPathSmall: `${buildPath}${topdir}/${subdir}/`
+      pubPathSmall: `${publicPath}${topdir}/${subdir}/`
     }
   }
   return {
     pubPathBig: `${publicPath}${topdir}/${subdir}/`,
-    pubPathSmall: `${publicPath}${topdir}/`,
-    buildPathBig: `${buildPath}${topdir}/${subdir}/`,
-    buildPathSmall: `${buildPath}${topdir}/`
+    pubPathSmall: `${publicPath}${topdir}/`
   }
 }
 
+/**
+ * reads contents of the temp directory and returns a list of images that are ready to be moved.
+ * @returns An array of file names.
+ */
 export const getStagedImages = (): string => {
   try {
     checkPath(bigSourcePath)
@@ -86,6 +87,13 @@ export const getStagedImages = (): string => {
   return JSON.stringify({ message: 'No images to move.' })
 }
 
+/**
+ * Moves images from the temp directory to a public destination directory.
+ * @param filesToMove - An array of file names.
+ * @param toplevel - The top level directory.
+ * @param secondLevels - The second level directory.
+ * @returns A JSON string containing the message and the paths of the "moved" images.
+ */
 export const moveImages = (filesToMove, toplevel, secondLevels): string => {
   if (filesToMove && filesToMove.length > 0 && toplevel && secondLevels) {
     const filearray = !Array.isArray(filesToMove) ? [filesToMove] : filesToMove
@@ -93,8 +101,6 @@ export const moveImages = (filesToMove, toplevel, secondLevels): string => {
     const destPaths = getDestinationPaths(toplevel, secondLevels)
     const bigDestPath = destPaths.pubPathBig
     const smallDestPath = destPaths.pubPathSmall
-    const bigDestPath_build = destPaths.buildPathBig
-    const smallDestPath_build = destPaths.buildPathSmall
     let message = ''
     let smallfiles: string[] = []
     try {
@@ -105,40 +111,18 @@ export const moveImages = (filesToMove, toplevel, secondLevels): string => {
     }
     filearray.forEach((file) => {
       try {
-        /** copy to public */
-        fs.copyFileSync(`${bigSourcePath}${file}`, `${bigDestPath}${file}`)
-        fs.linkSync(
-          `${bigDestPath}${file}`,
-          `${bigDestPath.replace('skullyflower', 'skullyflowerTS')}${file}`
-        )
+        /** move to public */
+        fs.renameSync(`${bigSourcePath}${file}`, `${bigDestPath}${file}`)
       } catch (err) {
-        message += `Failed to copy big ${bigSourcePath}${file} to  ${bigDestPath}${file}:${err}\n`
-      }
-      try {
-        /** move to build */
-        fs.renameSync(`${bigSourcePath}${file}`, `${bigDestPath_build}${file}`)
-      } catch (err) {
-        message += `Failed to move big ${bigSourcePath}${file} to ${bigDestPath_build}${file} file :${err}\n`
+        message += `Failed to move big ${bigSourcePath}${file} to  ${bigDestPath}${file}:${err}\n`
       }
       if (smallfiles.includes(file)) {
         try {
-          /** copy to public */
-          fs.copyFileSync(`${smallSourcePath}${file}`, `${smallDestPath}${file}`)
-          /** create link to new TS version */
-          fs.linkSync(
-            `${smallDestPath}${file}`,
-            `${smallDestPath.replace('skullyflower', 'skullyflowerTS')}${file}`
-          )
+          /** move to public */
+          fs.renameSync(`${smallSourcePath}${file}`, `${smallDestPath}${file}`)
         } catch (err) {
           console.log(err, `Failed to copy small ${file} file\n`)
           message += `Failed to copy small ${file} file\n`
-        }
-        try {
-          /** move to build */
-          fs.renameSync(`${smallSourcePath}${file}`, `${smallDestPath_build}${file}`)
-        } catch (err) {
-          console.log(err, `Failed to move small ${file} file`)
-          message += `Failed to move small ${file} file\n`
         }
       }
       if (!message.length) {
@@ -171,34 +155,6 @@ export const renameImage = (imageurl, newname): string => {
           newname
         }`
       )
-      /** small file in build */
-      fs.renameSync(
-        `${buildPath}${relativePath}`,
-        `${buildPath}${relativePath.substring(0, relativePath.lastIndexOf('/'))}/${newname}`
-      )
-      /** bigger file in build */
-      fs.renameSync(
-        `${buildPath}${biggerRelativePath}`,
-        `${buildPath}${biggerRelativePath.substring(0, biggerRelativePath.lastIndexOf('/'))}/${
-          newname
-        }`
-      )
-      /** create link to new TS version of small file */
-      fs.renameSync(
-        `${publicPath.replace('skullyflower', 'skullyflowerTS')}${relativePath}`,
-        `${publicPath.replace('skullyflower', 'skullyflowerTS')}${relativePath.substring(
-          0,
-          relativePath.lastIndexOf('/')
-        )}/${newname}`
-      )
-      /** create link to new TS version */
-      fs.renameSync(
-        `${publicPath.replace('skullyflower', 'skullyflowerTS')}${biggerRelativePath}`,
-        `${publicPath.replace('skullyflower', 'skullyflowerTS')}${biggerRelativePath.substring(
-          0,
-          biggerRelativePath.lastIndexOf('/')
-        )}/${newname}`
-      )
       return JSON.stringify({ message: `Successfully renamed ${imageurl}` })
     } catch (error) {
       return JSON.stringify({ message: `Failed to rename ${imageurl}: ${error}` })
@@ -222,10 +178,6 @@ export const deleteImage = (imageurl): string => {
       } else {
         fs.rmSync(`${publicPath}/${relativePath}`)
         fs.rmSync(`${publicPath}${biggerRelativePath}`)
-        fs.rmSync(`${buildPath}/${relativePath}`)
-        fs.rmSync(`${buildPath}${biggerRelativePath}`)
-        fs.rmSync(`${publicPath.replace('skullyflower', 'skullyflowerTS')}/${relativePath}`)
-        fs.rmSync(`${publicPath.replace('skullyflower', 'skullyflowerTS')}${biggerRelativePath}`)
       }
       return JSON.stringify({ message: `Successfully removed ${imageurl}` })
     } catch (error) {
@@ -235,26 +187,30 @@ export const deleteImage = (imageurl): string => {
   return JSON.stringify({ message: `Nothng to remove.` })
 }
 
-export const getFolderImages = (toplevel): string => {
-  const topLeveDestination = toplevel
+/**
+ * Gets the images in a folder.
+ * @param directory - The top level directory.
+ * @returns An array of file names.
+ */
+export const getFolderImages = (directory: string): string => {
   const dirpattern = /^[^.]*$/
-  checkPath(`${pathToBuild}/${topLeveDestination}`)
-  fs.readdir(`${pathToBuild}/${topLeveDestination}`, (err, files) => {
-    if (err) {
-      console.log(err)
-      return JSON.stringify({ message: "Can't get the subirectories." })
-    }
+  checkPath(`${pathToBuild}/${directory}`)
+  try {
+    const files = fs.readdirSync(`${pathToBuild}/${directory}`)
     if (files) {
       const filtered = files.filter((file) => dirpattern.test(file))
       return JSON.stringify(filtered)
     }
-    return JSON.stringify('No Files to get.')
-  })
-  return JSON.stringify({ message: "Can't get the subirectories." })
+  } catch (err) {
+    return JSON.stringify({ message: `Can't get the files in the directory: ${directory}: ${err}` })
+  }
+  return JSON.stringify('No Files to get.')
 }
 
 /**
- * Process uploaded images for preview - saves files from renderer to temp location and returns preview URLs
+ * Process "uploaded" images, resize and move to temp directory - saves files from renderer to temp location and returns preview URLs
+ * @param fileDataArray - An array of file data.
+ * @returns A JSON string containing the preview URLs and file paths.
  */
 export const processUploadedImages = async (
   fileDataArray: Array<{ name: string; data: ArrayBuffer }>
@@ -263,29 +219,27 @@ export const processUploadedImages = async (
     return JSON.stringify([])
   }
 
-  const tempDir = path.join(app.getPath('temp'), 'site-admin-uploads')
-  checkPath(tempDir)
+  checkPath(tempPath)
   const previewUrls: string[] = []
   const filePaths: string[] = []
 
   for (const fileData of fileDataArray) {
     try {
       // Save file to temp directory
-      const tempPath = path.join(tempDir, fileData.name)
+      const filePath = path.join(tempPath, fileData.name)
       const buffer = Buffer.from(fileData.data)
-      fs.writeFileSync(tempPath, buffer)
+      fs.writeFileSync(filePath, buffer)
 
       // Store the path for later use
-      filePaths.push(tempPath)
+      filePaths.push(filePath)
 
       // Create a file:// URL for preview
-      previewUrls.push(`file://${tempPath}`)
+      previewUrls.push(`http://localhost:3000/${filePath}`)
     } catch (err) {
-      console.error(`Failed to process file ${fileData.name}:`, err)
+      return JSON.stringify({ message: `Failed to process file ${fileData.name}: ${err}` })
     }
   }
-
-  return JSON.stringify({ previewUrls, filePaths })
+  return JSON.stringify({ previewUrls, filePaths, message: 'Images processed successfully' })
 }
 
 /**
@@ -344,14 +298,18 @@ export const uploadBlogImage = async (
     return JSON.stringify({ error: `Failed to upload image: ${err}` })
   }
 }
-
-export const uploadImages = async (dest: string, files): Promise<string> => {
-  if (files) {
+/**
+ * "Uploads" multiple images to a destination folder. These should already be in the temp directory.
+ * @param dest - The destination folder.
+ * @param files - An array of file paths.
+ * @returns A JSON string containing the message and the paths of the "uploaded" images.
+ * image handling needs to be improved.
+ */
+export const uploadImages = async (dest: string, filePaths: string[]): Promise<string> => {
+  if (filePaths) {
     let destPaths: {
       pubPathBig: string
       pubPathSmall: string
-      buildPathBig: string
-      buildPathSmall: string
     } | null = null
     const messages: string[] = []
     if (dest) {
@@ -363,15 +321,15 @@ export const uploadImages = async (dest: string, files): Promise<string> => {
     const bigDestPath = destPaths?.pubPathBig ?? bigSourcePath
     const smallDestPath = destPaths?.pubPathSmall ?? smallSourcePath
 
-    for (const file of files) {
+    for (const filePath of filePaths) {
       try {
-        const result1 = await processFile(file, 750, bigSourcePath)
+        const result1 = await processFile(filePath, 750, bigSourcePath)
         if (result1 === 'success') {
           console.log('Big file uploaded to ', bigSourcePath)
         } else {
           messages.push(`Wrong Big File type.`)
         }
-        const result2 = await processFile(file, 450, smallSourcePath)
+        const result2 = await processFile(filePath, 450, smallSourcePath)
         if (result2 === 'success') {
           console.log('Small file uploaded to ', smallSourcePath)
         } else {
@@ -380,64 +338,24 @@ export const uploadImages = async (dest: string, files): Promise<string> => {
       } catch (err) {
         messages.push(`Could not process file:${err}`)
       }
+      const filename = path.basename(filePath)
+
       if (destPaths) {
         try {
           checkPath(bigDestPath)
-          fs.copyFileSync(`${bigSourcePath}${file.filename}`, `${bigDestPath}${file.filename}`)
+          fs.renameSync(`${bigSourcePath}${filename}`, `${bigDestPath}${filename}`)
         } catch (err) {
-          messages.push(`Could not copy big file:${file.filename} to ${bigDestPath}:${err}`)
+          messages.push(`Could not move big file:${filename} to ${bigDestPath}:${err}`)
         }
         try {
           checkPath(smallDestPath)
-          fs.copyFileSync(`${smallSourcePath}${file.filename}`, `${smallDestPath}${file.filename}`)
+          fs.renameSync(`${smallSourcePath}${filename}`, `${smallDestPath}${filename}`)
         } catch (err) {
-          messages.push(`Could not copy small file:${file.filename} to ${smallDestPath}:${err}`)
+          messages.push(`Could not move small file:${filename} to ${smallDestPath}:${err}`)
         }
-        try {
-          checkPath(smallDestPath.replace('public/', 'build/'))
-          fs.copyFileSync(
-            `${smallSourcePath}${file.filename}`,
-            `${smallDestPath.replace('public/', 'build/')}${file.filename}`
-          )
-        } catch (err) {
-          messages.push(`Could not copy small file:${file.filename} to build:${err}`)
-        }
-        try {
-          checkPath(bigDestPath.replace('public/', 'build/'))
-          fs.copyFileSync(
-            `${bigSourcePath}${file.filename}`,
-            `${bigDestPath.replace('public/', 'build/')}${file.filename}`
-          )
-        } catch (err) {
-          messages.push(`Could not copy big file:${file.filename} to build:${err}`)
-        }
-        try {
-          checkPath(bigDestPath.replace('skullyflower', 'skullyflowerTS'))
-          fs.linkSync(
-            `${bigDestPath}${file.filename}`,
-            `${bigDestPath.replace('skullyflower', 'skullyflowerTS')}${file.filename}`
-          )
-        } catch (err) {
-          messages.push(`Could not link big file:${file.filename} to TS:${err}`)
-        }
-        try {
-          checkPath(smallDestPath.replace('skullyflower', 'skullyflowerTS'))
-          fs.linkSync(
-            `${smallDestPath}${file.filename}`,
-            `${smallDestPath.replace('skullyflower', 'skullyflowerTS')}${file.filename}`
-          )
-        } catch (err) {
-          messages.push(`Could not link small file:${file.filename} to TS:${err}`)
-        }
-      }
-      try {
-        console.log('Removing ', file.path)
-        fs.rmSync(file.path)
-      } catch (err) {
-        messages.push(`Could not remove file: ${file.filename}: ${err}`)
       }
     }
-    return JSON.stringify({ message: messages.join(', ') })
+    return JSON.stringify({ messages: messages.join(', ') })
   } else {
     return JSON.stringify({ message: 'No uploaded files.' })
   }

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useForm } from 'react-hook-form'
+import { useForm, useWatch } from 'react-hook-form'
 import {
   Box,
   Button,
@@ -17,20 +17,19 @@ import { ApiMessageResponse, PageInfo } from 'src/shared/types'
 import StyledInput from '@renderer/components/StyledInput'
 import { buttonRecipe } from '@renderer/themeRecipes'
 
-const getPageData = (
-  pageId: string,
+const getPages = (
   setLoading: (loading: boolean) => void,
   setMessages: (messages: string) => void,
-  setPageData: (pageData: PageInfo) => void
+  setPagesData: (pagesData: string[]) => void
 ): void => {
   setLoading(true)
   window.api
-    .getPage(pageId)
-    .then((response: ApiMessageResponse | PageInfo) => {
+    .getPages()
+    .then((response: ApiMessageResponse | string[]) => {
       if ((response as ApiMessageResponse).message) {
         setMessages((response as ApiMessageResponse).message)
       } else {
-        setPageData(response as PageInfo)
+        setPagesData(response as string[])
       }
       setLoading(false)
     })
@@ -43,21 +42,23 @@ const getPageData = (
 function PageForm({
   pageId,
   pageData,
-  onSubmit
+  onSubmit,
+  onCancel
 }: {
   pageId: string
   pageData: PageInfo
-  onSubmit: (values: PageInfo) => void
+  onSubmit: (pageId: string, values: PageInfo) => void
+  onCancel: () => void
 }): React.JSX.Element {
   const [wysiwygText, setWysiwygText] = useState(pageData.page_content)
   const {
+    control,
     register,
-    handleSubmit,
     formState: { errors },
     setValue,
-    reset
+    getValues
   } = useForm({ defaultValues: pageData, mode: 'onChange' })
-
+  const id = useWatch({ control, name: 'page_id' })
   const handleTextChange = (formfield) => (newText) => {
     setValue(formfield, newText)
     setWysiwygText(newText)
@@ -66,8 +67,25 @@ function PageForm({
   return (
     <Box p={5}>
       <HStack justifyContent="space-between">
-        <Heading size="md">Edit Page {pageId}</Heading>
+        <Heading size="md">Edit Page {id}</Heading>
       </HStack>
+      {pageId === 'ChangeMe' && (
+        <Field.Root p={4} invalid={errors.page_id ? true : false}>
+          <HStack alignItems="center">
+            <Field.Label w={48}>
+              Page ID:{' '}
+              <InfoBubble
+                message={`This is the page id, it must be unique and cannot be changed.`}
+              />
+            </Field.Label>
+            <Input
+              _invalid={{ borderColor: 'red.300' }}
+              type="text"
+              {...register('page_id', { required: true, validate: (value) => value !== '' })}
+            />
+          </HStack>
+        </Field.Root>
+      )}
       <Field.Root p={4} invalid={errors.page_title ? true : false}>
         <HStack alignItems="center">
           <Field.Label w={48}>
@@ -127,15 +145,8 @@ function PageForm({
       </Field.Root>
       <Center>
         <HStack gap={4}>
-          <Button
-            onClick={() => {
-              setWysiwygText(pageData.page_content)
-              reset()
-            }}
-          >
-            Never mind
-          </Button>
-          <Button recipe={buttonRecipe} onClick={handleSubmit(onSubmit)}>
+          <Button onClick={onCancel}>Never mind</Button>
+          <Button recipe={buttonRecipe} onClick={() => onSubmit(id, getValues() as PageInfo)}>
             Submit Changes
           </Button>
         </HStack>
@@ -145,25 +156,60 @@ function PageForm({
 }
 
 export default function PageContent(): React.JSX.Element {
-  const pageId = 'about'
   const [messages, setMessages] = useState<string | null>(null)
-  const [pageData, setPageData] = useState<PageInfo | null>(null)
+  const [pagesData, setPagesData] = useState<string[] | null>(null)
+  const [activePage, setActivePage] = useState<PageInfo | null>(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    if (!pageData && !messages) {
-      getPageData(pageId, setLoading, setMessages, setPageData)
+    if (!pagesData && !messages) {
+      window.api
+        .getPages()
+        .then((response: ApiMessageResponse | string[]) => {
+          if ((response as ApiMessageResponse).message) {
+            setMessages((response as ApiMessageResponse).message)
+          } else {
+            setPagesData(response as string[])
+          }
+        })
+        .catch((err) => {
+          setMessages((err as ApiMessageResponse).message || "Couldn't get page data.")
+        })
+        .finally(() => setLoading(false))
     }
-  }, [pageData, messages])
+  }, [pagesData, messages, setLoading])
 
-  const onSubmit = (values: PageInfo): void => {
+  const addPage = (): void => {
+    setActivePage({ page_id: 'ChangeMe', page_title: '', page_description: '', page_content: '' })
+  }
+
+  const onSubmit = (pageId: string, values: PageInfo): void => {
     setMessages(null)
     setLoading(true)
     window.api
       .updatePage(pageId, values)
-      .then((response: ApiMessageResponse) => {
-        setMessages(response.message as string)
-        getPageData(pageId, setLoading, setMessages, setPageData)
+      .then((response: ApiMessageResponse | PageInfo) => {
+        if ((response as ApiMessageResponse).message) {
+          setMessages((response as ApiMessageResponse).message)
+        } else {
+          setActivePage(null)
+        }
+        getPages(setLoading, setMessages, setPagesData)
+      })
+      .catch((err: Error) => {
+        setMessages(err.message || 'There was a problem.')
+      })
+  }
+
+  const onPageClick = (pageId: string): void => {
+    window.api
+      .getPage(pageId)
+      .then((response: ApiMessageResponse | PageInfo) => {
+        if ((response as ApiMessageResponse).message) {
+          setMessages((response as ApiMessageResponse).message)
+        } else {
+          setActivePage(response as PageInfo)
+        }
       })
       .catch((err: Error) => {
         setMessages(err.message || 'There was a problem.')
@@ -172,17 +218,43 @@ export default function PageContent(): React.JSX.Element {
 
   return (
     <PageLayout
-      title={`Manage ${pageId} page`}
+      title={`Manage pages`}
       messages={messages}
-      button={{ action: onSubmit, text: 'Update', value: '' }}
+      button={{ action: addPage, text: 'Add New Page', value: '' }}
     >
-      {loading ? (
+      {loading && (
         <Stack>
           <Skeleton height="50px" />
           <Skeleton height="50px" />
         </Stack>
-      ) : (
-        <PageForm pageId={pageId} pageData={pageData as PageInfo} onSubmit={onSubmit} />
+      )}
+      {pagesData && (
+        <Stack gap={4}>
+          <Heading size="sm">Select a page to edit</Heading>
+          <HStack
+            border="1px solid"
+            borderRadius={5}
+            p={4}
+            width="100%"
+            wrap="wrap"
+            alignItems="flex-start"
+            justifyContent="center"
+          >
+            {pagesData.map((page) => (
+              <Button key={page} onClick={() => onPageClick(page)}>
+                {page}
+              </Button>
+            ))}
+          </HStack>
+        </Stack>
+      )}
+      {activePage && (
+        <PageForm
+          pageId={activePage?.page_id || ''}
+          pageData={activePage as PageInfo}
+          onSubmit={onSubmit}
+          onCancel={() => setActivePage(null)}
+        />
       )}
     </PageLayout>
   )

@@ -23,7 +23,7 @@ export const resetGallery = (galleryId: string): string => {
     return JSON.stringify({ message: `Gallery ${galleryId} not found.` })
   }
   const { json_path, path, isStory } = gallery
-  const public_file = `${pathToPublic}${json_path}`
+  const json_file = `${pathToPublic}${json_path}`
   //const build_file = public_file.replace('public', 'build')
   const img_files = {}
   const all_files = getImages(path)
@@ -63,12 +63,12 @@ export const resetGallery = (galleryId: string): string => {
       }
     })
     try {
-      checkFile(public_file, {})
-      writeFileSync(public_file, JSON.stringify(img_files))
+      checkFile(json_file, {})
+      writeFileSync(json_file, JSON.stringify(img_files))
       //writeFileSync(build_file, JSON.stringify(img_files))
       return JSON.stringify({ message: 'Success!', images: img_files })
     } catch (err) {
-      return JSON.stringify({ message: `Failed to write gallery images to ${public_file}: ${err}` })
+      return JSON.stringify({ message: `Failed to write gallery images to ${json_file}: ${err}` })
     }
   }
   return JSON.stringify({ message: 'No files in gallery.' })

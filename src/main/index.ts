@@ -34,10 +34,11 @@ import {
 } from './modules/imagesRouter'
 import { registerRoute } from '../lib/electron-router-dom'
 import { getAdminConfig, updateAdminConfig } from './modules/configRouter'
-import { BlogEntry, CategoryType, ProductType, Subject } from '../shared/types'
+import { BlogEntry, CategoryType, PageInfo, ProductType, Subject } from '../shared/types'
 import { deleteSubject, getSubjects, updateSubject } from './modules/subjectsRouter'
 import { getProducts, updateProduct } from './modules/productsRouter'
 import { getAllCategories, updateCategories } from './modules/categoriesRouter'
+import { createPage, deletePage, getPage, getPages, updatePage } from './modules/contentPageRouter'
 
 function createWindow(): void {
   // Create the browser window.
@@ -138,6 +139,14 @@ ipcMain.handle('delete-entry', (_event, blogid: string) => deletEntry(blogid))
 // Site Info API functions
 ipcMain.handle('get-site-info', getSiteInfo)
 ipcMain.handle('update-site-info', (_event, siteInfo: string) => updateSiteInfo(siteInfo))
+// Content Page API functions
+ipcMain.handle('get-pages', getPages)
+ipcMain.handle('get-page', (_event, pageId: string) => getPage(pageId))
+ipcMain.handle('create-page', (_event, pageId: string) => createPage(pageId))
+ipcMain.handle('update-page', (_event, pageId: string, values: PageInfo) =>
+  updatePage(pageId, values)
+)
+ipcMain.handle('delete-page', (_event, pageId: string) => deletePage(pageId))
 // Gallery API functions
 ipcMain.handle('get-galleries', getGalleries)
 ipcMain.handle('get-gallery-images', (_event, gallery_id: string) => getGalleryImages(gallery_id))
