@@ -27,22 +27,18 @@ const newblog = {
 } as BlogEntry
 
 const EditBlogEntry = ({
-  blogid,
-  blogEntries,
+  thisEntry = newblog,
   //isOpen,
   toggleForm,
   onSubmit,
   sitedata
 }: {
-  blogid: string
-  blogEntries: BlogEntry[]
+  thisEntry: BlogEntry
   //isOpen: boolean
   toggleForm: () => void
   onSubmit: (data: BlogEntry) => void
   sitedata: SiteInfo
 }): React.JSX.Element => {
-  const thisEntry = (blogEntries && blogEntries.find((blog) => blog.id === blogid)) || newblog
-
   const thisEntryDate = useMemo<Date>(() => {
     return thisEntry?.date ? new Date(thisEntry.date) : new Date()
   }, [thisEntry])

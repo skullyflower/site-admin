@@ -11,18 +11,21 @@ const getSiteData = async (
   setPageData: (pageData: SiteInfo) => void
 ): Promise<void> => {
   setLoading(true)
-  const response = await window.api.getSiteInfo()
-  if ((response as ApiMessageResponse).message) {
-    setMessages((response as ApiMessageResponse).message as string)
-    setLoading(false)
-    return
-  }
-  if ((response as SiteInfo).page_title) {
-    setPageData(response as SiteInfo)
-  } else {
-    setMessages('No site data found.')
-    setLoading(false)
-    return
+  const pathToSite = await window.api.getAdminConfig()
+  if (pathToSite && 'pathToSite' in pathToSite) {
+    const response = await window.api.getSiteInfo()
+    if ((response as ApiMessageResponse).message) {
+      setMessages((response as ApiMessageResponse).message as string)
+      setLoading(false)
+      return
+    }
+    if ((response as SiteInfo).page_title) {
+      setPageData(response as SiteInfo)
+    } else {
+      setMessages('No site data found.')
+      setLoading(false)
+      return
+    }
   }
   setLoading(false)
 }

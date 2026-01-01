@@ -27,12 +27,22 @@ import '@radix-ui/colors/slate-dark.css'
 const StyledInput = ({
   value,
   onChange,
-  placeholder = 'Add Content Here...'
+  placeholder = 'Add Content Here...',
+  onUploadImages
 }: {
   value: string
   onChange: (value: string) => void
   placeholder?: string
+  onUploadImages?: (images: string[]) => void
 }): React.ReactNode => {
+  const addUploadImages = async (image: File): Promise<string> => {
+    const result = await window.api.getPreviewImages([image])
+    if (onUploadImages) {
+      return await onUploadImages(result)[0]
+    }
+    return result[0]
+  }
+
   return (
     <Box
       borderWidth={1}
@@ -62,7 +72,9 @@ const StyledInput = ({
           }),
           quotePlugin(),
           thematicBreakPlugin(),
-          imagePlugin(),
+          imagePlugin({
+            imageUploadHandler: addUploadImages
+          }),
           markdownShortcutPlugin(),
           toolbarPlugin({
             toolbarContents: () => (

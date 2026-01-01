@@ -123,6 +123,10 @@ const api = {
     return JSON.parse(response)
   },
   // Image API functions
+  getImageFolders: async () => {
+    const response = await ipcRenderer.invoke('get-image-folders')
+    return JSON.parse(response)
+  },
   getStagedImages: async () => {
     const response = await ipcRenderer.invoke('get-staged-images')
     return JSON.parse(response)
@@ -140,10 +144,6 @@ const api = {
     const response = await ipcRenderer.invoke('upload-blog-image', filePath, destination)
     return JSON.parse(response)
   },
-  moveImages: async (filesToMove: string, toplevel: string, secondLevels: string) => {
-    const response = await ipcRenderer.invoke('move-images', filesToMove, toplevel, secondLevels)
-    return JSON.parse(response)
-  },
   renameImage: async (imageurl: string, newname: string) => {
     const response = await ipcRenderer.invoke('rename-image', imageurl, newname)
     return JSON.parse(response)
@@ -156,8 +156,12 @@ const api = {
     const response = await ipcRenderer.invoke('get-folder-images', toplevel)
     return JSON.parse(response)
   },
-  uploadImages: async (dest: string, files: string[]) => {
-    const response = await ipcRenderer.invoke('upload-images', dest, files)
+  moveImages: async (filesToMove: string[], destination: string) => {
+    const response = await ipcRenderer.invoke('move-images', filesToMove, destination)
+    return JSON.parse(response)
+  },
+  uploadImages: async (files: string[], destination: string) => {
+    const response = await ipcRenderer.invoke('upload-images', files, destination)
     return JSON.parse(response)
   }
 }

@@ -46,6 +46,8 @@ export interface Api {
   getGalleryImages: (gallery_id: string) => Promise<ApiMessageResponse | GalleryImage[]>
   updateGallery: (gallery: Gallery) => Promise<ApiMessageResponse>
   resetGallery: (galleryId: string) => Promise<ApiMessageResponse | GalleryImage[]>
+  // Image API functions
+  getImageFolders: () => Promise<ApiMessageResponse | string[]>
   // Returns list of image paths in temp directory - waiting for final destination.
   getStagedImages: () => Promise<string[]>
   // not sure what this for yet
@@ -55,13 +57,9 @@ export interface Api {
     filePath: string,
     destination?: string
   ) => Promise<{ relativeUrl: string; filename: string; message?: string; error?: string }>
-  uploadImages: (dest: string, files: string[]) => Promise<ApiMessageResponse>
+  uploadImages: (files: string[], destination: string) => Promise<ApiMessageResponse>
   // this one moves staged images to a new location.
-  moveImages: (
-    filesToMove: string,
-    toplevel: string,
-    secondLevels: string
-  ) => Promise<ApiMessageResponse>
+  moveImages: (filesToMove: string[], destination: string) => Promise<ApiMessageResponse>
   // this one renames an image.
   renameImage: (imageurl: string, newname: string) => Promise<ApiMessageResponse>
   // this one deletes an image.

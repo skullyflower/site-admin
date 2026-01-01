@@ -1,28 +1,26 @@
 import { app } from 'electron'
 import fs from 'fs'
 import path, { join } from 'path'
-import { configFile, defaultSitePath } from '../../shared/constants.d'
+import { configFile } from '../../shared/constants.d'
+import { getAdminConfig } from './configRouter'
 
 export const configfilepath = path.join(app.getPath('home'), '.WebSiteConfig', configFile)
 
 export const getPathsFromConfig = (): {
   pathToPublic: string
-  pathToBuild: string
 } => {
   try {
-    checkFile(configfilepath, { pathToSite: defaultSitePath })
-    const config = fs.readFileSync(configfilepath)
-    if (!JSON.parse(config.toString()).pathToSite) throw new Error('No path to site found.')
-    const pathToSite = join(app.getPath('home'), JSON.parse(config.toString()).pathToSite)
-    const pathToPublic = `${pathToSite}/public`
-    const pathToBuild = `${pathToSite}/build`
+    const configJson = getAdminConfig()
+    const config = JSON.parse(configJson)
+    const pathToSite = config.pathToSite
+    const pathToPublic = join(app.getPath('home'), pathToSite, 'public')
 
-    return { pathToPublic, pathToBuild }
+    return { pathToPublic }
   } catch (err) {
     console.log(
       `No config.json file found. Please create one in the root directory of your site. : ${err}`
     )
-    return { pathToPublic: '', pathToBuild: '' }
+    return { pathToPublic: '' }
   }
 }
 

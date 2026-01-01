@@ -6,13 +6,11 @@ import getPathsFromConfig, { checkFile } from './pathData.js'
 import { blogFile, blogRSSFile, defaultBlogInfo } from '../../shared/constants.d'
 import path from 'path'
 
-const { pathToPublic, pathToBuild } = getPathsFromConfig()
+const { pathToPublic } = getPathsFromConfig()
 
 const tempPath = path.join(pathToPublic, 'temp')
 const blogfilepath = `${pathToPublic}/data/${blogFile}`
-const blogfilepath_build = `${pathToBuild}/data/${blogFile}`
 const blogRSSpath = `${pathToPublic}/data/${blogRSSFile}`
-const blogRSSpath_build = `${pathToBuild}/data/${blogRSSFile}`
 
 export const getBlogs = (): string => {
   try {
@@ -38,7 +36,6 @@ export const updateBlogInfo = (blogInfo): string => {
       const oldpageObject: BlogInfo = JSON.parse(oldpageDataString.toString()) as BlogInfo
       const newpageData = { ...oldpageObject, ...blogInfo }
       fs.writeFileSync(blogfilepath, JSON.stringify(newpageData))
-      fs.copyFileSync(blogfilepath, blogfilepath_build)
       return JSON.stringify({ message: 'Updated Blog page!' })
     } catch (err) {
       console.log(err)
@@ -67,13 +64,11 @@ export const updateBlogPost = (entry: BlogEntry): string => {
         // new
         blogObject.entries.unshift(update)
       }
-      const bigDestPath = `${pathToPublic}/images/blog/`
-      //check for path. if it doesn't exist create it.
-      const smallDestPath = `${pathToPublic}/images/blog/smaller/`
-
+      const destPath = `images/blog/`
+      const smallDestPath = `${destPath}/smaller/`
       fs.readdirSync(tempPath).forEach(async (file) => {
         if (entry.image.includes(file.split('/').pop() || '')) {
-          await processFile(path.join(tempPath, file), 850, bigDestPath)
+          await processFile(path.join(tempPath, file), 850, destPath)
           await processFile(path.join(tempPath, file), 450, smallDestPath)
           fs.unlinkSync(path.join(tempPath, file))
         } else {
@@ -82,14 +77,9 @@ export const updateBlogPost = (entry: BlogEntry): string => {
       })
 
       fs.writeFileSync(blogfilepath, JSON.stringify({ ...blogObject, entries: blogObject.entries }))
-      fs.writeFileSync(
-        blogfilepath_build,
-        JSON.stringify({ ...blogObject, entries: blogObject.entries })
-      )
 
       const RSS = processRss(blogObject)
       fs.writeFileSync(blogRSSpath, RSS)
-      fs.writeFileSync(blogRSSpath_build, RSS)
       return JSON.stringify({ message: 'Updated Blog!' })
     } catch (error) {
       console.log(error)

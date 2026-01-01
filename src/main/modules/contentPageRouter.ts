@@ -1,6 +1,7 @@
 import { existsSync, readdirSync, readFileSync, unlinkSync, writeFileSync } from 'fs'
 import getPathsFromConfig, { checkFile } from './pathData'
 import { ApiMessageResponse, PageInfo } from '../../shared/types'
+import { moveImages } from './imagesRouter'
 
 const { pathToPublic } = getPathsFromConfig()
 const rootdir = `${pathToPublic}/data`
@@ -26,7 +27,6 @@ export const getPage = (pageId: string): PageInfo | string => {
   const pagefilepath = `${rootdir}/${pageId}-page.json`
   checkFile(pagefilepath, { page_title: '', page_description: '', page_content: '' })
   const pageDataJson = readFileSync(pagefilepath, 'utf8')
-  //const pageData = JSON.parse(pageDataJson)
   if (pageDataJson) {
     return pageDataJson
   }
@@ -37,7 +37,15 @@ export const updatePage = (page, body): string => {
   const pagefilepath = `${rootdir}/${page}-page.json`
   if (body) {
     try {
-      checkFile(pagefilepath, { page_title: '', page_description: '', page_content: '' })
+      checkFile(pagefilepath, {
+        page_title: '',
+        page_description: '',
+        page_content: ''
+      })
+      if (body.images) {
+        const imageNames = body.images.map((image) => image.split('/').pop() || '')
+        moveImages(imageNames, `images/${page}`)
+      }
       const oldpageDataString = readFileSync(pagefilepath, 'utf8')
       const oldpageObject = JSON.parse(oldpageDataString)
       const newpageData = { ...oldpageObject, ...body }

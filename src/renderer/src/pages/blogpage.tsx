@@ -42,7 +42,7 @@ const BlogPage = (): React.JSX.Element => {
   const [blogInfo, setBlogInfo] = useState<BlogInfo | null>(null)
   const [messages, setMessages] = useState<string | null>(null)
   const [showForm, setShowForm] = useState(false)
-  const [activeBlog, setActiveBlog] = useState<string | null>(null)
+  const [activeBlog, setActiveBlog] = useState<BlogEntry | null>(null)
   const [sitedata, setSiteData] = useState<SiteInfo | null>()
 
   const onUpdateInfo = async (values: BlogInfo): Promise<void> => {
@@ -62,7 +62,7 @@ const BlogPage = (): React.JSX.Element => {
       const json = await window.api.updateBlogPost(values, [])
       setMessages((json as ApiMessageResponse).message as string)
       getBlogEntries(setBlogEntries, setMessages, setBlogInfo)
-      toggleForm()
+      toggleForm(null)
     } catch (err) {
       setMessages((err as ApiMessageResponse).message || 'there was a problem.')
     }
@@ -82,9 +82,9 @@ const BlogPage = (): React.JSX.Element => {
     }
   }, [])
 
-  const toggleForm = (blogid?: string | null): void => {
-    setActiveBlog(blogid || null)
-    setShowForm(!!blogid)
+  const toggleForm = (blog: BlogEntry | null): void => {
+    setActiveBlog(blog || null)
+    setShowForm(!!blog)
   }
 
   useEffect(() => {
@@ -115,9 +115,8 @@ const BlogPage = (): React.JSX.Element => {
           >
             <EditBlogEntry
               sitedata={sitedata as SiteInfo}
-              blogid={activeBlog as string}
-              blogEntries={blogEntries as BlogEntry[]}
-              toggleForm={toggleForm}
+              thisEntry={activeBlog as BlogEntry}
+              toggleForm={() => toggleForm(null)}
               onSubmit={(values: BlogEntry) => onSubmit(values as BlogEntry)}
             />
           </Box>
@@ -173,7 +172,7 @@ const BlogPage = (): React.JSX.Element => {
                             size="sm"
                             recipe={buttonRecipe}
                             value={blog.id}
-                            onClick={() => toggleForm(blog.id)}
+                            onClick={() => toggleForm(blog)}
                           >
                             Edit
                           </Button>

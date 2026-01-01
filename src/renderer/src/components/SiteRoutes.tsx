@@ -13,6 +13,7 @@ import { useEffect, useState } from 'react'
 import { AdminConfig, ApiMessageResponse } from 'src/shared/types'
 import SubjectsPage from '@renderer/pages/subjectspage'
 import ContentPages from '@renderer/pages/contentpages'
+import ImageUploadPage from '@renderer/pages/ImageUploadpage'
 
 export default function SiteRoutes(): React.JSX.Element {
   const [config, setConfig] = useState<AdminConfig | null>(null)
@@ -41,7 +42,7 @@ export default function SiteRoutes(): React.JSX.Element {
           <Route path="/blog" element={<BlogPage />} />
           <Route path="/content" element={<ContentPages />} />
           <Route path="/gallery" element={<GalleryPage />} />
-          {/*<Route path="/images" element={<ImagesPage />} />*/}
+          <Route path="/images" element={<ImageUploadPage />} />
           <Route path="/products" element={<ProductsPage />} />
           <Route path="/categories" element={<CategoriesPage />} />
           <Route path="/subjects" element={<SubjectsPage />} />

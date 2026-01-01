@@ -25,7 +25,7 @@ const HomePageForm = ({
   } = useForm({ defaultValues: pageData as SiteInfo, mode: 'onChange' })
   const [page_content, setPage_content] = useState<string>(getValues('page_content') || '')
 
-  const handleImageUpload = (paths: string[]): void => {
+  const handleLogoUpload = (paths: string[]): void => {
     if (paths.length > 0) {
       const newSitelogo = `${pageData?.live_site_url}/images/${paths[0].split('/').pop()}`
       setValue('sitelogo', newSitelogo)
@@ -118,7 +118,7 @@ const HomePageForm = ({
               <Field.Root>
                 <HStack alignItems="top" width="100%">
                   <label>Upload New Image</label>
-                  <UploadInput multiple={false} onUpload={handleImageUpload} />
+                  <UploadInput multiple={false} onUpload={handleLogoUpload} />
                 </HStack>
               </Field.Root>
               <Field.Root p={4} invalid={errors.sitelogo ? true : false}>
@@ -154,6 +154,7 @@ const HomePageForm = ({
               value={page_content}
               onChange={(value) => setValue('page_content', value)}
               placeholder="Add Content Here..."
+              onUploadImages={handleLogoUpload}
             />
           </Stack>
         </Field.Root>

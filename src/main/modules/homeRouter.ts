@@ -2,9 +2,8 @@ import fs from 'fs'
 import getPathsFromConfig, { checkFile } from './pathData'
 import { siteFile, defaultSiteData } from '../../shared/constants.d'
 
-const { pathToPublic } = getPathsFromConfig()
-
 export const getSiteInfo = (): string => {
+  const { pathToPublic } = getPathsFromConfig()
   const homefilepath = pathToPublic ? `${pathToPublic}/data/${siteFile}` : null
   try {
     if (!homefilepath) throw new Error('No path to site found.')
@@ -18,6 +17,7 @@ export const getSiteInfo = (): string => {
 }
 
 export const updateSiteInfo = (siteInfo): string => {
+  const { pathToPublic } = getPathsFromConfig()
   const homefilepath = pathToPublic ? `${pathToPublic}/data/${siteFile}` : null
   if (!homefilepath) throw new Error('No path to site found.')
   if (JSON.parse(siteInfo)) {

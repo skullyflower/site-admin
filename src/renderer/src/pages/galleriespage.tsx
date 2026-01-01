@@ -83,9 +83,8 @@ const GalleryPage: React.FC = () => {
       .then((res) => {
         if (typeof res === 'object' && 'message' in res) {
           setMessages(res.message)
-        } else {
-          getGalleryImages(gallery.id, setImages, setMessages)
         }
+        getGalleryImages(gallery.id, setImages, setMessages)
       })
       .catch((err) => {
         setMessages(err.message || 'There was a problem.')
@@ -97,8 +96,8 @@ const GalleryPage: React.FC = () => {
       setMessages('No gallery selected.')
       return
     }
-    const res = await window.api.uploadImages(activeGallery?.path || 'artwork', newImages)
-    setMessages(res.message)
+    const result = await window.api.uploadImages(newImages, activeGallery?.path || 'artwork')
+    setMessages(result.message)
     doResetGallery(activeGallery)
     setShowUpload(false)
   }

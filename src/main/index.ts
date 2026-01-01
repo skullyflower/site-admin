@@ -23,6 +23,7 @@ import {
 } from './modules/galleryRouter'
 import {
   getStagedImages,
+  getImageFolders,
   moveImages,
   renameImage,
   deleteImage,
@@ -162,20 +163,19 @@ ipcMain.handle('upload-blog-image', (_event, filePath: string, destination: stri
   uploadBlogImage(filePath, destination)
 )
 // Image API functions
-ipcMain.handle(
-  'move-images', // simplify this to just move images to a new location
-  (_event, filesToMove: string, toplevel: string, secondLevels: string) =>
-    moveImages(filesToMove, toplevel, secondLevels)
-)
+ipcMain.handle('get-image-folders', getImageFolders)
 ipcMain.handle('rename-image', (_event, imageurl: string, newname: string) =>
   renameImage(imageurl, newname)
 )
 ipcMain.handle('delete-image', (_event, imageurl: string) => deleteImage(imageurl))
 ipcMain.handle('get-folder-images', (_event, toplevel: string) => getFolderImages(toplevel))
-ipcMain.handle('upload-images', (_event, dest: string, filePaths: string[]) =>
-  uploadImages(dest, filePaths)
+ipcMain.handle(
+  'move-images', // simplify this to just move images to a new location
+  (_event, filesToMove: string[], destination: string) => moveImages(filesToMove, destination)
 )
-// work this out, might need to get one preview at a time, we are only moving files and then displaying them.
+ipcMain.handle('upload-images', (_event, filePaths: string[], destination: string) =>
+  uploadImages(filePaths, destination)
+)
 ipcMain.handle('get-preview-images', (_event, images: string[]) => getPreviewImages(images))
 // Shop API functions
 ipcMain.handle('get-products', getProducts)
