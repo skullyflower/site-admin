@@ -1,11 +1,11 @@
 import fs from 'fs'
-import getPathsFromConfig, { checkFile } from './pathData'
+import getPathsFromConfig, { checkFile } from '../utilities/pathData'
 import { ProductType } from '../../shared/types'
 
 const { pathToPublic } = getPathsFromConfig()
 
 const shopfilepath = `${pathToPublic}/data/products.json`
-import processFile from './imageProcessor'
+import processFile from '../utilities/imageProcessor'
 
 export const updateProduct = async (product: ProductType): Promise<string> => {
   if (product) {

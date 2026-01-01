@@ -1,5 +1,5 @@
 import fs from 'fs'
-import getPathsFromConfig, { checkFile } from './pathData'
+import getPathsFromConfig, { checkFile } from '../utilities/pathData'
 
 const { pathToPublic } = getPathsFromConfig()
 

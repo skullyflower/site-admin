@@ -1,7 +1,7 @@
 import fs from 'fs'
 import path from 'path'
-import processFile, { ProcessedImage } from './imageProcessor'
-import getPathsFromConfig, { checkPath } from './pathData'
+import processFile, { ProcessedImage } from '../utilities/imageProcessor'
+import getPathsFromConfig, { checkPath } from '../utilities/pathData'
 
 const { pathToPublic } = getPathsFromConfig()
 const tempPath = path.join(pathToPublic, 'temp')
@@ -70,12 +70,12 @@ export const getStagedImages = (): string => {
  * @param filesToMove - An array of file names.
  * @param destination - The destination directory.
  */
-export const moveImages = (filesToMove, destination): string => {
+export const moveImages = (filesToMove: string[], destination: string): string => {
   if (filesToMove && filesToMove.length > 0 && destination) {
     const filearray = !Array.isArray(filesToMove) ? [filesToMove] : filesToMove
 
-    const bigDestPath = `${pathToPublic}/${destination}`
-    const smallDestPath = `${pathToPublic}/${destination}/smaller`
+    const bigDestPath = `${pathToPublic}/images/${destination}`
+    const smallDestPath = `${pathToPublic}/images/${destination}/smaller`
     let message = ''
     let smallfiles: string[] = []
     try {
@@ -141,10 +141,10 @@ export const renameImage = (imageurl, newname): string => {
 export const deleteImage = (imageurl): string => {
   if (imageurl) {
     const relativePath = imageurl
-    const biggerRelativePath = `${relativePath.substring(
+    const smallerRelativePath = `${relativePath.substring(
       0,
       relativePath.lastIndexOf('/')
-    )}/bigger${relativePath.substring(relativePath.lastIndexOf('/'))}`
+    )}/smaller${relativePath.substring(relativePath.lastIndexOf('/'))}`
     try {
       console.log(relativePath)
       if (relativePath.includes('files')) {
@@ -152,7 +152,7 @@ export const deleteImage = (imageurl): string => {
         return JSON.stringify({ message: `Successfully removed ${imageurl}` })
       } else {
         fs.rmSync(`${pathToPublic}/${relativePath}`)
-        fs.rmSync(`${pathToPublic}${biggerRelativePath}`)
+        fs.rmSync(`${pathToPublic}${smallerRelativePath}`)
       }
       return JSON.stringify({ message: `Successfully removed ${imageurl}` })
     } catch (error) {
@@ -275,7 +275,7 @@ export const uploadBlogImage = async (
 export const uploadImages = async (filePaths: string[], destination: string): Promise<string> => {
   if (filePaths) {
     const messages: string[] = []
-    const bigDestPath = destination ? `${pathToPublic}/${destination}/` : `${pathToPublic}/images/`
+    const bigDestPath = destination ? `${imagesPath}/${destination}/` : `${imagesPath}/`
     const smallDestPath = `${bigDestPath}/smaller/`
 
     for (const filePath of filePaths) {

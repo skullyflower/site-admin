@@ -1,8 +1,8 @@
 import { BlogInfo, BlogEntry } from '../../shared/types'
 import fs from 'fs'
-import processRss from './processBlogRSS.js'
-import processFile from './imageProcessor'
-import getPathsFromConfig, { checkFile } from './pathData.js'
+import processRss from '../utilities/processBlogRSS.js'
+import processFile from '../utilities/imageProcessor'
+import getPathsFromConfig, { checkFile } from '../utilities/pathData.js'
 import { blogFile, blogRSSFile, defaultBlogInfo } from '../../shared/constants.d'
 import path from 'path'
 

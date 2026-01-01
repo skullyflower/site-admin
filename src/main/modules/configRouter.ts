@@ -1,5 +1,5 @@
 import fs from 'fs'
-import { checkFile, configfilepath } from './pathData'
+import { checkFile, configfilepath } from '../utilities/pathData'
 import { AdminConfig } from '../../shared/types'
 interface ConfigResponse {
   message: string

@@ -1,6 +1,6 @@
 import fs from 'fs'
-import getPathsFromConfig, { checkFile } from './pathData'
-//import processFile from './imageProcessor'
+import getPathsFromConfig, { checkFile } from '../utilities/pathData'
+//import processFile from '../utilities/imageProcessor'
 import { CategoryType } from '../../shared/types'
 
 const { pathToPublic } = getPathsFromConfig()

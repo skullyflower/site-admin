@@ -1,5 +1,5 @@
 import { existsSync, readdirSync, readFileSync, unlinkSync, writeFileSync } from 'fs'
-import getPathsFromConfig, { checkFile } from './pathData'
+import getPathsFromConfig, { checkFile } from '../utilities/pathData'
 import { ApiMessageResponse, PageInfo } from '../../shared/types'
 import { moveImages } from './imagesRouter'
 

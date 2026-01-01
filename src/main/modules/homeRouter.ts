@@ -1,5 +1,5 @@
 import fs from 'fs'
-import getPathsFromConfig, { checkFile } from './pathData'
+import getPathsFromConfig, { checkFile } from '../utilities/pathData'
 import { siteFile, defaultSiteData } from '../../shared/constants.d'
 
 export const getSiteInfo = (): string => {

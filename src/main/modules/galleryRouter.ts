@@ -1,5 +1,5 @@
 import { readFileSync, readdirSync, writeFileSync } from 'fs'
-import getPathsFromConfig, { checkFile, checkPath } from './pathData'
+import getPathsFromConfig, { checkFile, checkPath } from '../utilities/pathData'
 
 const { pathToPublic } = getPathsFromConfig()
 const galleries_json = `${pathToPublic}/data/galleries_list.json`
