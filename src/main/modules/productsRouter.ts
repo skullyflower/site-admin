@@ -1,13 +1,16 @@
 import fs from 'fs'
 import getPathsFromConfig, { checkFile } from '../utilities/pathData'
 import { ProductType } from '../../shared/types'
-
-const { pathToPublic } = getPathsFromConfig()
-
-const shopfilepath = `${pathToPublic}/data/products.json`
 import processFile from '../utilities/imageProcessor'
 
+const getPaths = (): { pathToPublic: string; shopfilepath: string } => {
+  const { pathToPublic } = getPathsFromConfig()
+  const shopfilepath = `${pathToPublic}/data/products.json`
+  return { pathToPublic, shopfilepath }
+}
+
 export const updateProduct = async (product: ProductType): Promise<string> => {
+  const { pathToPublic, shopfilepath } = getPaths()
   if (product) {
     try {
       const categoryId = product.cat[0]
@@ -68,6 +71,7 @@ export const updateProduct = async (product: ProductType): Promise<string> => {
 }
 
 export const getProducts = (): string => {
+  const { shopfilepath } = getPaths()
   checkFile(shopfilepath, { products: [] })
   const shopData = fs.readFileSync(shopfilepath, 'utf8')
   const shop = JSON.parse(shopData)
@@ -79,6 +83,7 @@ export const getProducts = (): string => {
 
 export const deleteProduct = (prodId): string => {
   try {
+    const { shopfilepath } = getPaths()
     const prodToDelete = prodId
     checkFile(shopfilepath, { products: [] })
     const shopData = fs.readFileSync(shopfilepath, 'utf8')

@@ -6,13 +6,16 @@ import getPathsFromConfig, { checkFile } from '../utilities/pathData.js'
 import { blogFile, blogRSSFile, defaultBlogInfo } from '../../shared/constants.d'
 import path from 'path'
 
-const { pathToPublic } = getPathsFromConfig()
-
-const tempPath = path.join(pathToPublic, 'temp')
-const blogfilepath = `${pathToPublic}/data/${blogFile}`
-const blogRSSpath = `${pathToPublic}/data/${blogRSSFile}`
+const getPaths = (): { tempPath: string; blogfilepath: string; blogRSSpath: string } => {
+  const { pathToPublic } = getPathsFromConfig()
+  const tempPath = path.join(pathToPublic, 'temp')
+  const blogfilepath = `${pathToPublic}/data/${blogFile}`
+  const blogRSSpath = `${pathToPublic}/data/${blogRSSFile}`
+  return { tempPath, blogfilepath, blogRSSpath }
+}
 
 export const getBlogs = (): string => {
+  const { blogfilepath } = getPaths()
   try {
     checkFile(blogfilepath, defaultBlogInfo)
     const blogData = fs.readFileSync(blogfilepath)
@@ -29,6 +32,7 @@ export const getBlogs = (): string => {
 }
 
 export const updateBlogInfo = (blogInfo): string => {
+  const { blogfilepath } = getPaths()
   if (blogInfo) {
     try {
       checkFile(blogfilepath, defaultBlogInfo)
@@ -47,6 +51,7 @@ export const updateBlogInfo = (blogInfo): string => {
 }
 
 export const updateBlogPost = (entry: BlogEntry): string => {
+  const { blogfilepath, tempPath, blogRSSpath } = getPaths()
   if (entry) {
     try {
       checkFile(blogfilepath, defaultBlogInfo)
@@ -91,6 +96,7 @@ export const updateBlogPost = (entry: BlogEntry): string => {
 }
 
 export const deletEntry = (blogid: string): string => {
+  const { blogfilepath, blogRSSpath } = getPaths()
   try {
     checkFile(blogfilepath, defaultBlogInfo)
     const blogJSONString = fs.readFileSync(blogfilepath)

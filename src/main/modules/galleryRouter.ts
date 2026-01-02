@@ -1,10 +1,14 @@
 import { readFileSync, readdirSync, writeFileSync } from 'fs'
 import getPathsFromConfig, { checkFile, checkPath } from '../utilities/pathData'
 
-const { pathToPublic } = getPathsFromConfig()
-const galleries_json = `${pathToPublic}/data/galleries_list.json`
+const getPaths = (): { pathToPublic: string; galleries_json: string } => {
+  const { pathToPublic } = getPathsFromConfig()
+  const galleries_json = `${pathToPublic}/data/galleries_list.json`
+  return { pathToPublic, galleries_json }
+}
 
 function getImages(path): string[] {
+  const { pathToPublic } = getPaths()
   const files_path = `${pathToPublic}/${path}`
   checkPath(files_path)
   const all_files = readdirSync(files_path)
@@ -16,6 +20,7 @@ function getImages(path): string[] {
 }
 
 export const resetGallery = (galleryId: string): string => {
+  const { pathToPublic } = getPaths()
   const galleriesJson = getGalleries()
   const galleries = JSON.parse(galleriesJson)
   const gallery = galleries.find((g) => g.id === galleryId)
@@ -75,6 +80,7 @@ export const resetGallery = (galleryId: string): string => {
 }
 
 export const getGalleries = (): string => {
+  const { galleries_json } = getPaths()
   try {
     checkFile(galleries_json, { galleries: [] })
     const gallerData = readFileSync(galleries_json, 'utf8')
@@ -85,6 +91,7 @@ export const getGalleries = (): string => {
 }
 
 export const updateGallery = (gallery): string => {
+  const { pathToPublic, galleries_json } = getPaths()
   if (gallery) {
     const galleriesJson = getGalleries()
     const galleries = JSON.parse(galleriesJson)
@@ -110,6 +117,7 @@ export const updateGallery = (gallery): string => {
 }
 
 export const getGalleryImages = (galleryId): string => {
+  const { pathToPublic } = getPaths()
   try {
     const galleriesJson = getGalleries()
     const galleries = JSON.parse(galleriesJson)

@@ -3,10 +3,14 @@ import getPathsFromConfig, { checkFile } from '../utilities/pathData'
 import { ApiMessageResponse, PageInfo } from '../../shared/types'
 import { moveImages } from './imagesRouter'
 
-const { pathToPublic } = getPathsFromConfig()
-const rootdir = `${pathToPublic}/data`
+const getPaths = (): { rootdir: string } => {
+  const { pathToPublic } = getPathsFromConfig()
+  const rootdir = `${pathToPublic}/data`
+  return { rootdir }
+}
 
 export const getPageFiles = (): string[] => {
+  const { rootdir } = getPaths()
   try {
     const files = readdirSync(rootdir)
     const pageFiles = files.filter((file) => file.endsWith('-page.json'))
@@ -24,6 +28,7 @@ export const getPages = (): string => {
 }
 
 export const getPage = (pageId: string): PageInfo | string => {
+  const { rootdir } = getPaths()
   const pagefilepath = `${rootdir}/${pageId}-page.json`
   checkFile(pagefilepath, { page_title: '', page_description: '', page_content: '' })
   const pageDataJson = readFileSync(pagefilepath, 'utf8')
@@ -34,6 +39,7 @@ export const getPage = (pageId: string): PageInfo | string => {
 }
 
 export const updatePage = (page, body): string => {
+  const { rootdir } = getPaths()
   const pagefilepath = `${rootdir}/${page}-page.json`
   if (body) {
     try {
@@ -61,6 +67,7 @@ export const updatePage = (page, body): string => {
 }
 
 export const createPage = (pageId: string): string => {
+  const { rootdir } = getPaths()
   const pagefilepath = `${rootdir}/${pageId}-page.json`
   checkFile(pagefilepath, { page_title: '', page_description: '', page_content: '' })
   const pageData: PageInfo = {
@@ -74,6 +81,7 @@ export const createPage = (pageId: string): string => {
 }
 
 export const deletePage = (pageId: string): string => {
+  const { rootdir } = getPaths()
   const pagefilepath = `${rootdir}/${pageId}-page.json`
   if (existsSync(pagefilepath)) {
     unlinkSync(pagefilepath)

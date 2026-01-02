@@ -3,10 +3,14 @@ import getPathsFromConfig, { checkFile } from '../utilities/pathData'
 //import processFile from '../utilities/imageProcessor'
 import { CategoryType } from '../../shared/types'
 
-const { pathToPublic } = getPathsFromConfig()
-const shopfilepath = `${pathToPublic}/data/categories.json`
+const getPaths = (): { shopfilepath: string } => {
+  const { pathToPublic } = getPathsFromConfig()
+  const shopfilepath = `${pathToPublic}/data/categories.json`
+  return { shopfilepath }
+}
 
 export const updateCategories = (category: CategoryType): string => {
+  const { shopfilepath } = getPaths()
   //upload('newImage', 1)
   if (category) {
     // const bigDestPath = `${pathToPublic}/shop/categories/${category.id}/`
@@ -62,6 +66,7 @@ export const updateCategories = (category: CategoryType): string => {
 }
 
 export const getAllCategories = (): string => {
+  const { shopfilepath } = getPaths()
   checkFile(shopfilepath, { categories: [] })
   const shopData = fs.readFileSync(shopfilepath)
   const shop = JSON.parse(shopData.toString())
@@ -74,6 +79,7 @@ export const getAllCategories = (): string => {
 // TODO: add check for prods with the category
 export const deleteCategory = (catId): string => {
   try {
+    const { shopfilepath } = getPaths()
     const catToDelete = catId
     checkFile(shopfilepath, { categories: [] })
     const shopData = fs.readFileSync(shopfilepath)

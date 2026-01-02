@@ -3,9 +3,20 @@ import path from 'path'
 import processFile, { ProcessedImage } from '../utilities/imageProcessor'
 import getPathsFromConfig, { checkPath } from '../utilities/pathData'
 
-const { pathToPublic } = getPathsFromConfig()
-const tempPath = path.join(pathToPublic, 'temp')
-const imagesPath = path.join(pathToPublic, 'images')
+const getPaths = (): {
+  pathToPublic: string
+  tempPath: string
+  imagesPath: string
+  bigSourcePath: string
+  smallSourcePath: string
+} => {
+  const { pathToPublic } = getPathsFromConfig()
+  const tempPath = path.join(pathToPublic, 'temp')
+  const imagesPath = path.join(pathToPublic, 'images')
+  const bigSourcePath = tempPath
+  const smallSourcePath = path.join(tempPath, 'small')
+  return { pathToPublic, tempPath, imagesPath, bigSourcePath, smallSourcePath }
+}
 // TODO: rewrite so that big images are the standard size and small images are in the smaller directory, always.
 /**
  * Moves images to the publictemp directory of the subject site for previewing.
@@ -13,6 +24,7 @@ const imagesPath = path.join(pathToPublic, 'images')
  * @returns An array of updated file paths for previewing.
  */
 export const getPreviewImages = async (files: string[]): Promise<string[]> => {
+  const { tempPath, pathToPublic } = getPaths()
   checkPath(tempPath)
   if (files.length > 0) {
     console.log('files', files)
@@ -32,14 +44,13 @@ export const getPreviewImages = async (files: string[]): Promise<string[]> => {
   }
   return []
 }
-const bigSourcePath = tempPath
-const smallSourcePath = path.join(tempPath, 'small')
 
 /**
  * reads contents of the temp directory and returns a list of images that are ready to be moved.
  * @returns An array of file names.
  */
 export const getStagedImages = (): string => {
+  const { bigSourcePath, smallSourcePath } = getPaths()
   try {
     checkPath(bigSourcePath)
     checkPath(smallSourcePath)
@@ -71,6 +82,7 @@ export const getStagedImages = (): string => {
  * @param destination - The destination directory.
  */
 export const moveImages = (filesToMove: string[], destination: string): string => {
+  const { pathToPublic, smallSourcePath, bigSourcePath } = getPaths()
   if (filesToMove && filesToMove.length > 0 && destination) {
     const filearray = !Array.isArray(filesToMove) ? [filesToMove] : filesToMove
 
@@ -111,6 +123,7 @@ export const moveImages = (filesToMove: string[], destination: string): string =
 }
 
 export const renameImage = (imageurl, newname): string => {
+  const { pathToPublic } = getPaths()
   if (imageurl && newname) {
     const relativePath = imageurl
     const biggerRelativePath = `${relativePath.substring(
@@ -139,6 +152,7 @@ export const renameImage = (imageurl, newname): string => {
 }
 
 export const deleteImage = (imageurl): string => {
+  const { pathToPublic } = getPaths()
   if (imageurl) {
     const relativePath = imageurl
     const smallerRelativePath = `${relativePath.substring(
@@ -163,6 +177,7 @@ export const deleteImage = (imageurl): string => {
 }
 
 export const getImageFolders = (): string => {
+  const { imagesPath } = getPaths()
   checkPath(imagesPath)
   const files = fs.readdirSync(imagesPath)
   const filtered = files.filter((file) => fs.statSync(path.join(imagesPath, file)).isDirectory())
@@ -179,6 +194,7 @@ export const getImageFolders = (): string => {
  * @returns An array of file names.
  */
 export const getFolderImages = (directory: string): string => {
+  const { pathToPublic } = getPaths()
   const dirpattern = /^[^.]*$/
   checkPath(`${pathToPublic}/${directory}`)
   try {
@@ -201,6 +217,7 @@ export const getFolderImages = (directory: string): string => {
 export const processUploadedImages = async (
   fileDataArray: Array<{ name: string; data: ArrayBuffer }>
 ): Promise<string> => {
+  const { tempPath } = getPaths()
   if (!fileDataArray || fileDataArray.length === 0) {
     return JSON.stringify([])
   }
@@ -240,7 +257,7 @@ export const uploadBlogImage = async (
   }
 
   try {
-    const { pathToPublic } = getPathsFromConfig()
+    const { pathToPublic } = getPaths()
     const bigDestPath = `${pathToPublic}/images/${destination}/`
     const smallDestPath = `${pathToPublic}/images/${destination}/smaller/`
 
@@ -273,6 +290,7 @@ export const uploadBlogImage = async (
  * image handling needs to be improved.
  */
 export const uploadImages = async (filePaths: string[], destination: string): Promise<string> => {
+  const { imagesPath, tempPath, smallSourcePath } = getPaths()
   if (filePaths) {
     const messages: string[] = []
     const bigDestPath = destination ? `${imagesPath}/${destination}/` : `${imagesPath}/`

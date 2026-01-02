@@ -1,12 +1,14 @@
 import fs from 'fs'
 import getPathsFromConfig, { checkFile } from '../utilities/pathData'
 
-const { pathToPublic } = getPathsFromConfig()
-
-const subjectFilePath = `${pathToPublic}/data/subjects.json`
-//import processFile from './imageProcessor.js'
+const getPaths = (): { pathToPublic: string; subjectFilePath: string } => {
+  const { pathToPublic } = getPathsFromConfig()
+  const subjectFilePath = `${pathToPublic}/data/subjects.json`
+  return { pathToPublic, subjectFilePath }
+}
 
 export const updateSubject = async (subject): Promise<string> => {
+  const { subjectFilePath } = getPaths()
   if (subject) {
     try {
       checkFile(subjectFilePath, { designs: [] })
@@ -36,6 +38,7 @@ export const updateSubject = async (subject): Promise<string> => {
 }
 
 export const getSubjects = (): string => {
+  const { subjectFilePath } = getPaths()
   checkFile(subjectFilePath, { designs: [] })
   const shopData = fs.readFileSync(subjectFilePath, 'utf8')
   const shop = JSON.parse(shopData)
@@ -48,6 +51,7 @@ export const getSubjects = (): string => {
 // TODO: add check for prods with the category
 export const deleteSubject = (catId): string => {
   try {
+    const { subjectFilePath } = getPaths()
     const catToDelete = catId
     checkFile(subjectFilePath, { designs: [] })
     const shopData = fs.readFileSync(subjectFilePath, 'utf8')

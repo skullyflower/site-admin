@@ -1,9 +1,7 @@
-import { BlogInfo } from '../../shared/types'
+import { BlogInfo } from '../../shared/types.d'
 import getPathsFromConfig, { checkFile } from './pathData.js'
-import { blogFile, defaultBlogInfo, defaultSiteData, siteFile } from '../../shared/constants'
+import { blogFile, defaultBlogInfo, defaultSiteData, siteFile } from '../../shared/constants.d'
 import fs from 'fs'
-
-const { pathToPublic } = getPathsFromConfig()
 
 const htmlEncodeString = (string): string =>
   string.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
@@ -11,6 +9,7 @@ const htmlEncodeString = (string): string =>
 const year = new Date().getUTCFullYear()
 
 const processRss = (blogData: BlogInfo): string => {
+  const { pathToPublic } = getPathsFromConfig()
   if (pathToPublic) {
     checkFile(`${pathToPublic}/data/${siteFile}`, defaultSiteData)
     checkFile(`${pathToPublic}/data/${blogFile}`, defaultBlogInfo)

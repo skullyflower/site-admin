@@ -2,7 +2,7 @@ import { app } from 'electron'
 import fs from 'fs'
 import path, { join } from 'path'
 import { configFile } from '../../shared/constants.d'
-import { getAdminConfig } from './configRouter'
+import { getAdminConfig } from '../modules/configRouter'
 
 export const configfilepath = path.join(app.getPath('home'), '.WebSiteConfig', configFile)
 
