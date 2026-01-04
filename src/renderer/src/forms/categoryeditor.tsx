@@ -1,15 +1,15 @@
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import FloatingFormWrapper from '../components/floatingformwrap'
-import UploadInput from '../components/upload-input'
+import UploadInput from '../components/inputs/upload-input'
 import InfoBubble from '../components/info-bubble'
 import imageLoading from '@renderer/assets/image-loading.svg'
 import { Box, Button, Field, Image, Input, HStack, Center, Heading } from '@chakra-ui/react'
 
 import { CategoryType } from 'src/shared/types'
-import StyledInput from '@renderer/components/StyledInput'
+import StyledInput from '@renderer/components/inputs/StyledInput'
 import { buttonRecipe } from '@renderer/themeRecipes'
-import TagSelector from '@renderer/components/TagSelector'
+import TagSelector from '@renderer/components/inputs/TagSelector'
 
 const newcat: CategoryType = {
   id: '',

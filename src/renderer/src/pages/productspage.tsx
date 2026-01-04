@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { Box, Button, Center, HStack, Heading, Skeleton, Stack } from '@chakra-ui/react'
 import EditProduct from '../forms/producteditor'
-import PageLayout from '../components/PageLayout'
+import PageLayout from '../components/layout/PageLayout'
 import OneProduct from '../components/oneProduct'
 import { ApiMessageResponse, CategoryType, ProductType, Subject } from 'src/shared/types'
 import { buttonRecipe } from '@renderer/themeRecipes'

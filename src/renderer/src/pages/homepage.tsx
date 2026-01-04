@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Skeleton, Stack } from '@chakra-ui/react'
-import PageLayout from '../components/PageLayout'
+import PageLayout from '../components/layout/PageLayout'
 import HomePageForm from '../forms/homepageForm'
 import HomePagePreview from '../forms/homepagePreview'
 import { SiteInfo, ApiMessageResponse } from 'src/shared/types'

@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { HStack, Input, Stack } from '@chakra-ui/react'
-import ImagePreview from './image-preview'
+import ImagePreview from '../image-preview'
 import backgroundImage from '@renderer/assets/image-loading.svg'
 
 interface UploadInputProps {

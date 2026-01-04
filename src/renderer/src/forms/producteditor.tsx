@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import UploadInput from '../components/upload-input'
+import UploadInput from '../components/inputs/upload-input'
 import InfoBubble from '../components/info-bubble'
 import {
   Box,
@@ -19,8 +19,8 @@ import { convertDate } from '../components/datetimebit'
 import { buttonRecipe } from '@renderer/themeRecipes'
 const today = new Date()
 import { ProductType, CategoryType, Subject } from 'src/shared/types'
-import StyledInput from '@renderer/components/StyledInput'
-import TagSelector from '@renderer/components/TagSelector'
+import StyledInput from '@renderer/components/inputs/StyledInput'
+import TagSelector from '@renderer/components/inputs/TagSelector'
 import imageLoading from '@renderer/assets/image-loading.svg'
 
 const newprodId = 'new-prod-id'

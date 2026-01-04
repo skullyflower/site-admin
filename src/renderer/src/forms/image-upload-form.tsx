@@ -1,4 +1,4 @@
-import UploadInput from '../components/upload-input'
+import UploadInput from '../components/inputs/upload-input'
 import { Heading, HStack, Button, Stack } from '@chakra-ui/react'
 import FloatingFormWrapper from '../components/floatingformwrap'
 import { buttonRecipe } from '@renderer/themeRecipes/button.recipe'

@@ -12,9 +12,9 @@ import {
   Stack
 } from '@chakra-ui/react'
 import InfoBubble from '../components/info-bubble'
-import PageLayout from '../components/PageLayout'
+import PageLayout from '../components/layout/PageLayout'
 import { ApiMessageResponse, PageInfo } from 'src/shared/types'
-import StyledInput from '@renderer/components/StyledInput'
+import StyledInput from '@renderer/components/inputs/StyledInput'
 import { buttonRecipe } from '@renderer/themeRecipes'
 import FormContainer from '@renderer/components/formcontainer'
 

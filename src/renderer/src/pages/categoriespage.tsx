@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Box, Button, Center, HStack, Heading, Image, Skeleton, Stack } from '@chakra-ui/react'
 import EditCategory from '../forms/categoryeditor'
-import PageLayout from '../components/PageLayout'
+import PageLayout from '../components/layout/PageLayout'
 import { ApiMessageResponse, CategoryType } from 'src/shared/types'
 import { buttonRecipe } from '@renderer/themeRecipes'
 import imageLoading from '@renderer/assets/image-loading.svg'

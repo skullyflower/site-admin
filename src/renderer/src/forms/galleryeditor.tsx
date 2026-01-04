@@ -15,7 +15,7 @@ import FloatingFormWrapper from '../components/floatingformwrap'
 import { useForm, useWatch } from 'react-hook-form'
 import { newGalleryId } from '../pages/galleriespage'
 import { GalleryInfo } from 'src/shared/types'
-import StyledInput from '@renderer/components/StyledInput'
+import StyledInput from '@renderer/components/inputs/StyledInput'
 import { buttonRecipe } from '@renderer/themeRecipes'
 
 interface EditGalleryProps {

@@ -1,6 +1,6 @@
 import { Text } from '@chakra-ui/react'
 import { useEffect, useState } from 'react'
-import PageLayout from '../components/PageLayout'
+import PageLayout from '../components/layout/PageLayout'
 import { AdminConfig, ApiMessageResponse, SiteInfo } from 'src/shared/types'
 import ConfigForm from '@renderer/forms/configeditor'
 import FormContainer from '@renderer/components/formcontainer'

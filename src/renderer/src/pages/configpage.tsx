@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import PageLayout from '../components/PageLayout'
+import PageLayout from '../components/layout/PageLayout'
 import ConfigForm from '@renderer/forms/configeditor'
 import { AdminConfig, ApiMessageResponse } from 'src/shared/types'
 import FormContainer from '@renderer/components/formcontainer'

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
-import PageLayout from '../components/PageLayout'
+import PageLayout from '../components/layout/PageLayout'
 import { Button, Center, Field, HStack, Input, Stack } from '@chakra-ui/react'
 import InfoBubble from '../components/info-bubble'
 import { ApiMessageResponse } from 'src/shared/types'

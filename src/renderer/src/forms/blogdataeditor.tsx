@@ -15,7 +15,7 @@ import {
 } from '@chakra-ui/react'
 import { buttonRecipe } from '@renderer/themeRecipes/button.recipe'
 import { BlogInfo } from 'src/shared/types'
-import StyledInput from '@renderer/components/StyledInput'
+import StyledInput from '@renderer/components/inputs/StyledInput'
 
 const EditBlogData = ({
   blogInfo,

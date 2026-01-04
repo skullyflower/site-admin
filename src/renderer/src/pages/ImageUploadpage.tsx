@@ -11,7 +11,7 @@ import {
   Separator,
   VStack
 } from '@chakra-ui/react'
-import PageLayout from '../components/PageLayout'
+import PageLayout from '../components/layout/PageLayout'
 import { buttonRecipe } from '@renderer/themeRecipes'
 import { ApiMessageResponse } from 'src/shared/types'
 import FormContainer from '@renderer/components/formcontainer'
