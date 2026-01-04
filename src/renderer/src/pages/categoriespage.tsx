@@ -6,6 +6,7 @@ import { ApiMessageResponse, CategoryType } from 'src/shared/types'
 import { buttonRecipe } from '@renderer/themeRecipes'
 import imageLoading from '@renderer/assets/image-loading.svg'
 import SemiSafeContent from '../components/SemiSafeContent'
+import FormContainer from '../components/formcontainer'
 
 const getCategories = (
   setCategories: (categories: CategoryType[]) => void,
@@ -90,13 +91,15 @@ const CategoriesPage = (): React.JSX.Element => {
       ) : (
         <Box p={5}>
           {showCatForm && (
-            <EditCategory
-              isOpen={showCatForm}
-              catid={activeCat as string}
-              categories={categories as CategoryType[]}
-              toggleCatForm={() => toggleCatForm(null)}
-              onSubmit={onSubmit}
-            />
+            <FormContainer>
+              <EditCategory
+                isOpen={showCatForm}
+                catid={activeCat as string}
+                categories={categories as CategoryType[]}
+                toggleCatForm={() => toggleCatForm(null)}
+                onSubmit={onSubmit}
+              />
+            </FormContainer>
           )}
           <Stack>
             {categories?.map((cat) => (

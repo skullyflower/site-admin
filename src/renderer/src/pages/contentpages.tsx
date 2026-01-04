@@ -16,6 +16,7 @@ import PageLayout from '../components/PageLayout'
 import { ApiMessageResponse, PageInfo } from 'src/shared/types'
 import StyledInput from '@renderer/components/StyledInput'
 import { buttonRecipe } from '@renderer/themeRecipes'
+import FormContainer from '@renderer/components/formcontainer'
 
 const getPages = (
   setLoading: (loading: boolean) => void,
@@ -228,7 +229,7 @@ export default function PageContent(): React.JSX.Element {
           <Skeleton height="50px" />
         </Stack>
       )}
-      {pagesData && (
+      {!activePage && pagesData && (
         <Stack gap={4}>
           <Heading size="sm">Select a page to edit</Heading>
           <HStack
@@ -241,7 +242,7 @@ export default function PageContent(): React.JSX.Element {
             justifyContent="center"
           >
             {pagesData.map((page) => (
-              <Button key={page} onClick={() => onPageClick(page)}>
+              <Button size="sm" key={page} onClick={() => onPageClick(page)}>
                 {page}
               </Button>
             ))}
@@ -249,12 +250,14 @@ export default function PageContent(): React.JSX.Element {
         </Stack>
       )}
       {activePage && (
-        <PageForm
-          pageId={activePage?.page_id || ''}
-          pageData={activePage as PageInfo}
-          onSubmit={onSubmit}
-          onCancel={() => setActivePage(null)}
-        />
+        <FormContainer>
+          <PageForm
+            pageId={activePage?.page_id || ''}
+            pageData={activePage as PageInfo}
+            onSubmit={onSubmit}
+            onCancel={() => setActivePage(null)}
+          />
+        </FormContainer>
       )}
     </PageLayout>
   )

@@ -1,5 +1,14 @@
+export type Feature =
+  | 'blog'
+  | 'content'
+  | 'galleries'
+  | 'products'
+  | 'categories'
+  | 'subjects'
+  | 'sale'
 export interface AdminConfig {
   pathToSite: string
+  features?: Feature[]
 }
 export interface BlogInfo {
   page_title: string

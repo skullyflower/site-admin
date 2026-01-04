@@ -5,6 +5,7 @@ import EditSubject from '../forms/subjectseditor'
 import PageLayout from '../components/PageLayout'
 import { buttonRecipe } from '@renderer/themeRecipes'
 import SemiSafeContent from '../components/SemiSafeContent'
+import FormContainer from '@renderer/components/formcontainer'
 
 const getSubjects = (
   setSubjects: (subjects: Subject[]) => void,
@@ -91,13 +92,15 @@ const SubjectsPage = (): React.JSX.Element => {
       ) : (
         <Box p={5}>
           {showCatForm && (
-            <EditSubject
-              isOpen={showCatForm}
-              subjectid={activeCat as string}
-              subjects={subjects as Subject[]}
-              toggleSubjectForm={() => toggleSubjectForm(activeCat as string | null)}
-              onSubmit={(values: Subject) => onSubmit(values)}
-            />
+            <FormContainer>
+              <EditSubject
+                isOpen={showCatForm}
+                subjectid={activeCat as string}
+                subjects={subjects as Subject[]}
+                toggleSubjectForm={() => toggleSubjectForm(activeCat as string | null)}
+                onSubmit={(values: Subject) => onSubmit(values)}
+              />
+            </FormContainer>
           )}
           <Stack>
             {subjects?.map((cat) => (

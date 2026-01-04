@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import PageLayout from '../components/PageLayout'
 import { AdminConfig, ApiMessageResponse, SiteInfo } from 'src/shared/types'
 import ConfigForm from '@renderer/forms/configeditor'
+import FormContainer from '@renderer/components/formcontainer'
 
 const WelcomePage = (): React.JSX.Element => {
   const [sitename, setSitename] = useState('Spa-Shop')
@@ -44,13 +45,15 @@ const WelcomePage = (): React.JSX.Element => {
     // If the config does not exist, show the config form
     return (
       <PageLayout title={`Welcome to the ${sitename} Admin`} messages={messages}>
-        <ConfigForm
-          formData={null}
-          setValue={() => {}}
-          onSubmit={() => (pathToSite: string) =>
-            window.api.setAdminConfig({ pathToSite: pathToSite })
-          }
-        />
+        <FormContainer>
+          <ConfigForm
+            formData={null}
+            setValue={() => {}}
+            onSubmit={() => (pathToSite: string) =>
+              window.api.setAdminConfig({ pathToSite: pathToSite })
+            }
+          />
+        </FormContainer>
       </PageLayout>
     )
   }

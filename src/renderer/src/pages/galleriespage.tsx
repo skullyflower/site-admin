@@ -8,6 +8,7 @@ import EditGallery from '../forms/galleryeditor'
 import PageLayout from '../components/PageLayout'
 import { GalleryInfo, GalleryImage } from 'src/shared/types'
 import { buttonRecipe } from '@renderer/themeRecipes'
+import FormContainer from '@renderer/components/formcontainer'
 
 export const newGalleryId = 'new-gallery'
 
@@ -220,17 +221,19 @@ const GalleryPage: React.FC = () => {
                 )}
               </Stack>
             </FloatingFormWrapper>
-            {activeGallery && (
-              <EditGallery
-                selectedGallery={activeGallery}
-                toggleForm={() => {
-                  setActiveGallery(null)
-                  toggleShowAdd()
-                }}
-                isOpen={showAddEdit}
-              />
-            )}
           </Stack>
+        )}{' '}
+        {activeGallery && (
+          <FormContainer>
+            <EditGallery
+              selectedGallery={activeGallery}
+              toggleForm={() => {
+                setActiveGallery(null)
+                toggleShowAdd()
+              }}
+              isOpen={showAddEdit}
+            />
+          </FormContainer>
         )}
       </Stack>
     </PageLayout>

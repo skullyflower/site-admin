@@ -4,6 +4,7 @@ import PageLayout from '../components/PageLayout'
 import HomePageForm from '../forms/homepageForm'
 import HomePagePreview from '../forms/homepagePreview'
 import { SiteInfo, ApiMessageResponse } from 'src/shared/types'
+import FormContainer from '@renderer/components/formcontainer'
 
 const getSiteData = async (
   setLoading: (loading: boolean) => void,
@@ -81,10 +82,12 @@ export default function HomePage(): React.JSX.Element {
           <Skeleton height="50px" />
         </Stack>
       ) : showForm || !pageData ? (
-        <HomePageForm
-          pageData={pageData || (emptySiteInfo as SiteInfo)}
-          onSubmit={(values: SiteInfo) => onSubmit(values as SiteInfo & { newsitelogo: File[] })}
-        />
+        <FormContainer>
+          <HomePageForm
+            pageData={pageData || (emptySiteInfo as SiteInfo)}
+            onSubmit={(values: SiteInfo) => onSubmit(values as SiteInfo & { newsitelogo: File[] })}
+          />
+        </FormContainer>
       ) : (
         <HomePagePreview pageData={pageData as SiteInfo} />
       )}

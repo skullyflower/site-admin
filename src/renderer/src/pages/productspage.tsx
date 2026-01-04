@@ -5,6 +5,7 @@ import PageLayout from '../components/PageLayout'
 import OneProduct from '../components/oneProduct'
 import { ApiMessageResponse, CategoryType, ProductType, Subject } from 'src/shared/types'
 import { buttonRecipe } from '@renderer/themeRecipes'
+import FormContainer from '@renderer/components/formcontainer'
 
 const getProducts = (setProducts, setMessages, setLoading): void => {
   setLoading(true)
@@ -179,15 +180,17 @@ const ProductsPage = (): React.JSX.Element => {
       ) : (
         <Box p={5} padding={0}>
           {showForm && (
-            <EditProduct
-              isOpen={showForm}
-              prodId={activeProd as string}
-              categories={categories}
-              subjects={subjects}
-              products={products}
-              toggleForm={toggleForm}
-              onSubmit={onSubmit}
-            />
+            <FormContainer>
+              <EditProduct
+                isOpen={showForm}
+                prodId={activeProd as string}
+                categories={categories}
+                subjects={subjects}
+                products={products}
+                toggleForm={toggleForm}
+                onSubmit={onSubmit}
+              />
+            </FormContainer>
           )}
           <Stack gap={4}>
             <HStack wrap="wrap" alignItems="flex-start" justifyContent="center">

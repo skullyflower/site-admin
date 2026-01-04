@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import PageLayout from '../components/PageLayout'
 import ConfigForm from '@renderer/forms/configeditor'
 import { AdminConfig, ApiMessageResponse } from 'src/shared/types'
-
+import FormContainer from '@renderer/components/formcontainer'
 const getConfig = (
   setConfig: (config: AdminConfig | null) => void,
   setMessages: (message: string) => void
@@ -13,7 +13,7 @@ const getConfig = (
       if (typeof data === 'object' && 'message' in data) {
         setMessages(data.message as string)
       } else {
-        setConfig(data as AdminConfig)
+        setConfig(data as unknown as AdminConfig)
       }
     })
     .catch((err: Error) => {
@@ -31,13 +31,13 @@ const ConfigPage = (): React.ReactNode => {
     }
   }, [config, messages, setConfig, setMessages])
 
-  const onSubmit = (pathToSite: string): void => {
-    if (!pathToSite) {
+  const onSubmit = (): void => {
+    if (!config?.pathToSite) {
       setMessages('You must fill out all fields.')
       return
     }
     window.api
-      .setAdminConfig({ pathToSite: pathToSite })
+      .setAdminConfig(config as AdminConfig)
       .then((data: ApiMessageResponse) => {
         setMessages(data.message as string)
         getConfig(setConfig, setMessages)
@@ -51,13 +51,15 @@ const ConfigPage = (): React.ReactNode => {
     <PageLayout
       messages={messages}
       title="Set Config"
-      button={{ action: () => onSubmit(config?.pathToSite || ''), text: 'Update', value: '' }}
+      button={{ action: onSubmit, text: 'Update', value: '' }}
     >
-      <ConfigForm
-        formData={config as AdminConfig}
-        setValue={(value: string) => setConfig({ pathToSite: value } as AdminConfig)}
-        onSubmit={() => onSubmit(config?.pathToSite || '')}
-      />
+      <FormContainer>
+        <ConfigForm
+          formData={config as AdminConfig}
+          setValue={(value: AdminConfig) => setConfig(value)}
+          onSubmit={onSubmit}
+        />
+      </FormContainer>
     </PageLayout>
   )
 }

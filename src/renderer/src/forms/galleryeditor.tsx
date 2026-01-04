@@ -147,7 +147,12 @@ export default function EditGallery({
             <Field.Label w={40}>
               Sort Old to new: <InfoBubble message={`Optional, mostly for comic stories.`} />
             </Field.Label>
-            <Checkbox.Root {...register('isStory')} />
+            <Checkbox.Root {...register('isStory')}>
+              <Checkbox.HiddenInput />
+              <Checkbox.Control>
+                <Checkbox.Indicator />
+              </Checkbox.Control>
+            </Checkbox.Root>
           </HStack>
         </Field.Root>
         <Center>

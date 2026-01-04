@@ -6,6 +6,7 @@ import PageLayout from '../components/PageLayout'
 import { buttonRecipe } from '@renderer/themeRecipes/button.recipe'
 import { BlogEntry, BlogInfo, SiteInfo } from 'src/shared/types'
 import { ApiMessageResponse, BlogResponse } from 'src/shared/types'
+import FormContainer from '../components/formcontainer'
 
 const getSiteInfo = async (setSiteData: (siteData: SiteInfo) => void): Promise<void> => {
   const response = await window.api.getSiteInfo()
@@ -102,24 +103,14 @@ const BlogPage = (): React.JSX.Element => {
     >
       <div className="content">
         {showForm ? (
-          <Box
-            w={['95vw', '93vw', '88vw', '85vw', '1000px']}
-            marginInline={'auto'}
-            overflow={'auto'}
-            backgroundColor="slate.800"
-            borderWidth={2}
-            borderStyle="solid"
-            borderColor="slate.500"
-            p={5}
-            borderRadius={5}
-          >
+          <FormContainer>
             <EditBlogEntry
               sitedata={sitedata as SiteInfo}
               thisEntry={activeBlog as BlogEntry}
               toggleForm={() => toggleForm(null)}
               onSubmit={(values: BlogEntry) => onSubmit(values as BlogEntry)}
             />
-          </Box>
+          </FormContainer>
         ) : (
           <Box p={5}>
             {blogInfo && <EditBlogData blogInfo={blogInfo} onSubmit={onUpdateInfo} />}
