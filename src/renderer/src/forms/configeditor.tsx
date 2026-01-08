@@ -44,7 +44,7 @@ const ConfigForm = ({
         </HStack>
       </Field.Root>
       <Fieldset.Root p={4}>
-        <Fieldset.Legend w={48}>Select Features to Enable:</Fieldset.Legend>
+        <Fieldset.Legend>Select Features to Enable:</Fieldset.Legend>
         <Fieldset.Content>
           <Checkbox.Group
             value={formData?.features || []}

@@ -82,6 +82,7 @@ const SubjectsPage = (): React.JSX.Element => {
     <PageLayout
       title="Add, Update, Delete Subjects"
       messages={messages}
+      setMessages={setMessages}
       button={{ action: () => toggleSubjectForm('newcat'), text: 'Add a new one', value: 'newcat' }}
     >
       {loading ? (

@@ -136,8 +136,9 @@ const api = {
     const response = await ipcRenderer.invoke('get-preview-images', fileArray)
     return response as string[]
   },
-  processUploadedImages: async (fileDataArray: Array<{ name: string; data: ArrayBuffer }>) => {
-    const response = await ipcRenderer.invoke('process-uploaded-images', fileDataArray)
+  processUploadedImages: async (fileDataArray: File[]) => {
+    const fileArray = fileDataArray.map((file) => webUtils.getPathForFile(file))
+    const response = await ipcRenderer.invoke('process-uploaded-images', fileArray)
     return JSON.parse(response)
   },
   uploadBlogImage: async (filePath: string, destination: string) => {
@@ -162,7 +163,7 @@ const api = {
   },
   uploadImages: async (files: string[], destination: string) => {
     const response = await ipcRenderer.invoke('upload-images', files, destination)
-    return JSON.parse(response)
+    return JSON.parse(response) as { messages: string; filePaths: string[] }
   }
 }
 

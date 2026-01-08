@@ -1,5 +1,5 @@
 import fs from 'fs'
-import path from 'path'
+import path, { join } from 'path'
 import processFile, { ProcessedImage } from '../utilities/imageProcessor'
 import getPathsFromConfig, { checkPath } from '../utilities/pathData'
 
@@ -20,20 +20,19 @@ const getPaths = (): {
 // TODO: rewrite so that big images are the standard size and small images are in the smaller directory, always.
 /**
  * Moves images to the publictemp directory of the subject site for previewing.
- * @param files - An array of file paths.
+ * @param files - An array of file paths. // File objects are converted to paths in the preload file.
  * @returns An array of updated file paths for previewing.
  */
 export const getPreviewImages = async (files: string[]): Promise<string[]> => {
   const { tempPath, pathToPublic } = getPaths()
   checkPath(tempPath)
   if (files.length > 0) {
-    console.log('files', files)
     try {
       const newFilePaths = await Promise.all(
         files.map(async (file) => {
-          const newFilePath = `${tempPath}/${file.split('/').pop()}`
+          const newFilePath = join(tempPath, file.split('/').pop() || '')
           fs.copyFileSync(file, newFilePath)
-          return newFilePath.replace(pathToPublic, 'http://localhost:3000/')
+          return newFilePath.replace(pathToPublic, 'http://localhost:3000/') //preview url
         })
       )
       return newFilePaths
@@ -43,6 +42,47 @@ export const getPreviewImages = async (files: string[]): Promise<string[]> => {
     }
   }
   return []
+}
+/**
+ * Process "uploaded" images, resize and move to temp directory - saves files from renderer to temp location and returns preview URLs
+ * @param files - An array of file paths. // File objects are converted to paths in the preload file.
+ * @returns A JSON string containing the preview URLs and file paths.
+ */
+export const processUploadedImages = async (
+  files: string[]
+): Promise<{ previewUrls: string[]; filePaths: string[]; message: string }> => {
+  const { tempPath } = getPaths()
+  checkPath(tempPath)
+
+  const previewUrls: string[] = []
+  const filePaths: string[] = []
+  let message = ''
+
+  if (files.length > 0) {
+    for (const fileData of files) {
+      try {
+        // resize and move to temp directory
+        const bigResult = await processFile(fileData, 850, tempPath)
+        const smallResult = await processFile(fileData, 450, join(tempPath, 'smaller'))
+        if (typeof bigResult === 'object' && 'relativeUrl' in bigResult && bigResult.relativeUrl) {
+          previewUrls.push(join('http://localhost:3000', bigResult.relativeUrl))
+          filePaths.push(bigResult.relativeUrl)
+        }
+        if (
+          typeof smallResult === 'object' &&
+          'relativeUrl' in smallResult &&
+          smallResult.relativeUrl
+        ) {
+          previewUrls.push(join('http://localhost:3000', smallResult.relativeUrl))
+          filePaths.push(smallResult.relativeUrl)
+        }
+      } catch (err) {
+        message = message + `Failed to process file ${fileData}: ${err}`
+      }
+    }
+    return { previewUrls, filePaths, message: message }
+  }
+  return { previewUrls, filePaths, message: message || 'No files to process.' }
 }
 
 /**
@@ -126,20 +166,20 @@ export const renameImage = (imageurl, newname): string => {
   const { pathToPublic } = getPaths()
   if (imageurl && newname) {
     const relativePath = imageurl
-    const biggerRelativePath = `${relativePath.substring(
+    const smallerRelativePath = `${relativePath.substring(
       0,
       relativePath.lastIndexOf('/')
-    )}/bigger${relativePath.substring(relativePath.lastIndexOf('/'))}`
+    )}/smaller${relativePath.substring(relativePath.lastIndexOf('/'))}`
     try {
       /** small file in public */
       fs.renameSync(
         `${pathToPublic}${relativePath}`,
         `${pathToPublic}${relativePath.substring(0, relativePath.lastIndexOf('/'))}/${newname}`
       )
-      /** bigger file in public */
+      /** smaller file in public */
       fs.renameSync(
-        `${pathToPublic}${biggerRelativePath}`,
-        `${pathToPublic}${biggerRelativePath.substring(0, biggerRelativePath.lastIndexOf('/'))}/${
+        `${pathToPublic}${smallerRelativePath}`,
+        `${pathToPublic}${smallerRelativePath.substring(0, smallerRelativePath.lastIndexOf('/'))}/smaller${
           newname
         }`
       )
@@ -210,42 +250,6 @@ export const getFolderImages = (directory: string): string => {
 }
 
 /**
- * Process "uploaded" images, resize and move to temp directory - saves files from renderer to temp location and returns preview URLs
- * @param fileDataArray - An array of file data.
- * @returns A JSON string containing the preview URLs and file paths.
- */
-export const processUploadedImages = async (
-  fileDataArray: Array<{ name: string; data: ArrayBuffer }>
-): Promise<string> => {
-  const { tempPath } = getPaths()
-  if (!fileDataArray || fileDataArray.length === 0) {
-    return JSON.stringify([])
-  }
-
-  checkPath(tempPath)
-  const previewUrls: string[] = []
-  const filePaths: string[] = []
-
-  for (const fileData of fileDataArray) {
-    try {
-      // Save file to temp directory
-      const filePath = path.join(tempPath, fileData.name)
-      const buffer = Buffer.from(fileData.data)
-      fs.writeFileSync(filePath, buffer)
-
-      // Store the path for later use
-      filePaths.push(filePath)
-
-      // Create a file:// URL for preview
-      previewUrls.push(`http://localhost:3000/${filePath}`)
-    } catch (err) {
-      return JSON.stringify({ message: `Failed to process file ${fileData.name}: ${err}` })
-    }
-  }
-  return JSON.stringify({ previewUrls, filePaths, message: 'Images processed successfully' })
-}
-
-/**
  * Upload and process a blog image - resize and move to blog directory, return relative URL
  */
 export const uploadBlogImage = async (
@@ -289,33 +293,36 @@ export const uploadBlogImage = async (
  * @returns A JSON string containing the message and the paths of the "uploaded" images.
  * image handling needs to be improved.
  */
-export const uploadImages = async (filePaths: string[], destination: string): Promise<string> => {
+export const uploadImages = async (
+  filePaths: string[],
+  destination: string
+): Promise<ProcessedImage[]> => {
+  const processedImages: ProcessedImage[] = []
   const { imagesPath, tempPath, smallSourcePath } = getPaths()
   if (filePaths) {
-    const messages: string[] = []
-    const bigDestPath = destination ? `${imagesPath}/${destination}/` : `${imagesPath}/`
-    const smallDestPath = `${bigDestPath}/smaller/`
+    const bigDestPath = destination ? join(imagesPath, destination) : `${imagesPath}/`
+    const smallDestPath = join(bigDestPath, 'smaller')
 
     for (const filePath of filePaths) {
       try {
         const result1 = await processFile(`${tempPath}/${filePath}`, 750, bigDestPath)
-        if (result1 === 'success') {
+        if (typeof result1 === 'string') {
+          console.error(`Wrong Big File type.`)
+        } else if (result1.relativeUrl) {
           console.log('Big file uploaded to ', tempPath)
-        } else {
-          messages.push(`Wrong Big File type.`)
+          processedImages.push(result1)
         }
         const result2 = await processFile(`${smallSourcePath}/${filePath}`, 450, smallDestPath)
-        if (result2 === 'success') {
+        if (typeof result2 === 'string') {
+          console.error(`Wrong Small File type.`)
+        } else if (result2.relativeUrl) {
           console.log('Small file uploaded to ', smallDestPath)
-        } else {
-          messages.push(`Wrong Small File type.`)
+          processedImages.push(result2)
         }
       } catch (err) {
-        messages.push(`Could not process file:${err}`)
+        console.error(`Could not process file:${err}`)
       }
     }
-    return JSON.stringify({ messages: messages.join(', ') })
-  } else {
-    return JSON.stringify({ message: 'No uploaded files.' })
   }
+  return processedImages || []
 }

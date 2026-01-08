@@ -169,6 +169,7 @@ const ProductsPage = (): React.JSX.Element => {
   return (
     <PageLayout
       messages={messages}
+      setMessages={setMessages}
       title="Add, Update, Delete Products"
       button={{ action: () => toggleForm('newcat'), text: 'Add a new one', value: 'newcat' }}
     >

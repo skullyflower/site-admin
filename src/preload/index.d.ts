@@ -57,7 +57,13 @@ export interface Api {
     filePath: string,
     destination?: string
   ) => Promise<{ relativeUrl: string; filename: string; message?: string; error?: string }>
-  uploadImages: (files: string[], destination: string) => Promise<ApiMessageResponse>
+  uploadImages: (
+    files: string[],
+    destination: string
+  ) => Promise<{ messages: string; filePaths: string[] }>
+  processUploadedImages: (
+    fileDataArray: File[]
+  ) => Promise<{ previewUrls: string[]; filePaths: string[]; message: string }>
   // this one moves staged images to a new location.
   moveImages: (filesToMove: string[], destination: string) => Promise<ApiMessageResponse>
   // this one renames an image.

@@ -154,10 +154,8 @@ ipcMain.handle('get-gallery-images', (_event, gallery_id: string) => getGalleryI
 ipcMain.handle('update-gallery', (_event, gallery: string) => updateGallery(gallery))
 ipcMain.handle('reset-gallery', (_event, gallery: string) => resetGallery(gallery))
 ipcMain.handle('get-staged-images', getStagedImages)
-ipcMain.handle(
-  'process-uploaded-images',
-  (_event, fileDataArray: Array<{ name: string; data: ArrayBuffer }>) =>
-    processUploadedImages(fileDataArray)
+ipcMain.handle('process-uploaded-images', (_event, fileDataArray: Array<string>) =>
+  processUploadedImages(fileDataArray)
 )
 ipcMain.handle('upload-blog-image', (_event, filePath: string, destination: string) =>
   uploadBlogImage(filePath, destination)

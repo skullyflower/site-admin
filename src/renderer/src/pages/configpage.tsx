@@ -50,6 +50,7 @@ const ConfigPage = (): React.ReactNode => {
   return (
     <PageLayout
       messages={messages}
+      setMessages={setMessages}
       title="Set Config"
       button={{ action: onSubmit, text: 'Update', value: '' }}
     >

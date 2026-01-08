@@ -116,6 +116,7 @@ const ImagesUploadPage: React.FC = () => {
   return (
     <PageLayout
       messages={messages}
+      setMessages={setMessages}
       title="Add Images"
       button={{ action: () => setShowForm(!showForm), text: 'Add new ones', value: 'newcat' }}
     >

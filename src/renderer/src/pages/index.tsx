@@ -34,7 +34,7 @@ const WelcomePage = (): React.JSX.Element => {
 
   if (pathToSite) {
     return (
-      <PageLayout title={`Welcome to the Admin`} messages={messages}>
+      <PageLayout title={`Welcome to the Admin`} messages={messages} setMessages={setMessages}>
         <Text>
           <em>Currently editing:</em> {sitename} at {pathToSite}
         </Text>
@@ -44,7 +44,11 @@ const WelcomePage = (): React.JSX.Element => {
   } else {
     // If the config does not exist, show the config form
     return (
-      <PageLayout title={`Welcome to the ${sitename} Admin`} messages={messages}>
+      <PageLayout
+        title={`Welcome to the ${sitename} Admin`}
+        messages={messages}
+        setMessages={setMessages}
+      >
         <FormContainer>
           <ConfigForm
             formData={null}

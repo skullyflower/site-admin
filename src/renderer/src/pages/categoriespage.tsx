@@ -81,6 +81,7 @@ const CategoriesPage = (): React.JSX.Element => {
     <PageLayout
       title="Add, Update, Delete Categories"
       messages={messages}
+      setMessages={setMessages}
       button={{ action: () => toggleCatForm('newcat'), text: 'Add a new one', value: 'newcat' }}
     >
       {loading ? (

@@ -74,6 +74,7 @@ export default function HomePage(): React.JSX.Element {
     <PageLayout
       title="Manage Site Data and Homepage"
       messages={messages}
+      setMessages={setMessages}
       button={{ text: showForm ? 'Show Preview' : 'Show Form', action: toggleForm, value: '' }}
     >
       {loading ? (

@@ -1,8 +1,19 @@
-import { Alert, Button, Card, Heading, HStack, ScrollArea, Stack } from '@chakra-ui/react'
+import {
+  Alert,
+  Button,
+  Card,
+  Dialog,
+  Heading,
+  HStack,
+  Portal,
+  ScrollArea,
+  Stack
+} from '@chakra-ui/react'
 import { buttonRecipe } from '@renderer/themeRecipes'
 
 interface PageLayoutProps {
   messages: string | null
+  setMessages: (string: string | null) => void
   title: string
   button?: {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -13,7 +24,13 @@ interface PageLayoutProps {
   }
   children: React.ReactNode
 }
-const PageLayout = ({ messages, title, button, children }: PageLayoutProps): React.ReactNode => {
+const PageLayout = ({
+  messages,
+  setMessages,
+  title,
+  button,
+  children
+}: PageLayoutProps): React.ReactNode => {
   return (
     <Card.Root
       variant="outline"
@@ -44,7 +61,30 @@ const PageLayout = ({ messages, title, button, children }: PageLayoutProps): Rea
               </Button>
             )}
           </HStack>
-          {messages && <Alert.Root status="info">{messages}</Alert.Root>}
+          {messages && (
+            <Dialog.Root placement="center" role="alertdialog" open={messages !== null}>
+              <Portal>
+                <Dialog.Backdrop />
+                <Dialog.Positioner>
+                  <Dialog.Content>
+                    <Dialog.Header>
+                      <Dialog.Title>Submitted</Dialog.Title>
+                    </Dialog.Header>
+                    <Dialog.Body>
+                      <Alert.Root status="info">{messages}</Alert.Root>
+                    </Dialog.Body>
+                    <Dialog.Footer>
+                      <Dialog.CloseTrigger asChild>
+                        <Button variant="outline" size="sm" onClick={() => setMessages(null)}>
+                          Close
+                        </Button>
+                      </Dialog.CloseTrigger>
+                    </Dialog.Footer>
+                  </Dialog.Content>
+                </Dialog.Positioner>
+              </Portal>
+            </Dialog.Root>
+          )}
         </Stack>
       </Card.Header>
       <Card.Body>

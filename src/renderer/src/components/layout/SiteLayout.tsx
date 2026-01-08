@@ -1,6 +1,6 @@
 import { Stack, Flex, LinkBox, Image } from '@chakra-ui/react'
 import { Link, Outlet } from 'react-router-dom'
-import NavBar from './NavBar'
+import NavBar from '../NavBar'
 import logo from '@renderer/assets/SiteAdmin.png'
 
 export default function SiteLayout(): React.JSX.Element {

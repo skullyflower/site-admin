@@ -99,6 +99,7 @@ const BlogPage = (): React.JSX.Element => {
     <PageLayout
       title="Update Yer Blarrgh"
       messages={messages}
+      setMessages={setMessages}
       button={{ action: toggleForm, text: 'Add a new one', value: 'newentry' }}
     >
       <div className="content">

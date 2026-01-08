@@ -142,6 +142,7 @@ const GalleryPage: React.FC = () => {
     <PageLayout
       title="Update a Gallery"
       messages={messages}
+      setMessages={setMessages}
       button={{
         text: showAddEdit ? 'Never mind' : 'Add new Gallery',
         action: () => {
