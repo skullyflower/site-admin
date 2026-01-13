@@ -31,7 +31,8 @@ import {
   uploadImages,
   getPreviewImages,
   processUploadedImages,
-  uploadBlogImage
+  uploadBlogImage,
+  uploadImage
 } from './modules/imagesRouter'
 import { registerRoute } from '../lib/electron-router-dom'
 import { getAdminConfig, updateAdminConfig } from './modules/configRouter'
@@ -170,6 +171,9 @@ ipcMain.handle('get-folder-images', (_event, toplevel: string) => getFolderImage
 ipcMain.handle(
   'move-images', // simplify this to just move images to a new location
   (_event, filesToMove: string[], destination: string) => moveImages(filesToMove, destination)
+)
+ipcMain.handle('upload-image', (_event, filePath: string, destination: string) =>
+  uploadImage(filePath, destination)
 )
 ipcMain.handle('upload-images', (_event, filePaths: string[], destination: string) =>
   uploadImages(filePaths, destination)

@@ -24,10 +24,13 @@ const NavButton = ({ path, children }: NavButtonProps): React.ReactNode => {
 const NavBar = (): React.ReactNode => {
   const [config, setConfig] = useState<AdminConfig | null>(null)
   useEffect(() => {
-    window.api.getAdminConfig().then((response: ApiMessageResponse | AdminConfig) => {
-      setConfig(response as AdminConfig)
-    })
-  })
+    if (config === null) {
+      window.api.getAdminConfig().then((response: ApiMessageResponse | AdminConfig) => {
+        setConfig(response as AdminConfig)
+      })
+    }
+  }, [config])
+
   return (
     <HStack className="navbar" justifyContent={'center'} gap={2} wrap={'wrap'}>
       <NavButton path="/home">Home</NavButton>

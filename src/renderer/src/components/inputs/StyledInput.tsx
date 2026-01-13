@@ -28,25 +28,21 @@ const StyledInput = ({
   value,
   onChange,
   placeholder = 'Add Content Here...',
-  onUploadImages
+  onUploadImage
 }: {
   value: string
   onChange: (value: string) => void
   placeholder?: string
-  onUploadImages?: (images: string[]) => Promise<string[]>
+  onUploadImage?: (image: string) => Promise<string>
 }): React.ReactNode => {
   const addUploadImages = async (image: File): Promise<string> => {
-    console.log('imagePath', image)
-    const result = await window.api.processUploadedImages([image])
-    result.message && alert(result.message)
-    if (result && result.previewUrls.length > 0 && onUploadImages) {
-      const imageUrl = await onUploadImages(result.previewUrls)[0]
+    const result = await window.api.getPreviewImages([image])
+    if (result && onUploadImage) {
+      const imageUrl = await onUploadImage(result[0].replace('http://localhost:3000/', ''))
       console.log('imageUrl', imageUrl)
-      return imageUrl // relative url to the image for use in the content block, not the staging url.
+      return imageUrl as string // relative url to the image for use in the content block, not the staging url.
     }
-    console.log('result.previewUrls[0]', result.previewUrls[0])
-    return result.previewUrls[0]
-    //defaults to the staging url.
+    return result[0]
   }
 
   return (
@@ -61,7 +57,7 @@ const StyledInput = ({
       overflow="hidden"
     >
       <MDXEditor
-        markdown={value}
+        markdown={value.replace(/<[/]*p>/g, '').replace(/<[/]*[^>]*>/g, '')}
         onChange={onChange}
         placeholder={placeholder}
         className="dark-theme dark-editor"

@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
 import { PageInfo } from 'src/shared/types'
-import { Box, Button, Field, HStack, Heading, Input, Center } from '@chakra-ui/react'
+import { Box, Button, Field, HStack, Heading, Input, Center, Stack } from '@chakra-ui/react'
 import InfoBubble from '../components/info-bubble'
 import StyledInput from '@renderer/components/inputs/StyledInput'
 import { buttonRecipe } from '@renderer/themeRecipes/button.recipe'
@@ -30,43 +30,41 @@ export default function PageForm({
     setValue(formfield, newText)
     setWysiwygText(newText)
   }
-  const handleUploadImages = async (images: string[]): Promise<string[]> => {
-    if (images.length > 0) {
-      const imageNames = images
-        .map((image) => image.split('/').pop())
-        .filter((name) => name !== undefined)
-      const response = await window.api.uploadImages(imageNames, `${id}`)
-      if (response.filePaths) {
-        return response.filePaths || []
-      }
-      return []
+  const handleUploadImage = async (image: string): Promise<string> => {
+    const imageName = image.split('/').pop() || image
+    const response = await window.api.uploadImage(imageName, `${id}`)
+    if (response.relativeUrl) {
+      return response.relativeUrl
     }
-    return []
+    return image
   }
   return (
-    <Box p={5}>
+    <Stack gap={1}>
       <HStack justifyContent="space-between">
         <Heading size="md">Edit Page {id}</Heading>
       </HStack>
-      {pageId === 'ChangeMe' && (
-        <Field.Root p={4} invalid={errors.page_id ? true : false}>
-          <HStack alignItems="center">
-            <Field.Label w={48}>
+      {pageId === 'change-me' && (
+        <Field.Root p={1} invalid={errors.page_id ? true : false}>
+          <HStack alignItems="center" width={'100%'}>
+            <Field.Label w={40}>
               Page ID:{' '}
               <InfoBubble
                 message={`This is the page id, it must be unique and cannot be changed.`}
               />
             </Field.Label>
             <Input
-              _invalid={{ borderColor: 'red.300' }}
+              _invalid={{ borderColor: 'red.300', borderWidth: '2px', borderStyle: 'solid' }}
               type="text"
-              {...register('page_id', { required: true, validate: (value) => value !== '' })}
+              {...register('page_id', {
+                required: true,
+                validate: (value) => value !== '' && value !== 'change-me'
+              })}
             />
           </HStack>
         </Field.Root>
       )}
-      <Field.Root p={4} invalid={errors.page_title ? true : false}>
-        <HStack alignItems="center">
+      <Field.Root p={1} invalid={errors.page_title ? true : false}>
+        <HStack alignItems="center" width={'100%'}>
           <Field.Label w={48}>
             Page Title:{' '}
             <InfoBubble message={`This is the SEO page title for the ${pageId} page.`} />
@@ -78,8 +76,8 @@ export default function PageForm({
           />
         </HStack>
       </Field.Root>
-      <Field.Root p={4} invalid={errors.page_description ? true : false}>
-        <HStack alignItems="center">
+      <Field.Root p={1} invalid={errors.page_description ? true : false}>
+        <HStack alignItems="center" width={'100%'}>
           <Field.Label w={48}>
             {pageId} SEO Page Description:{' '}
             <InfoBubble message="Short description that will show in Google searches. " />
@@ -94,9 +92,9 @@ export default function PageForm({
           />
         </HStack>
       </Field.Root>
-      <Field.Root p={4}>
-        <HStack alignItems="top">
-          <Field.Label w={48}>Page Content:</Field.Label>
+      <Field.Root p={1}>
+        <Stack alignItems="top" width={'100%'}>
+          <Field.Label>Page Content:</Field.Label>
           <Box
             width={'100%'}
             flexGrow={3}
@@ -116,12 +114,12 @@ export default function PageForm({
               <StyledInput
                 value={wysiwygText}
                 onChange={handleTextChange('page_content')}
-                onUploadImages={handleUploadImages}
+                onUploadImage={handleUploadImage}
                 placeholder="Add Content Here..."
               />
             </Box>
           </Box>
-        </HStack>
+        </Stack>
       </Field.Root>
       <Center>
         <HStack gap={4}>
@@ -131,6 +129,6 @@ export default function PageForm({
           </Button>
         </HStack>
       </Center>
-    </Box>
+    </Stack>
   )
 }

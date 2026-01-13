@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useForm } from 'react-hook-form'
+import { useForm, useWatch } from 'react-hook-form'
 import ImageUpload from '../forms/image-upload-form'
 import {
   Button,
@@ -57,19 +57,25 @@ const defaultValues: { destination: string; filesToMove: string[] } = {
 }
 
 const ImagesUploadPage: React.FC = () => {
-  const { register, handleSubmit, setValue, getValues } = useForm<{
+  const [showForm, setShowForm] = useState(false)
+  const [messages, setMessages] = useState<string | null>(null)
+  // read from api based on gallery/shop/etc files. standardize image loacations.
+  const [toDirectories, setToDirectories] = useState<string[]>([])
+  const [allImages, setAllImages] = useState<string[]>([])
+  const { control, register, handleSubmit, setValue, getValues } = useForm<{
     destination: string
     filesToMove: string[]
   }>({
     defaultValues
   })
-  const filesToMove = getValues('filesToMove')
+  const filesToMove = useWatch({ control, name: 'filesToMove' })
+
   const onSubmit = (): void => {
     const values = getValues()
     window.api
       .uploadImages(values.filesToMove, values.destination)
       .then((response) => {
-        setMessages(response.message)
+        setMessages(response.messages)
         getImages(
           (files) => setValue('filesToMove', files),
           () => {}
@@ -80,30 +86,24 @@ const ImagesUploadPage: React.FC = () => {
       })
   }
 
-  const [showForm, setShowForm] = useState(false)
-  const [messages, setMessages] = useState<string | null>(null)
-  // read from api based on gallery/shop/etc files. standardize image loacations.
-  const [toDirectories, setToDirectories] = useState<string[]>([])
-
   const checkForImages = (): void => {
     setMessages(null)
-    getImages((files) => setValue('filesToMove', files), setMessages)
+    getImages(setAllImages, setMessages)
   }
-  const setFilesToMove = (files: string[]): void => setValue('filesToMove', files)
+  //const setFilesToMove = (files: string[]): void => setValue('filesToMove', files)
 
   useEffect(() => {
     if (!toDirectories.length) {
       getDirectories(setToDirectories, setMessages)
     }
-    if (filesToMove.length === 0 && !messages) {
-      getImages(setFilesToMove, setMessages)
+    if (allImages.length === 0 && !messages) {
+      getImages(setAllImages, setMessages)
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [filesToMove, messages, setMessages, toDirectories])
+  }, [allImages, messages, setMessages, toDirectories])
 
   const doDelete = (imageurl: string): void => {
     window.api
-      .deleteImage(imageurl)
+      .deleteImage(imageurl.replace('http://localhost:3000/', ''))
       .then((response) => {
         setMessages(response.message)
         checkForImages()
@@ -140,9 +140,9 @@ const ImagesUploadPage: React.FC = () => {
           onValueChange={(value: string[]) => setValue('filesToMove', value)}
         >
           <HStack maxW="1000px" alignItems="stretch" wrap="wrap">
-            {filesToMove &&
-              filesToMove.length > 0 &&
-              filesToMove.map((file, i) => (
+            {allImages &&
+              allImages.length > 0 &&
+              allImages.map((file, i) => (
                 <VStack key={i} style={{ padding: '5px' }}>
                   <Button recipe={buttonRecipe} size="sm" onClick={() => doDelete(`/temp/${file}`)}>
                     delete

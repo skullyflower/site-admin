@@ -14,7 +14,7 @@ const getPaths = (): {
   const tempPath = path.join(pathToPublic, 'temp')
   const imagesPath = path.join(pathToPublic, 'images')
   const bigSourcePath = tempPath
-  const smallSourcePath = path.join(tempPath, 'small')
+  const smallSourcePath = path.join(tempPath, 'smaller')
   return { pathToPublic, tempPath, imagesPath, bigSourcePath, smallSourcePath }
 }
 // TODO: rewrite so that big images are the standard size and small images are in the smaller directory, always.
@@ -298,7 +298,7 @@ export const uploadImages = async (
   destination: string
 ): Promise<ProcessedImage[]> => {
   const processedImages: ProcessedImage[] = []
-  const { imagesPath, tempPath, smallSourcePath } = getPaths()
+  const { imagesPath, tempPath } = getPaths()
   if (filePaths) {
     const bigDestPath = destination ? join(imagesPath, destination) : `${imagesPath}/`
     const smallDestPath = join(bigDestPath, 'smaller')
@@ -312,7 +312,7 @@ export const uploadImages = async (
           console.log('Big file uploaded to ', tempPath)
           processedImages.push(result1)
         }
-        const result2 = await processFile(`${smallSourcePath}/${filePath}`, 450, smallDestPath)
+        const result2 = await processFile(`${tempPath}/${filePath}`, 450, smallDestPath)
         if (typeof result2 === 'string') {
           console.error(`Wrong Small File type.`)
         } else if (result2.relativeUrl) {
@@ -325,4 +325,13 @@ export const uploadImages = async (
     }
   }
   return processedImages || []
+}
+export const uploadImage = async (filePath: string, destination: string): Promise<string> => {
+  const { tempPath, imagesPath } = getPaths()
+  const result = await processFile(`${tempPath}/${filePath}`, 750, `${imagesPath}/${destination}`)
+
+  if (typeof result === 'string') {
+    return JSON.stringify({ error: result })
+  }
+  return JSON.stringify({ relativeUrl: result.relativeUrl, filename: result.filename })
 }

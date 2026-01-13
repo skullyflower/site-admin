@@ -47,13 +47,13 @@ export default async function processFile(
     const baseName = newName ? newName : path.parse(sourceFilename).name
     //const outputFilename = `${baseName}.${extension}`
     const outputPath = path.join(destinationPath, baseName)
-
+    const fullFilePath = `${outputPath}.${extension}`
     // Write the resized image
     await resized.write(`${outputPath}.${extension}`)
 
     // Get relative URL from the public path
     const { pathToPublic } = getPathsFromConfig()
-    const relativeUrl = outputPath.replace(pathToPublic, '').replace(/\\/g, '/')
+    const relativeUrl = fullFilePath.replace(pathToPublic, '').replace(/\\/g, '/')
 
     return {
       relativeUrl: relativeUrl.startsWith('/') ? relativeUrl : `/${relativeUrl}`,

@@ -9,30 +9,11 @@ import GalleryPage from '@renderer/pages/galleriespage'
 import { Route } from 'react-router-dom'
 import { Router } from '@renderer/../../lib/electron-router-dom'
 import SiteLayout from './layout/SiteLayout'
-import { useEffect, useState } from 'react'
-import { AdminConfig, ApiMessageResponse } from 'src/shared/types'
 import SubjectsPage from '@renderer/pages/subjectspage'
 import ContentPages from '@renderer/pages/contentpages'
 import ImageUploadPage from '@renderer/pages/ImageUploadpage'
 
 export default function SiteRoutes(): React.JSX.Element {
-  const [config, setConfig] = useState<AdminConfig | null>(null)
-  const [messages, setMessages] = useState<string | null>(null)
-  useEffect(() => {
-    window.api.getAdminConfig().then((response: ApiMessageResponse | AdminConfig) => {
-      if (typeof response === 'object' && 'message' in response) {
-        setMessages(response.message as string)
-      } else {
-        setConfig(response as AdminConfig)
-      }
-    })
-  }, [])
-  if (config === null && messages === null) {
-    return <div>Loading...</div>
-  }
-  if (messages) {
-    return <div>{messages}</div>
-  }
   return (
     <Router
       main={

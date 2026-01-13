@@ -52,7 +52,7 @@ export default function PageContent(): React.JSX.Element {
   }, [pagesData, messages, setLoading])
 
   const addPage = (): void => {
-    setActivePage({ page_id: 'ChangeMe', page_title: '', page_description: '', page_content: '' })
+    setActivePage({ page_id: 'change-me', page_title: '', page_description: '', page_content: '' })
   }
 
   const onSubmit = (pageId: string, values: PageInfo): void => {

@@ -51,7 +51,11 @@ const EditBlogEntry = ({
     getValues,
     setValue
   } = useForm({
-    defaultValues: { ...thisEntry, date: convertDate(thisEntryDate, 'input') },
+    defaultValues: {
+      ...thisEntry,
+      id: convertDate(thisEntryDate, 'id'),
+      date: convertDate(thisEntryDate, 'input')
+    },
     mode: 'onChange'
   })
 
@@ -71,7 +75,7 @@ const EditBlogEntry = ({
   }
 
   const thumb = useWatch({ control: control, name: 'image' }) || ''
-
+  const textValue = useWatch({ control: control, name: 'text' }) || ''
   return (
     <Stack gap={1}>
       <HStack justifyContent="space-between" p={1}>
@@ -87,7 +91,7 @@ const EditBlogEntry = ({
           <Field.Label w={40}>
             Id: <InfoBubble message={`Blog ids are based on the date"`} />
           </Field.Label>
-          <Input _invalid={{ borderColor: 'red.300' }} type="text" {...register('id')} />
+          <Input _invalid={{ borderColor: 'red.300' }} type="text" {...register('id')} readOnly />
         </HStack>
       </Field.Root>
       <Field.Root p={1} invalid={errors.date ? true : false}>
@@ -198,7 +202,7 @@ const EditBlogEntry = ({
           <Field.Label w={40}>Blog Content:</Field.Label>
           <Box width="100%" minH={2} border="1px solid gray" borderRadius={5} className="content">
             <StyledInput
-              value={getValues('text')}
+              value={textValue}
               onChange={handleTextChange}
               placeholder="Add Content Here..."
             />

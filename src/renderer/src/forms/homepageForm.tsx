@@ -1,8 +1,7 @@
-import { useForm } from 'react-hook-form'
+import { useForm, useWatch } from 'react-hook-form'
 import { Box, Button, Field, Image, Input, HStack, Center, Textarea, Stack } from '@chakra-ui/react'
 import InfoBubble from '../components/info-bubble'
 import UploadInput from '../components/inputs/upload-input'
-import { useState } from 'react'
 import StyledInput from '@renderer/components/inputs/StyledInput'
 import { buttonRecipe, inputRecipe } from '@renderer/themeRecipes'
 import { SiteInfo } from 'src/shared/types'
@@ -17,19 +16,22 @@ const HomePageForm = ({
 }): React.JSX.Element => {
   const {
     register,
+    control,
     handleSubmit,
     formState: { errors },
     reset,
-    setValue,
-    getValues
+    setValue
   } = useForm({ defaultValues: pageData as SiteInfo, mode: 'onChange' })
-  const [page_content, setPage_content] = useState<string>(getValues('page_content') || '')
 
-  const handleLogoUpload = (paths: string[]): void => {
+  const page_content = useWatch({ control, name: 'page_content' })
+
+  const handleLogoUpload = async (paths: string[]): Promise<string[]> => {
     if (paths.length > 0) {
       const newSitelogo = `${pageData?.live_site_url}/images/${paths[0].split('/').pop()}`
       setValue('sitelogo', newSitelogo)
+      return [newSitelogo]
     }
+    return []
   }
 
   if (!pageData) {
@@ -154,7 +156,6 @@ const HomePageForm = ({
               value={page_content}
               onChange={(value) => setValue('page_content', value)}
               placeholder="Add Content Here..."
-              onUploadImages={handleLogoUpload}
             />
           </Stack>
         </Field.Root>
@@ -164,8 +165,7 @@ const HomePageForm = ({
             <Button
               recipe={buttonRecipe}
               onClick={() => {
-                setPage_content(pageData.page_content || '')
-                reset() //reset the form to the default values
+                reset(pageData) //reset the form to the default values
               }}
             >
               Reset Changes

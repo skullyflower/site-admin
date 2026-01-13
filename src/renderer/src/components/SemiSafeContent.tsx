@@ -1,6 +1,6 @@
 import ReactMarkdown from 'react-markdown'
 function SemiSafeContent({ rawContent }: { rawContent: string | TrustedHTML }): React.JSX.Element {
-  if (rawContent && typeof rawContent === 'string' && !/<[^>]*>/g.test(rawContent)) {
+  if (rawContent && typeof rawContent === 'string' && !/<[^/>]*>/g.test(rawContent)) {
     return <ReactMarkdown>{rawContent as string}</ReactMarkdown>
   } else {
     const unsafePatterns = /(<[/]+script[^>]?>|javascript)/gi

@@ -26,7 +26,6 @@ export const getPathsFromConfig = (): {
 
 export const checkPath = (path): boolean => {
   try {
-    console.log(`Checking path: ${path}`)
     if (!fs.existsSync(path) || !fs.lstatSync(path).isDirectory()) {
       fs.mkdirSync(path, { recursive: true })
       return true

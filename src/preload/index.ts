@@ -139,7 +139,7 @@ const api = {
   processUploadedImages: async (fileDataArray: File[]) => {
     const fileArray = fileDataArray.map((file) => webUtils.getPathForFile(file))
     const response = await ipcRenderer.invoke('process-uploaded-images', fileArray)
-    return JSON.parse(response)
+    return response
   },
   uploadBlogImage: async (filePath: string, destination: string) => {
     const response = await ipcRenderer.invoke('upload-blog-image', filePath, destination)
@@ -160,6 +160,15 @@ const api = {
   moveImages: async (filesToMove: string[], destination: string) => {
     const response = await ipcRenderer.invoke('move-images', filesToMove, destination)
     return JSON.parse(response)
+  },
+  uploadImage: async (filePath: string, destination: string) => {
+    const response = await ipcRenderer.invoke('upload-image', filePath, destination)
+    return JSON.parse(response) as {
+      relativeUrl: string
+      filename: string
+      message?: string
+      error?: string
+    }
   },
   uploadImages: async (files: string[], destination: string) => {
     const response = await ipcRenderer.invoke('upload-images', files, destination)
