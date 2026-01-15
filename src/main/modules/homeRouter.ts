@@ -1,6 +1,6 @@
 import fs from 'fs'
 import getPathsFromConfig, { checkFile } from '../utilities/pathData'
-import { siteFile, defaultSiteData } from '../../shared/constants.d'
+import { siteFile, defaultSiteData } from '../../shared/constants'
 
 export const getSiteInfo = (): string => {
   const { pathToPublic } = getPathsFromConfig()

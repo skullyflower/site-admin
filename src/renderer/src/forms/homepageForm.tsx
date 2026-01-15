@@ -1,11 +1,26 @@
 import { useForm, useWatch } from 'react-hook-form'
-import { Box, Button, Field, Image, Input, HStack, Center, Textarea, Stack } from '@chakra-ui/react'
+import {
+  Box,
+  Button,
+  Checkbox,
+  Field,
+  Fieldset,
+  Image,
+  Input,
+  HStack,
+  Center,
+  Textarea,
+  Stack,
+  For
+} from '@chakra-ui/react'
 import InfoBubble from '../components/info-bubble'
 import UploadInput from '../components/inputs/upload-input'
 import StyledInput from '@renderer/components/inputs/StyledInput'
 import { buttonRecipe, inputRecipe } from '@renderer/themeRecipes'
-import { SiteInfo } from 'src/shared/types'
+import { Feature, SiteInfo } from 'src/shared/types'
 import imageLoading from '@renderer/assets/image-loading.svg'
+
+const options = ['blog', 'content', 'galleries', 'products', 'categories', 'subjects', 'sale']
 
 const HomePageForm = ({
   pageData,
@@ -24,6 +39,7 @@ const HomePageForm = ({
   } = useForm({ defaultValues: pageData as SiteInfo, mode: 'onChange' })
 
   const page_content = useWatch({ control, name: 'page_content' })
+  const features = useWatch({ control, name: 'features' })
 
   const handleLogoUpload = async (paths: string[]): Promise<string[]> => {
     if (paths.length > 0) {
@@ -159,6 +175,27 @@ const HomePageForm = ({
             />
           </Stack>
         </Field.Root>
+        <Fieldset.Root p={4}>
+          <Fieldset.Legend>Select Features to Enable:</Fieldset.Legend>
+          <Fieldset.Content>
+            <Checkbox.Group
+              value={features}
+              onValueChange={(value: string[]) => setValue('features', value as Feature[])}
+            >
+              <HStack maxW="1000px" alignItems="stretch" wrap="wrap">
+                <For each={options}>
+                  {(value) => (
+                    <Checkbox.Root key={value} value={value}>
+                      <Checkbox.HiddenInput />
+                      <Checkbox.Control />
+                      <Checkbox.Label>{value}</Checkbox.Label>
+                    </Checkbox.Root>
+                  )}
+                </For>
+              </HStack>
+            </Checkbox.Group>
+          </Fieldset.Content>
+        </Fieldset.Root>
 
         <Center>
           <HStack gap={4}>

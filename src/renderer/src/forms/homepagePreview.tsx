@@ -1,4 +1,4 @@
-import { Box, Image, HStack, Text, Stack } from '@chakra-ui/react'
+import { Box, Image, HStack, Text, Stack, Badge } from '@chakra-ui/react'
 import SemiSafeContent from '../components/SemiSafeContent'
 import { SiteInfo } from 'src/shared/types'
 
@@ -62,6 +62,14 @@ function HomePagePreview({ pageData }: { pageData: SiteInfo }): React.JSX.Elemen
           <Box flexGrow={3} minH={2} borderWidth={1} borderStyle="solid" borderRadius={5} p={4}>
             <SemiSafeContent rawContent={pageData.page_content} />
           </Box>
+        </HStack>
+        <HStack alignItems="top">
+          <Text fontWeight="bold" minW={48}>
+            Features:
+          </Text>
+          {pageData.features?.map((feature) => (
+            <Badge key={feature}>{feature}</Badge>
+          ))}
         </HStack>
       </Stack>
     </Box>

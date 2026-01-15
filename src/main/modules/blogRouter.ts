@@ -3,7 +3,7 @@ import fs from 'fs'
 import processRss from '../utilities/processBlogRSS.js'
 import processFile from '../utilities/imageProcessor'
 import getPathsFromConfig, { checkFile } from '../utilities/pathData.js'
-import { blogFile, blogRSSFile, defaultBlogInfo } from '../../shared/constants.d'
+import { blogFile, blogRSSFile, defaultBlogInfo } from '../../shared/constants'
 import path from 'path'
 
 const getPaths = (): { tempPath: string; blogfilepath: string; blogRSSpath: string } => {

@@ -1,7 +1,7 @@
 import { Button, HStack } from '@chakra-ui/react'
 import { useEffect, useState } from 'react'
 import { Link, useLocation, useMatch } from 'react-router-dom'
-import { AdminConfig, ApiMessageResponse } from 'src/shared/types'
+import { SiteInfo, ApiMessageResponse } from 'src/shared/types'
 interface NavButtonProps extends React.HTMLAttributes<HTMLButtonElement> {
   path: string
   children: React.ReactNode
@@ -22,11 +22,11 @@ const NavButton = ({ path, children }: NavButtonProps): React.ReactNode => {
 }
 
 const NavBar = (): React.ReactNode => {
-  const [config, setConfig] = useState<AdminConfig | null>(null)
+  const [config, setConfig] = useState<SiteInfo | null>(null)
   const location = useLocation()
   useEffect(() => {
-    window.api.getAdminConfig().then((response: ApiMessageResponse | AdminConfig) => {
-      setConfig(response as AdminConfig)
+    window.api.getSiteInfo().then((response: ApiMessageResponse | SiteInfo) => {
+      setConfig(response as SiteInfo)
     })
   }, [location])
 

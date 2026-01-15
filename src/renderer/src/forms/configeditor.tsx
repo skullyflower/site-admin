@@ -1,9 +1,7 @@
-import { Button, Center, Field, Heading, HStack, Checkbox, Fieldset, Text } from '@chakra-ui/react'
+import { Button, Center, Field, Heading, HStack, Text } from '@chakra-ui/react'
 import { Stack } from '@chakra-ui/react'
 import { AdminConfig } from 'src/shared/types'
 import { buttonRecipe } from '@renderer/themeRecipes'
-
-const options = ['blog', 'content', 'galleries', 'products', 'categories', 'subjects', 'sale']
 
 const ConfigForm = ({
   formData,
@@ -43,29 +41,6 @@ const ConfigForm = ({
           </Button>
         </HStack>
       </Field.Root>
-      <Fieldset.Root p={4}>
-        <Fieldset.Legend>Select Features to Enable:</Fieldset.Legend>
-        <Fieldset.Content>
-          <Checkbox.Group
-            value={formData?.features || []}
-            onValueChange={(value: string[]) => {
-              setValue({ ...formData, features: value } as AdminConfig)
-            }}
-          >
-            <HStack maxW="1000px" alignItems="stretch" wrap="wrap">
-              {options.map((key) => (
-                <Checkbox.Root key={key} value={key}>
-                  <Checkbox.HiddenInput />
-                  <Checkbox.Control>
-                    <Checkbox.Indicator />
-                  </Checkbox.Control>
-                  <Checkbox.Label>{key}</Checkbox.Label>
-                </Checkbox.Root>
-              ))}
-            </HStack>
-          </Checkbox.Group>
-        </Fieldset.Content>
-      </Fieldset.Root>
       <Center>
         <HStack gap={4}>
           <Button recipe={buttonRecipe} onClick={() => onSubmit()}>

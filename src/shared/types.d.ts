@@ -8,7 +8,6 @@ export type Feature =
   | 'sale'
 export interface AdminConfig {
   pathToSite: string
-  features?: Feature[]
 }
 export interface BlogInfo {
   page_title: string
@@ -48,6 +47,7 @@ export interface SiteInfo extends PageInfo {
   site_theme: string
   live_site_url: string
   sitelogo: string
+  features?: Feature[]
 }
 
 export interface CategoryType {

@@ -7,15 +7,18 @@ export const blogFile = 'blog-data.json'
 export const blogRSSFile = 'blog.rss'
 
 export const defaultSiteData: SiteInfo = {
+  page_id: '',
   page_title: '',
   page_description: '',
   page_content: '',
   company_name: '',
   site_theme: '',
   live_site_url: '',
-  sitelogo: ''
+  sitelogo: '',
+  features: []
 }
 export const defaultBlogInfo: BlogInfo = {
+  page_id: '',
   page_title: '',
   page_description: '',
   page_content: '',

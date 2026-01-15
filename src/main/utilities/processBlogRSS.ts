@@ -1,6 +1,6 @@
 import { BlogInfo } from '../../shared/types.d'
 import getPathsFromConfig, { checkFile } from './pathData.js'
-import { blogFile, defaultBlogInfo, defaultSiteData, siteFile } from '../../shared/constants.d'
+import { blogFile, defaultBlogInfo, defaultSiteData, siteFile } from '../../shared/constants'
 import fs from 'fs'
 
 const htmlEncodeString = (string): string =>
