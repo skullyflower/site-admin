@@ -12,7 +12,7 @@ import path, { join } from 'path'
 import { electronApp, optimizer } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 
-import { getBlogs, updateBlogInfo, updateBlogPost, deletEntry } from './modules/blogRouter'
+import { getBlog, updateBlogInfo, updateBlogPost, deletEntry } from './modules/blogRouter'
 import { getSiteInfo, updateSiteInfo } from './modules/homeRouter'
 import { getSale, setSale } from './modules/saleRouter'
 import {
@@ -36,7 +36,7 @@ import {
 } from './modules/imagesRouter'
 import { registerRoute } from '../lib/electron-router-dom'
 import { getAdminConfig, updateAdminConfig } from './modules/configRouter'
-import { BlogEntry, CategoryType, PageInfo, ProductType, Subject } from '../shared/types'
+import { BlogEntry, BlogInfo, CategoryType, PageInfo, ProductType, Subject } from '../shared/types'
 import { deleteSubject, getSubjects, updateSubject } from './modules/subjectsRouter'
 import { getProducts, updateProduct } from './modules/productsRouter'
 import { getAllCategories, updateCategories } from './modules/categoriesRouter'
@@ -134,8 +134,8 @@ ipcMain.handle('select-site-directory', () => {
   return directory.then((result) => result.filePaths[0].replace(`${app.getPath('home')}`, ''))
 })
 // Blog API functions
-ipcMain.handle('get-blogs', getBlogs)
-ipcMain.handle('update-blog-info', updateBlogInfo)
+ipcMain.handle('get-blogs', getBlog)
+ipcMain.handle('update-blog-info', (_event, values: BlogInfo) => updateBlogInfo(values))
 ipcMain.handle('update-blog-post', (_event, entry: BlogEntry) => updateBlogPost(entry))
 ipcMain.handle('delete-entry', (_event, blogid: string) => deletEntry(blogid))
 // Site Info API functions

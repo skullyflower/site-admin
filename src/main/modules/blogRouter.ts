@@ -1,20 +1,26 @@
 import { BlogInfo, BlogEntry } from '../../shared/types'
-import fs from 'fs'
+import fs, { writeFileSync } from 'fs'
 import processRss from '../utilities/processBlogRSS.js'
-import processFile from '../utilities/imageProcessor'
-import getPathsFromConfig, { checkFile } from '../utilities/pathData.js'
+import getPathsFromConfig, { checkFile, checkPath } from '../utilities/pathData.js'
 import { blogFile, blogRSSFile, defaultBlogInfo } from '../../shared/constants'
-import path from 'path'
+import path, { join } from 'path'
+import processFile from '../utilities/imageProcessor'
 
-const getPaths = (): { tempPath: string; blogfilepath: string; blogRSSpath: string } => {
+const getPaths = (): {
+  tempPath: string
+  blogfilepath: string
+  blogRSSpath: string
+  blogImagesPath: string
+} => {
   const { pathToPublic } = getPathsFromConfig()
   const tempPath = path.join(pathToPublic, 'temp')
-  const blogfilepath = `${pathToPublic}/data/${blogFile}`
-  const blogRSSpath = `${pathToPublic}/data/${blogRSSFile}`
-  return { tempPath, blogfilepath, blogRSSpath }
+  const blogfilepath = join(pathToPublic, 'data', blogFile)
+  const blogRSSpath = join(pathToPublic, 'data', blogRSSFile)
+  const blogImagesPath = join(pathToPublic, 'images', 'blog')
+  return { tempPath, blogfilepath, blogRSSpath, blogImagesPath }
 }
 
-export const getBlogs = (): string => {
+export const getBlog = (): string => {
   const { blogfilepath } = getPaths()
   try {
     checkFile(blogfilepath, defaultBlogInfo)
@@ -23,65 +29,58 @@ export const getBlogs = (): string => {
     if (blogObject) {
       return JSON.stringify(blogObject)
     } else {
-      return JSON.stringify({ message: "Couldn't read blog file" })
+      return JSON.stringify(defaultBlogInfo as BlogInfo)
     }
   } catch (error) {
     console.log(error)
-    return JSON.stringify({ message: 'Blog Data Get Failed' })
+    return JSON.stringify(defaultBlogInfo as BlogInfo)
   }
 }
 
-export const updateBlogInfo = (blogInfo): string => {
+export const updateBlogInfo = (blogInfo: BlogInfo): string => {
   const { blogfilepath } = getPaths()
-  if (blogInfo) {
-    try {
-      checkFile(blogfilepath, defaultBlogInfo)
-      const oldpageDataString = fs.readFileSync(blogfilepath)
-      const oldpageObject: BlogInfo = JSON.parse(oldpageDataString.toString()) as BlogInfo
-      const newpageData = { ...oldpageObject, ...blogInfo }
-      fs.writeFileSync(blogfilepath, JSON.stringify(newpageData))
-      return JSON.stringify({ message: 'Updated Blog page!' })
-    } catch (err) {
-      console.log(err)
-      return JSON.stringify({ message: 'Blog page update failed.' })
-    }
-  } else {
-    return JSON.stringify({ message: 'You must fill out all fields.' })
+  try {
+    const oldpageObject: BlogInfo = JSON.parse(getBlog())
+    const newpageData: BlogInfo = { ...oldpageObject, ...blogInfo }
+    writeFileSync(blogfilepath, JSON.stringify(newpageData))
+    return JSON.stringify({ message: 'Updated Blog page!' })
+  } catch (error) {
+    console.log(error)
+    return JSON.stringify({ message: 'Failed to update blog info.' })
   }
 }
 
 export const updateBlogPost = (entry: BlogEntry): string => {
-  const { blogfilepath, tempPath, blogRSSpath } = getPaths()
+  const { blogfilepath, blogRSSpath, blogImagesPath, tempPath } = getPaths()
   if (entry) {
     try {
       checkFile(blogfilepath, defaultBlogInfo)
-      const blogInfoData = fs.readFileSync(blogfilepath)
-      const blogObject: BlogInfo = JSON.parse(blogInfoData.toString()) as BlogInfo
-
-      const update: BlogEntry = entry
-      const updateIndex = blogObject.entries.findIndex(
-        (entry) => entry.id === update.id || entry.title === update.title
+      const blogObject: BlogInfo = JSON.parse(getBlog()) as BlogInfo
+      const entries = blogObject.entries || []
+      const updateIndex = entries.findIndex(
+        (entry) => entry.id === entry.id || entry.title === entry.title
       )
       if (updateIndex !== -1) {
-        // existing
-        blogObject.entries[updateIndex] = update
+        entries[updateIndex] = entry
       } else {
-        // new
-        blogObject.entries.unshift(update)
+        entries.unshift(entry)
       }
-      const destPath = `images/blog/`
-      const smallDestPath = `${destPath}/smaller/`
+      checkPath(blogImagesPath)
       fs.readdirSync(tempPath).forEach(async (file) => {
         if (entry.image.includes(file.split('/').pop() || '')) {
-          await processFile(path.join(tempPath, file), 850, destPath)
-          await processFile(path.join(tempPath, file), 450, smallDestPath)
-          fs.unlinkSync(path.join(tempPath, file))
+          const bigResult = await processFile(join(tempPath, file), 850, blogImagesPath)
+          if (typeof bigResult === 'string') {
+            console.error(`Wrong Big File type.`)
+          } else if (bigResult.relativeUrl) {
+            console.log('Big file uploaded to ', blogImagesPath)
+          }
+          fs.unlinkSync(join(tempPath, file))
         } else {
           console.log(`File ${file} not found in entry.image`)
         }
       })
 
-      fs.writeFileSync(blogfilepath, JSON.stringify({ ...blogObject, entries: blogObject.entries }))
+      writeFileSync(blogfilepath, JSON.stringify({ ...blogObject, entries }))
 
       const RSS = processRss(blogObject)
       fs.writeFileSync(blogRSSpath, RSS)
@@ -99,6 +98,7 @@ export const deletEntry = (blogid: string): string => {
   const { blogfilepath, blogRSSpath } = getPaths()
   try {
     checkFile(blogfilepath, defaultBlogInfo)
+    checkFile(blogRSSpath, '')
     const blogJSONString = fs.readFileSync(blogfilepath)
     const blogData: BlogInfo = JSON.parse(blogJSONString.toString()) as BlogInfo
     const entryToDelete = blogData.entries.find((entry) => entry.id === blogid)

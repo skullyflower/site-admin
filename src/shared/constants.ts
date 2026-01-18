@@ -18,7 +18,6 @@ export const defaultSiteData: SiteInfo = {
   features: []
 }
 export const defaultBlogInfo: BlogInfo = {
-  page_id: '',
   page_title: '',
   page_description: '',
   page_content: '',

@@ -2,6 +2,7 @@ import { existsSync, readdirSync, readFileSync, unlinkSync, writeFileSync } from
 import getPathsFromConfig, { checkFile } from '../utilities/pathData'
 import { ApiMessageResponse, PageInfo } from '../../shared/types'
 import { moveImages } from './imagesRouter'
+import { join } from 'path'
 
 const getPaths = (): { rootdir: string } => {
   const { pathToPublic } = getPathsFromConfig()
@@ -21,9 +22,23 @@ export const getPageFiles = (): string[] => {
   }
 }
 
+const updatePagesData = (): void => {
+  const { rootdir } = getPaths()
+  const pagesFile = join(rootdir, 'pages-data.json')
+  checkFile(pagesFile, [])
+  const pageFiles = getPageFiles()
+  const pagesData = pageFiles.map((file) => {
+    const pageData = readFileSync(join(rootdir, file), 'utf8')
+    const pageObject = JSON.parse(pageData)
+    return { page_id: pageObject.page_id, page_title: pageObject.page_title }
+  })
+  writeFileSync(pagesFile, JSON.stringify(pagesData))
+}
+
 export const getPages = (): string => {
   const pageFiles = getPageFiles()
   const pages = pageFiles.map((file) => file.replace('-page.json', ''))
+
   return JSON.stringify(pages || [])
 }
 
@@ -56,6 +71,7 @@ export const updatePage = (page, body): string => {
       const oldpageObject = JSON.parse(oldpageDataString)
       const newpageData = { ...oldpageObject, ...body }
       writeFileSync(pagefilepath, JSON.stringify(newpageData))
+      updatePagesData()
       return JSON.stringify({ message: 'Updated page!' })
     } catch (err) {
       console.log(err)
@@ -77,6 +93,7 @@ export const createPage = (pageId: string): string => {
     page_content: ''
   }
   writeFileSync(pagefilepath, JSON.stringify(pageData))
+  updatePagesData()
   return JSON.stringify({ message: 'Page created!' } as ApiMessageResponse)
 }
 
@@ -85,6 +102,7 @@ export const deletePage = (pageId: string): string => {
   const pagefilepath = `${rootdir}/${pageId}-page.json`
   if (existsSync(pagefilepath)) {
     unlinkSync(pagefilepath)
+    updatePagesData()
     return JSON.stringify({ message: 'Page deleted!' })
   } else {
     return JSON.stringify({ message: 'Page not found.' })

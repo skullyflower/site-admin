@@ -1,6 +1,7 @@
 import { BlogInfo } from '../../shared/types.d'
 import getPathsFromConfig, { checkFile } from './pathData.js'
 import { blogFile, defaultBlogInfo, defaultSiteData, siteFile } from '../../shared/constants'
+import convertToHTML from 'markdown-to-html-converter'
 import fs from 'fs'
 
 const htmlEncodeString = (string): string =>
@@ -49,7 +50,7 @@ const processRss = (blogData: BlogInfo): string => {
     <p>${entry.imgcaption}</p>
     </div>
     <h3>${entry.heading}</h3>
-    ${entry.text}`
+    ${convertToHTML(entry.text)}`
 
     rssString += `
     <item>

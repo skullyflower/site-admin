@@ -7,6 +7,7 @@ import { buttonRecipe } from '@renderer/themeRecipes/button.recipe'
 import { BlogEntry, BlogInfo, SiteInfo } from 'src/shared/types'
 import { ApiMessageResponse, BlogResponse } from 'src/shared/types'
 import FormContainer from '../components/formcontainer'
+import { convertDate } from '@renderer/components/datetimebit'
 
 const getSiteInfo = async (setSiteData: (siteData: SiteInfo) => void): Promise<void> => {
   const response = await window.api.getSiteInfo()
@@ -45,6 +46,23 @@ const BlogPage = (): React.JSX.Element => {
   const [showForm, setShowForm] = useState(false)
   const [activeBlog, setActiveBlog] = useState<BlogEntry | null>(null)
   const [sitedata, setSiteData] = useState<SiteInfo | null>()
+
+  const addNewBlogEntry = (): void => {
+    const today = new Date()
+    setActiveBlog({
+      id: convertDate(today, 'id'),
+      date: convertDate(today, 'input'),
+      title: '',
+      imagelink: '',
+      image: '',
+      imagealt: '',
+      imgcaption: '',
+      heading: '',
+      text: '',
+      tags: []
+    })
+    setShowForm(true)
+  }
 
   const onUpdateInfo = async (values: BlogInfo): Promise<void> => {
     setMessages(null as unknown as string)
@@ -89,7 +107,7 @@ const BlogPage = (): React.JSX.Element => {
   }
 
   useEffect(() => {
-    if (!blogEntries && !messages) {
+    if (!blogInfo && !messages) {
       getBlogEntries(setBlogEntries, setMessages, setBlogInfo)
       getSiteInfo(setSiteData)
     }
@@ -100,7 +118,7 @@ const BlogPage = (): React.JSX.Element => {
       title="Update Yer Blarrgh"
       messages={messages}
       setMessages={setMessages}
-      button={{ action: toggleForm, text: 'Add a new one', value: 'newentry' }}
+      button={{ action: addNewBlogEntry, text: 'Add a new one', value: null }}
     >
       <div className="content">
         {showForm ? (
@@ -133,8 +151,8 @@ const BlogPage = (): React.JSX.Element => {
                       >
                         <Image
                           src={blog.image.replace(
-                            sitedata?.live_site_url || '',
-                            'http://localhost:3000/'
+                            sitedata?.live_site_url as string,
+                            'http://localhost:3000'
                           )}
                           boxSize="120px"
                           alt={blog.imagealt}

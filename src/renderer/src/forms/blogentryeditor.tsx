@@ -1,5 +1,4 @@
 import { useForm, useWatch } from 'react-hook-form'
-import { convertDate } from '../components/datetimebit'
 import UploadInput from '../components/inputs/upload-input'
 import InfoBubble from '../components/info-bubble'
 import { Box, Button, Field, Input, HStack, Center, Heading, Stack, Image } from '@chakra-ui/react'
@@ -9,26 +8,9 @@ import { buttonRecipe } from '@renderer/themeRecipes'
 import { BlogEntry, SiteInfo } from 'src/shared/types'
 import imageLoading from '@renderer/assets/image-loading.svg'
 import TagSelector from '@renderer/components/inputs/TagSelector'
-import { useMemo } from 'react'
-// TODO: fix the image upload and url generation. localhost for admin display, / for save, live_site_url for RSS only.
-const today = new Date()
-
-const newblog = {
-  id: convertDate(today, 'id'),
-  date: convertDate(today, 'input'),
-  title: '',
-  imagelink: '',
-  image: '',
-  imagealt: '',
-  imgcaption: '',
-  heading: '',
-  text: '',
-  tags: []
-} as BlogEntry
 
 const EditBlogEntry = ({
-  thisEntry = newblog,
-  //isOpen,
+  thisEntry,
   toggleForm,
   onSubmit,
   sitedata
@@ -39,10 +21,6 @@ const EditBlogEntry = ({
   onSubmit: (data: BlogEntry) => void
   sitedata: SiteInfo
 }): React.JSX.Element => {
-  const thisEntryDate = useMemo<Date>(() => {
-    return thisEntry?.date ? new Date(thisEntry.date) : new Date()
-  }, [thisEntry])
-
   const {
     control,
     register,
@@ -51,11 +29,7 @@ const EditBlogEntry = ({
     getValues,
     setValue
   } = useForm({
-    defaultValues: {
-      ...thisEntry,
-      id: convertDate(thisEntryDate, 'id'),
-      date: convertDate(thisEntryDate, 'input')
-    },
+    defaultValues: thisEntry,
     mode: 'onChange'
   })
 

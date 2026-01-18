@@ -6157,6 +6157,11 @@ markdown-table@^3.0.0:
   resolved "https://registry.yarnpkg.com/markdown-table/-/markdown-table-3.0.4.tgz#fe44d6d410ff9d6f2ea1797a3f60aa4d2b631c2a"
   integrity sha512-wiYz4+JrLyb/DqW2hkFJxP7Vd7JuTDm77fvbM8VfEQdmSMqcImWeeRbHwZjBjIFki/VaMK2BhFi7oUUZeM5bqw==
 
+markdown-to-html-converter@^1.0.4:
+  version "1.0.4"
+  resolved "https://registry.yarnpkg.com/markdown-to-html-converter/-/markdown-to-html-converter-1.0.4.tgz#2d60406e9a18ff0cbdba9410552b68abd4e61252"
+  integrity sha512-u7xzA7HvOlo2A1bEeIDLV8aYpcFbNGwJ1tjBqYjQedBCRjxIiWADXpA/uBNXalj4xGjafhgtgb+cdX7CYwBt6g==
+
 matcher@^3.0.0:
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/matcher/-/matcher-3.0.0.tgz#bd9060f4c5b70aa8041ccc6f80368760994f30ca"
