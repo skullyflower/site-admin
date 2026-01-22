@@ -61,7 +61,7 @@ const ImagesUploadPage: React.FC = () => {
   const [messages, setMessages] = useState<string | null>(null)
   // read from api based on gallery/shop/etc files. standardize image loacations.
   const [toDirectories, setToDirectories] = useState<string[]>([])
-  const [allImages, setAllImages] = useState<string[]>([])
+  const [allImages, setAllImages] = useState<string[]|null>(null)
   const { control, register, handleSubmit, setValue, getValues } = useForm<{
     destination: string
     filesToMove: string[]
@@ -96,7 +96,7 @@ const ImagesUploadPage: React.FC = () => {
     if (!toDirectories.length) {
       getDirectories(setToDirectories, setMessages)
     }
-    if (allImages.length === 0 && !messages) {
+    if (!allImages && !messages) {
       getImages(setAllImages, setMessages)
     }
   }, [allImages, messages, setMessages, toDirectories])

@@ -31,7 +31,7 @@ const OneProduct = ({ product, toggleForm, doDelete }: OneProductProps): React.R
     >
       <Stack align={'center'} gap={2}>
         <Image
-          src={`http://localhost:3000/shop/${product.img}`}
+          src={`http://localhost:3000${product.img}`}
           boxSize="100px"
           alt={product.name}
         />

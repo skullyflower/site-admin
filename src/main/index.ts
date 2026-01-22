@@ -38,7 +38,7 @@ import { registerRoute } from '../lib/electron-router-dom'
 import { getAdminConfig, updateAdminConfig } from './modules/configRouter'
 import { BlogEntry, BlogInfo, CategoryType, PageInfo, ProductType, Subject } from '../shared/types'
 import { deleteSubject, getSubjects, updateSubject } from './modules/subjectsRouter'
-import { getProducts, updateProduct } from './modules/productsRouter'
+import { deleteProduct, getProducts, updateProduct } from './modules/productsRouter'
 import { getAllCategories, updateCategories } from './modules/categoriesRouter'
 import { createPage, deletePage, getPage, getPages, updatePage } from './modules/contentPageRouter'
 
@@ -182,6 +182,7 @@ ipcMain.handle('get-preview-images', (_event, images: string[]) => getPreviewIma
 // Shop API functions
 ipcMain.handle('get-products', getProducts)
 ipcMain.handle('update-product', (_event, product: ProductType) => updateProduct(product))
+ipcMain.handle('delete-product', (_event, productid: string) => deleteProduct(productid))
 ipcMain.handle('get-subjects', getSubjects)
 ipcMain.handle('update-subject', (_event, subject: Subject) => updateSubject(subject))
 ipcMain.handle('delete-subject', (_event, subjectid: string) => deleteSubject(subjectid))

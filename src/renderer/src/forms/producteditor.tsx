@@ -276,6 +276,7 @@ export default function EditProduct({
             onChange={(tags: string[]) => setValue('cat', tags)}
             value={prodCategories}
             defaultOptions={categories.map((c) => c.id)}
+            placeholder="Add category Id..."
           />
         </HStack>
       </Field.Root>
@@ -286,6 +287,7 @@ export default function EditProduct({
             onChange={(tags: string[]) => setValue('design', tags)}
             value={prodSubjects}
             defaultOptions={subjects.map((c) => c.id)}
+            placeholder="Add subject Id..."
           />
         </HStack>
       </Field.Root>

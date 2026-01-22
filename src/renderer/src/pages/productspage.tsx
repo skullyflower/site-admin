@@ -86,13 +86,13 @@ const getSubjects = (
 
 const ProductsPage = (): React.JSX.Element => {
   const [loading, setLoading] = useState(false)
-  const [products, setProducts] = useState<ProductType[]>([])
+  const [products, setProducts] = useState<ProductType[] | null>(null)
   const [categories, setCategories] = useState<CategoryType[]>([])
   const [subjects, setSubjects] = useState<Subject[]>([])
   const [messages, setMessages] = useState<string | null>(null)
   const [showForm, setShowForm] = useState(false)
   const [activeProd, setActiveProd] = useState<string | null>(null)
-  const [filteredFroducts, setFilteredProducts] = useState<ProductType[] | null>(null)
+  const [filteredFroducts, setFilteredProducts] = useState<ProductType[] | null>(products)
   const [filter, setFilter] = useState<string | null>(null)
 
   const onSubmit = (values: ProductType): void => {
@@ -108,18 +108,12 @@ const ProductsPage = (): React.JSX.Element => {
       weight: Number(values.weight)
     }
 
-    //formData.append('product', JSON.stringify(change))
-
-    // for (var file of imagesArr) {
-    //   formData.append('newImage', file as Blob)
-    // }
-
     window.api
       .updateProduct(change)
       .then((response: ApiMessageResponse) => {
         setMessages(response.message as string)
         getProducts(setProducts, setMessages, setLoading)
-        if (filter) {
+        if (filter && products) {
           setFilteredProducts(
             products.filter((prod: ProductType) => prod.cat.includes(filter as string))
           )
@@ -135,7 +129,7 @@ const ProductsPage = (): React.JSX.Element => {
     window.api.deleteProduct(prodid).then((json) => {
       setMessages(json.message)
       getProducts(setProducts, setMessages, setLoading)
-      if (filter) {
+      if (filter && products) {
         setFilteredProducts(products.filter((prod) => prod.cat.includes(filter)))
       }
     })
@@ -143,12 +137,14 @@ const ProductsPage = (): React.JSX.Element => {
 
   const doFilterProducts = useCallback(
     (filtercat: string | null) => {
-      setFilter(filtercat)
-      setFilteredProducts(
-        filtercat
-          ? products.filter((prod: ProductType) => prod.cat.includes(filtercat as string))
-          : products
-      )
+      if (products) {
+        setFilter(filtercat)
+        setFilteredProducts(
+          filtercat
+            ? products.filter((prod: ProductType) => prod.cat.includes(filtercat as string))
+            : products
+        )
+      }
     },
     [setFilter, products, setFilteredProducts]
   )
@@ -159,7 +155,7 @@ const ProductsPage = (): React.JSX.Element => {
   }
 
   useEffect(() => {
-    if (!products?.length && !messages) {
+    if (!products && !messages) {
       getCategories(setCategories, setMessages, setLoading)
       getSubjects(setSubjects, setMessages, setLoading)
       getProducts(setProducts, setMessages, setLoading)
@@ -187,7 +183,7 @@ const ProductsPage = (): React.JSX.Element => {
                 prodId={activeProd as string}
                 categories={categories}
                 subjects={subjects}
-                products={products}
+                products={products as ProductType[]}
                 toggleForm={toggleForm}
                 onSubmit={onSubmit}
               />

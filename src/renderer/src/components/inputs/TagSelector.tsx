@@ -15,6 +15,7 @@ interface TagSelectorProps {
   value: string[]
   defaultOptions?: string[]
   label?: string
+  placeholder?: string
   allowCustomValue?: boolean
 }
 const TagSelector = ({
@@ -22,7 +23,8 @@ const TagSelector = ({
   value,
   defaultOptions,
   onChange,
-  allowCustomValue = true
+  allowCustomValue = true,
+  placeholder = 'Add tag...'
 }: TagSelectorProps): React.JSX.Element => {
   const { contains } = useFilter({ sensitivity: 'base' })
 
@@ -71,7 +73,7 @@ const TagSelector = ({
   return (
     <Combobox.RootProvider value={comobobox}>
       <TagsInput.RootProvider value={tags}>
-        <TagsInput.Label>{label || 'Tags:'}</TagsInput.Label>
+        {label && <TagsInput.Label>{label }</TagsInput.Label>}
         <TagsInput.Control ref={controlRef}>
           {tags.value.map((tag, index) => (
             <TagsInput.Item key={index} index={index} value={tag}>
@@ -83,7 +85,7 @@ const TagSelector = ({
           ))}
 
           <Combobox.Input unstyled asChild>
-            <TagsInput.Input placeholder="Add tag..." />
+            <TagsInput.Input placeholder={placeholder} />
           </Combobox.Input>
         </TagsInput.Control>
 

@@ -81,6 +81,10 @@ const api = {
     const response = await ipcRenderer.invoke('update-product', product)
     return JSON.parse(response)
   },
+  deleteProduct: async (productid: string) => {
+    const response = await ipcRenderer.invoke('delete-product', productid)
+    return JSON.parse(response)
+  },
   getSubjects: async () => {
     const response = await ipcRenderer.invoke('get-subjects')
     return JSON.parse(response)

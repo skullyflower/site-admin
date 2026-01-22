@@ -1,7 +1,4 @@
-import { Box /*, Editable,  Heading, Link, List, /* Stack, */ /* Text */ } from '@chakra-ui/react'
-//import { useRef, useState } from 'react'
-//import ReactMarkdown from 'react-markdown'
-//import { useEffect } from 'react'
+import { Box } from '@chakra-ui/react'
 import {
   MDXEditor,
   BlockTypeSelect,
@@ -57,7 +54,7 @@ const StyledInput = ({
       overflow="hidden"
     >
       <MDXEditor
-        markdown={value.replace(/<[/]*p>/g, '').replace(/<[/]*[^>]*>/g, '')}
+        markdown={value?.replace(/<[/]*p>/g, '').replace(/<[/]*[^>]*>/g, '') || ''}
         onChange={onChange}
         placeholder={placeholder}
         className="dark-theme dark-editor"
