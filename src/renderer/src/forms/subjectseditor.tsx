@@ -13,7 +13,7 @@ interface EditSubjectProps {
   subjectid: string
   subjects: Subject[]
   isOpen: boolean
-  toggleSubjectForm: (subjectid: string | null) => void
+  toggleSubjectForm: () => void
   onSubmit: (data: Subject) => void
 }
 
@@ -40,10 +40,10 @@ export default function EditSubject({
   }
 
   return (
-    <FloatingFormWrapper isOpen={isOpen} onClose={() => toggleSubjectForm(null)}>
+    <FloatingFormWrapper isOpen={isOpen} onClose={toggleSubjectForm}>
       <HStack justifyContent="space-between">
         <Heading size="md">Add/Edit Product Subjects</Heading>
-        <Button onClick={() => toggleSubjectForm(null)}>Never mind</Button>
+        <Button onClick={toggleSubjectForm}>Never mind</Button>
       </HStack>
       <Field.Root p={1} invalid={errors.id ? true : false}>
         <HStack alignItems="center" width={'100%'}>
@@ -72,8 +72,8 @@ export default function EditSubject({
       </Field.Root>
 
       <Field.Root p={1}>
-        <HStack alignItems="top">
-          <Field.Label w={40}>Description:</Field.Label>
+        <Field.Label w={40}>Description:</Field.Label>
+        <HStack alignItems="top" width={'100%'}>
           <Box
             width={'100%'}
             flexGrow={3}

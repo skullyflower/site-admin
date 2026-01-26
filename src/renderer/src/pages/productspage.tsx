@@ -7,92 +7,66 @@ import { ApiMessageResponse, CategoryType, ProductType, Subject } from 'src/shar
 import { buttonRecipe } from '@renderer/themeRecipes'
 import FormContainer from '@renderer/components/formcontainer'
 
-const getProducts = (setProducts, setMessages, setLoading): void => {
-  setLoading(true)
-  setProducts([])
-  window.api
-    .getProducts()
-    .then((response: ApiMessageResponse | ProductType[]) => {
-      if (Array.isArray(response)) {
-        setProducts(response.sort((a: ProductType, b: ProductType) => a.name.localeCompare(b.name)))
-      } else {
-        setProducts([])
-        setMessages(response.message)
-      }
-      setLoading(false)
-    })
-    .catch((err) => {
-      setMessages(err.message || "Couldn't get products.")
-    })
+type ShopData = {
+  products: ProductType[]
+  categories: CategoryType[]
+  subjects: Subject[]
 }
 
-const getCategories = (
-  setCategories: (categories: CategoryType[]) => void,
+const getShopData = async (
+  setShopData: (shopData: ShopData) => void,
   setMessages: (message: string) => void,
   setLoading: (loading: boolean) => void
-): void => {
+): Promise<void> => {
   setLoading(true)
-  setCategories([])
-  window.api
-    .getCategories()
-    .then((response: ApiMessageResponse | CategoryType[]) => {
-      if (Array.isArray(response)) {
-        // sort by name
-        // filter out the super categories
-        const categories: CategoryType[] = response.sort((a: CategoryType, b: CategoryType) =>
-          a.name.localeCompare(b.name)
-        )
-        const newcats: CategoryType[] = categories.filter(
-          (cat: CategoryType) => cat.subcat.length === 0
-        )
-        setCategories(newcats)
+  const siteInfo = await window.api.getSiteInfo()
+  if (typeof siteInfo === 'object' && 'message' in siteInfo) {
+    setMessages((siteInfo as ApiMessageResponse).message as string)
+    setLoading(false)
+    return
+  }
+  if (typeof siteInfo === 'object' && 'features' in siteInfo && Array.isArray(siteInfo.features)) {
+    let products: ProductType[] = []
+    let categories: CategoryType[] = []
+    let subjects: Subject[] = []
+    if (siteInfo.features.includes('products')) {
+      products = (await window.api.getProducts()) as ProductType[]
+    }
+    if (siteInfo.features.includes('categories')) {
+      categories = await window.api.getCategories()
+      if (typeof categories === 'object' && !('message' in categories)) {
+        categories = categories as CategoryType[]
       } else {
-        setCategories([])
-        setMessages(response.message as string)
+        categories = []
       }
-      setLoading(false)
-    })
-    .catch((err) => {
-      setMessages((err.message as string) || "Couldn't get categories.")
-    })
-}
-
-const getSubjects = (
-  setSubjects: (subjects: Subject[]) => void,
-  setMessages: (message: string) => void,
-  setLoading: (loading: boolean) => void
-): void => {
-  setSubjects([])
-  window.api
-    .getSubjects()
-    .then((response: ApiMessageResponse | Subject[]) => {
-      if (Array.isArray(response)) {
-        // sort by name
-        // filter out the super categories
-        const subjects: Subject[] = response.sort((a: Subject, b: Subject) =>
-          a.name.localeCompare(b.name)
-        )
-        setSubjects(subjects)
+    }
+    if (siteInfo.features.includes('subjects')) {
+      subjects = await window.api.getSubjects()
+      if (typeof subjects === 'object' && !('message' in subjects)) {
+        subjects = subjects as Subject[]
       } else {
-        setSubjects([])
-        setMessages(response.message as string)
+        subjects = []
       }
-      setLoading(false)
+    }
+    setShopData({
+      products: products || [],
+      categories: categories || [],
+      subjects: subjects || []
     })
-    .catch((err) => {
-      setMessages((err.message as string) || "Couldn't get subjects.")
-    })
+    setLoading(false)
+  }
 }
 
 const ProductsPage = (): React.JSX.Element => {
   const [loading, setLoading] = useState(false)
-  const [products, setProducts] = useState<ProductType[] | null>(null)
-  const [categories, setCategories] = useState<CategoryType[]>([])
-  const [subjects, setSubjects] = useState<Subject[]>([])
+  const [shopData, setShopData] = useState<ShopData | null>(null)
   const [messages, setMessages] = useState<string | null>(null)
   const [showForm, setShowForm] = useState(false)
   const [activeProd, setActiveProd] = useState<string | null>(null)
-  const [filteredFroducts, setFilteredProducts] = useState<ProductType[] | null>(products)
+
+  const [filteredFroducts, setFilteredProducts] = useState<ProductType[] | null>(
+    shopData?.products || null
+  )
   const [filter, setFilter] = useState<string | null>(null)
 
   const onSubmit = (values: ProductType): void => {
@@ -112,10 +86,10 @@ const ProductsPage = (): React.JSX.Element => {
       .updateProduct(change)
       .then((response: ApiMessageResponse) => {
         setMessages(response.message as string)
-        getProducts(setProducts, setMessages, setLoading)
-        if (filter && products) {
+        getShopData(setShopData, setMessages, setLoading)
+        if (filter && shopData?.products) {
           setFilteredProducts(
-            products.filter((prod: ProductType) => prod.cat.includes(filter as string))
+            shopData.products.filter((prod: ProductType) => prod.cat.includes(filter as string))
           )
         }
         toggleForm(null)
@@ -128,25 +102,27 @@ const ProductsPage = (): React.JSX.Element => {
   const doDelete = (prodid: string) => () => {
     window.api.deleteProduct(prodid).then((json) => {
       setMessages(json.message)
-      getProducts(setProducts, setMessages, setLoading)
-      if (filter && products) {
-        setFilteredProducts(products.filter((prod) => prod.cat.includes(filter)))
+      getShopData(setShopData, setMessages, setLoading)
+      if (filter && shopData?.products) {
+        setFilteredProducts(shopData.products.filter((prod) => prod.cat.includes(filter)))
       }
     })
   }
 
   const doFilterProducts = useCallback(
     (filtercat: string | null) => {
-      if (products) {
+      if (shopData?.products) {
         setFilter(filtercat)
         setFilteredProducts(
           filtercat
-            ? products.filter((prod: ProductType) => prod.cat.includes(filtercat as string))
-            : products
+            ? shopData.products.filter((prod: ProductType) =>
+                prod.cat.includes(filtercat as string)
+              )
+            : shopData.products
         )
       }
     },
-    [setFilter, products, setFilteredProducts]
+    [setFilter, shopData, setFilteredProducts]
   )
 
   const toggleForm = (productId: string | null): void => {
@@ -155,12 +131,10 @@ const ProductsPage = (): React.JSX.Element => {
   }
 
   useEffect(() => {
-    if (!products && !messages) {
-      getCategories(setCategories, setMessages, setLoading)
-      getSubjects(setSubjects, setMessages, setLoading)
-      getProducts(setProducts, setMessages, setLoading)
+    if (!shopData && !messages) {
+      getShopData(setShopData, setMessages, setLoading)
     }
-  }, [products, messages, setCategories, setProducts, setMessages, setSubjects, setLoading])
+  }, [shopData, messages, setShopData, setMessages, setLoading])
 
   return (
     <PageLayout
@@ -181,9 +155,9 @@ const ProductsPage = (): React.JSX.Element => {
               <EditProduct
                 isOpen={showForm}
                 prodId={activeProd as string}
-                categories={categories}
-                subjects={subjects}
-                products={products as ProductType[]}
+                categories={shopData?.categories as CategoryType[]}
+                subjects={shopData?.subjects as Subject[]}
+                products={shopData?.products as ProductType[]}
                 toggleForm={toggleForm}
                 onSubmit={onSubmit}
               />
@@ -192,8 +166,10 @@ const ProductsPage = (): React.JSX.Element => {
           <Stack gap={4}>
             <HStack wrap="wrap" alignItems="flex-start" justifyContent="center">
               <Heading size="sm">Filter by category</Heading>
-              {categories?.length > 0 &&
-                categories.map((cat) => (
+              {shopData?.categories &&
+                Array.isArray(shopData.categories) &&
+                shopData.categories.length > 0 &&
+                shopData.categories.map((cat) => (
                   <Button
                     key={cat.id}
                     size="xs"

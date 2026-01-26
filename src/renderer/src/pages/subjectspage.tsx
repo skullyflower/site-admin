@@ -16,12 +16,20 @@ const getSubjects = (
   setSubjects([])
   window.api
     .getSubjects()
-    .then((response) => {
-      if (Array.isArray(response)) {
-        setSubjects(response.sort((a: Subject, b: Subject) => a.name.localeCompare(b.name)))
+    .then((response: ApiMessageResponse | Subject[]) => {
+      if (typeof response === 'object' && 'message' in response) {
+        console.log('message', response.message)
+        setSubjects([])
+      } else if (
+        typeof response === 'object' &&
+        'subjects' in response &&
+        Array.isArray(response.subjects)
+      ) {
+        setSubjects(
+          response.subjects.sort((a: Subject, b: Subject) => a.name.localeCompare(b.name))
+        )
       } else {
         setSubjects([])
-        setMessages(response.message as string)
       }
       setLoading(false)
     })
@@ -98,7 +106,7 @@ const SubjectsPage = (): React.JSX.Element => {
                 isOpen={showCatForm}
                 subjectid={activeCat as string}
                 subjects={subjects as Subject[]}
-                toggleSubjectForm={() => toggleSubjectForm(activeCat as string | null)}
+                toggleSubjectForm={() => toggleSubjectForm(null)}
                 onSubmit={(values: Subject) => onSubmit(values)}
               />
             </FormContainer>

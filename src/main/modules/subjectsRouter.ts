@@ -1,10 +1,10 @@
 import fs from 'fs'
 import getPathsFromConfig, { checkFile } from '../utilities/pathData'
 
-const getPaths = (): { pathToPublic: string; subjectFilePath: string } => {
+const getPaths = (): { subjectFilePath: string } => {
   const { pathToPublic } = getPathsFromConfig()
   const subjectFilePath = `${pathToPublic}/data/subjects.json`
-  return { pathToPublic, subjectFilePath }
+  return { subjectFilePath }
 }
 
 export const updateSubject = async (subject): Promise<string> => {
@@ -40,8 +40,8 @@ export const updateSubject = async (subject): Promise<string> => {
 export const getSubjects = (): string => {
   const { subjectFilePath } = getPaths()
   checkFile(subjectFilePath, { designs: [] })
-  const shopData = fs.readFileSync(subjectFilePath, 'utf8')
-  const shop = JSON.parse(shopData)
+  const shopData = fs.readFileSync(subjectFilePath)
+  const shop = JSON.parse(shopData.toString())
   if (shop.designs) {
     return JSON.stringify(shop.designs)
   }
