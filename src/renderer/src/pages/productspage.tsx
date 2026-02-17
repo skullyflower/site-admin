@@ -35,7 +35,9 @@ const getShopData = async (
     if (siteInfo.features.includes('categories')) {
       categories = await window.api.getCategories()
       if (typeof categories === 'object' && !('message' in categories)) {
-        categories = categories as CategoryType[]
+        categories = categories.filter(
+          (cat: CategoryType) => cat.subcat.length === 0
+        ) as CategoryType[]
       } else {
         categories = []
       }

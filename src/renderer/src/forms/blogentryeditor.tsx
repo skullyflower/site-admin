@@ -16,7 +16,6 @@ const EditBlogEntry = ({
   sitedata
 }: {
   thisEntry: BlogEntry
-  //isOpen: boolean
   toggleForm: () => void
   onSubmit: (data: BlogEntry) => void
   sitedata: SiteInfo
