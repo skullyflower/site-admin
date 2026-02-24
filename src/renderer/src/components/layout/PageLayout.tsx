@@ -40,7 +40,7 @@ const PageLayout = ({
       backgroundColor="gray.800"
       color="slate.100"
       w={['100%', '100%', '95%', '95%', '95%']}
-      height={'82vh'}
+      height={'100vh'}
       overflowY={'auto'}
       marginInline={'auto'}
     >
