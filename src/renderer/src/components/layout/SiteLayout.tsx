@@ -6,9 +6,9 @@ import Sidebar from '../Sidebar'
 import logo from '@renderer/assets/SiteAdmin.png'
 
 const SIDEBAR_WIDTH_EXPANDED = 20
+const CONTENT_WIDTH_EXPANDED = 80
 const SIDEBAR_WIDTH_COLLAPSED = 5
-const CONTENT_WIDTH_EXPANDED = 85
-const CONTENT_WIDTH_COLLAPSED = 60
+const CONTENT_WIDTH_COLLAPSED = 95
 
 export default function SiteLayout(): React.JSX.Element {
   const [sidebarOpen, setSidebarOpen] = useState(true)
@@ -23,25 +23,34 @@ export default function SiteLayout(): React.JSX.Element {
     }
   }
 
+  const onResize = (details: Splitter.ResizeDetails): void => {
+    setSizes(details.size)
+    if (details.size[0] > SIDEBAR_WIDTH_EXPANDED / 2) {
+      setSidebarOpen(true)
+    } else {
+      setSidebarOpen(false)
+    }
+  }
+
   return (
     <Splitter.Root
       panels={[
         { id: 'sidebar', minSize: SIDEBAR_WIDTH_COLLAPSED, maxSize: SIDEBAR_WIDTH_EXPANDED },
-        { id: 'content', minSize: CONTENT_WIDTH_COLLAPSED }
+        { id: 'content', minSize: CONTENT_WIDTH_EXPANDED, maxSize: CONTENT_WIDTH_COLLAPSED }
       ]}
       defaultSize={sizes}
       borderWidth="1px"
       size={sizes}
-      onResize={(details) => setSizes(details.size)}
+      onResize={onResize}
       minH="100"
     >
       <Splitter.Panel id="sidebar">
         <Stack direction="column" align="center" justify="start" gap={2}>
-          <Link to="/" style={{ flex: 1, minWidth: 0, display: 'block' }}>
+          <Link to="/" style={{ flex: 1, minWidth: '20px', display: 'block' }}>
             <Image src={logo} className="App-logo" alt="WebSite Config" maxW="120px" w="100%" />
           </Link>
           <IconButton aria-label="Toggle sidebar" size="sm" variant="ghost" onClick={toggleSidebar}>
-            {sidebarOpen ? <LuChevronLeft /> : <LuMenu />}
+            {sidebarOpen === true ? <LuChevronLeft /> : <LuMenu />}
           </IconButton>
           <Sidebar minimized={!sidebarOpen} />
         </Stack>
