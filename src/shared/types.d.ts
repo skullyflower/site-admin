@@ -83,7 +83,6 @@ export interface GalleryInfo {
 }
 export interface GalleryResponse {
   galleries: GalleryInfo[]
-  message?: string
 }
 
 export interface GalleryImage {

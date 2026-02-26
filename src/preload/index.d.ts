@@ -6,7 +6,8 @@ import {
   BlogResponse,
   SiteInfo,
   ApiMessageResponse,
-  GalleryImage
+  GalleryImage,
+  GalleryResponse
 } from '../shared/types'
 
 export interface Api {
