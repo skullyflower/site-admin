@@ -30,7 +30,7 @@ const NavButton = ({ path, icon, children, minimized }: NavButtonProps): React.R
       border={0}
       backgroundColor={useMatch(path) ? 'slate.700' : 'gray.500'}
       alignItems="center"
-      justifyContent="start"
+      justifyContent={minimized ? 'center' : 'start'}
       gap={2}
     >
       {icon}
@@ -57,48 +57,52 @@ const SideBar = ({ minimized }: { minimized?: boolean }): React.ReactNode => {
       gap={2}
       width={minimized ? '50px' : '200px'}
     >
-      <NavButton path="/home" icon={<HouseIcon />} minimized={minimized}>
+      <NavButton path="/home" icon={<HouseIcon weight="fill" />} minimized={minimized}>
         Home
       </NavButton>
       {config?.features?.includes('blog') && (
-        <NavButton path="/blog" icon={<NewspaperClippingIcon />} minimized={minimized}>
+        <NavButton
+          path="/blog"
+          icon={<NewspaperClippingIcon weight="fill" />}
+          minimized={minimized}
+        >
           Blog
         </NavButton>
       )}
       {config?.features?.includes('content') && (
-        <NavButton path="/content" icon={<FileTextIcon />} minimized={minimized}>
+        <NavButton path="/content" icon={<FileTextIcon weight="fill" />} minimized={minimized}>
           Content Pages
         </NavButton>
       )}
       {config?.features?.includes('galleries') && (
-        <NavButton path="/gallery" icon={<SlideshowIcon />} minimized={minimized}>
+        <NavButton path="/gallery" icon={<SlideshowIcon weight="fill" />} minimized={minimized}>
           Galleries
         </NavButton>
       )}
       {config?.features?.includes('products') && (
-        <NavButton path="/products" icon={<ShoppingCartIcon />} minimized={minimized}>
+        <NavButton path="/products" icon={<ShoppingCartIcon weight="fill" />} minimized={minimized}>
           Products
         </NavButton>
       )}
       {config?.features?.includes('categories') && (
-        <NavButton path="/categories" icon={<CatIcon />} minimized={minimized}>
+        <NavButton path="/categories" icon={<CatIcon weight="fill" />} minimized={minimized}>
           Categories
         </NavButton>
       )}
       {config?.features?.includes('subjects') && (
-        <NavButton icon={<CirclesFourIcon />} path="/subjects" minimized={minimized}>
+        <NavButton icon={<CirclesFourIcon weight="fill" />} path="/subjects" minimized={minimized}>
           Subjects
         </NavButton>
       )}
       {config?.features?.includes('sale') && (
-        <NavButton icon={<TagIcon />} path="/sale" minimized={minimized}>
+        <NavButton icon={<TagIcon weight="fill" />} path="/sale" minimized={minimized}>
           Sale
         </NavButton>
       )}
-      <NavButton icon={<ImageIcon />} path="/images" minimized={minimized}>
+      <NavButton icon={<ImageIcon weight="fill" />} path="/images" minimized={minimized}>
         Image Upload
       </NavButton>
-      <NavButton icon={<GearIcon />} path="/config" minimized={minimized}>
+      <NavButton icon={<GearIcon weight="fill" />} path="/config" minimized={minimized}>
         Config
       </NavButton>
     </Stack>

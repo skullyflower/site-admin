@@ -45,7 +45,7 @@ export default function SiteLayout(): React.JSX.Element {
       minH="100"
     >
       <Splitter.Panel id="sidebar">
-        <Stack direction="column" align="center" justify="start" gap={2}>
+        <Stack direction="column" align="center" justify="start" gap={1} paddingTop={2}>
           <Link to="/" style={{ flex: 1, minWidth: '20px', display: 'block' }}>
             <Image src={logo} className="App-logo" alt="WebSite Config" maxW="120px" w="100%" />
           </Link>
