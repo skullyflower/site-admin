@@ -18,8 +18,10 @@ import {
   InsertImage,
   ListsToggle
 } from '@mdxeditor/editor'
+import '@renderer/assets/main.css'
 import '@mdxeditor/editor/style.css'
 import '@radix-ui/colors/slate-dark.css'
+import '@renderer/assets/styledinput.css'
 
 const StyledInput = ({
   value,
@@ -58,6 +60,7 @@ const StyledInput = ({
         onChange={onChange}
         placeholder={placeholder}
         className="dark-theme dark-editor"
+        contentEditableClassName="editor-content"
         plugins={[
           headingsPlugin(),
           listsPlugin(),
