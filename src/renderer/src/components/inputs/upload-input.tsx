@@ -1,7 +1,8 @@
 import { useState } from 'react'
-import { HStack, Input, Stack } from '@chakra-ui/react'
+import { Box, FileUpload, Icon, HStack, Stack } from '@chakra-ui/react'
 import ImagePreview from '../image-preview'
-import backgroundImage from '@renderer/assets/image-loading.svg'
+//import backgroundImage from '@renderer/assets/image-loading.svg'
+import { UploadIcon } from '@phosphor-icons/react'
 
 interface UploadInputProps {
   setImageCount?: (count: number) => void
@@ -37,31 +38,52 @@ const UploadInput = ({
             updateImages={(images: string[]) => setPreviewImages(images)}
           />
         ) : (
-          <Input
-            type="file"
+          <FileUpload.Root
             accept="image/*"
-            multiple={multiple}
-            width={'100%'}
-            height={previewImages?.length > 0 ? 50 : 150}
-            paddingTop={previewImages?.length > 0 ? 2 : 10}
-            paddingLeft={10}
-            backgroundImage={backgroundImage}
-            borderColor={'slate.800'}
-            borderWidth={2}
-            borderStyle={'solid'}
-            _before={
-              previewImages?.length > 0
-                ? {
-                    content: '"Remove and Select New"',
-                    display: 'block',
-                    lineHeight: 2,
-                    fontWeight: 700
-                  }
-                : undefined
-            }
             onChange={addPreviewImages}
-          />
+            maxFiles={multiple ? 10 : 1}
+            maxW="lg"
+            alignItems="stretch"
+          >
+            <FileUpload.HiddenInput />
+            <FileUpload.Dropzone>
+              <Icon size="md" color="fg.muted">
+                <UploadIcon />
+              </Icon>
+              <FileUpload.DropzoneContent>
+                <Box>Drag and drop files here</Box>
+                <Box color="fg.muted">.png, .jpg, gif up to 5MB</Box>
+              </FileUpload.DropzoneContent>
+            </FileUpload.Dropzone>
+            <FileUpload.List />
+          </FileUpload.Root>
         )}
+
+        {/* <Input
+          type="file"
+          accept="image/*"
+          multiple={multiple}
+          width={'100%'}
+          height={previewImages?.length > 0 ? 50 : 150}
+          paddingTop={previewImages?.length > 0 ? 2 : 10}
+          paddingLeft={10}
+          backgroundImage={backgroundImage}
+          borderColor={'slate.800'}
+          borderWidth={2}
+          borderStyle={'solid'}
+          _before={
+            previewImages?.length > 0
+              ? {
+                  content: '"Remove and Select New"',
+                  display: 'block',
+                  lineHeight: 2,
+                  fontWeight: 700
+                }
+              : undefined
+          }
+          onChange={addPreviewImages}
+        />
+        } )}*/}
       </HStack>
     </Stack>
   )
