@@ -1,6 +1,6 @@
 import { Button, Stack } from '@chakra-ui/react'
 import { useEffect, useState } from 'react'
-import { Link, useLocation, useMatch } from 'react-router-dom'
+import { useLocation, useMatch, useNavigate } from 'react-router-dom'
 import { SiteInfo, ApiMessageResponse } from 'src/shared/types'
 import {
   CatIcon,
@@ -14,6 +14,7 @@ import {
   ImageIcon,
   GearIcon
 } from '@phosphor-icons/react'
+
 interface NavButtonProps extends React.HTMLAttributes<HTMLButtonElement> {
   path: string
   icon?: React.ReactNode
@@ -22,16 +23,24 @@ interface NavButtonProps extends React.HTMLAttributes<HTMLButtonElement> {
 }
 
 const NavButton = ({ path, icon, children, minimized }: NavButtonProps): React.ReactNode => {
+  const navigate = useNavigate()
+  const onClick = (): void => {
+    navigate(path)
+  }
   return (
     <Button
-      as={Link}
-      to={path}
-      size="sm"
+      onClick={onClick}
+      size="xs"
       border={0}
-      backgroundColor={useMatch(path) ? 'slate.700' : 'gray.500'}
-      alignItems="center"
+      color={useMatch(path) ? 'green.300' : 'green.900'}
+      backgroundColor={useMatch(path) ? 'slate.700' : 'slate.600'}
+      _hover={{
+        color: 'green.800',
+        backgroundColor: 'slate.300'
+      }}
       justifyContent={minimized ? 'center' : 'start'}
       gap={2}
+      title={children as string}
     >
       {icon}
       {!minimized && children}
