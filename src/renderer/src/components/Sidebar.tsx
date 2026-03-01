@@ -33,10 +33,10 @@ const NavButton = ({ path, icon, children, minimized }: NavButtonProps): React.R
       size="xs"
       border={0}
       color={useMatch(path) ? 'green.300' : 'green.900'}
-      backgroundColor={useMatch(path) ? 'slate.700' : 'slate.600'}
+      backgroundColor={useMatch(path) ? 'slate.700' : 'slate.500'}
       _hover={{
-        color: 'green.800',
-        backgroundColor: 'slate.300'
+        color: 'green.300',
+        backgroundColor: 'slate.700'
       }}
       justifyContent={minimized ? 'center' : 'start'}
       gap={2}
