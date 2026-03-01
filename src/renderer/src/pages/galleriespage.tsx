@@ -6,7 +6,7 @@ import FloatingFormWrapper from '../components/floatingformwrap'
 import GalleryGrid from '../components/galleryGrid'
 import EditGallery from '../forms/galleryeditor'
 import PageLayout from '../components/layout/PageLayout'
-import { GalleryInfo, GalleryImage } from 'src/shared/types'
+import { GalleryInfo, GalleryImage, GalleryResponse } from 'src/shared/types'
 import { buttonRecipe } from '@renderer/themeRecipes'
 import FormContainer from '@renderer/components/formcontainer'
 
@@ -20,7 +20,7 @@ const getGalleries = (
     if (typeof res === 'object' && 'message' in res) {
       setMessages((res.message as string) || '')
     } else {
-      const galleries = res as GalleryInfo[]
+      const galleries = (res as GalleryResponse).galleries
       setGalleries(galleries)
     }
   })
@@ -98,7 +98,7 @@ const GalleryPage: React.FC = () => {
       return
     }
     const result = await window.api.uploadImages(newImages, activeGallery?.path || 'artwork')
-    setMessages(result.message)
+    setMessages(result.messages)
     doResetGallery(activeGallery)
     setShowUpload(false)
   }
@@ -223,7 +223,7 @@ const GalleryPage: React.FC = () => {
               </Stack>
             </FloatingFormWrapper>
           </Stack>
-        )}{' '}
+        )}
         {activeGallery && (
           <FormContainer>
             <EditGallery

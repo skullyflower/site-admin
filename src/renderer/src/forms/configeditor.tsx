@@ -1,7 +1,8 @@
-import { Button, Center, Field, Heading, HStack, Text } from '@chakra-ui/react'
+import { Button, Field, HStack, Text } from '@chakra-ui/react'
 import { Stack } from '@chakra-ui/react'
 import { AdminConfig } from 'src/shared/types'
 import { buttonRecipe } from '@renderer/themeRecipes'
+import { useState } from 'react'
 
 const ConfigForm = ({
   formData,
@@ -9,45 +10,47 @@ const ConfigForm = ({
   onSubmit
 }: {
   formData: AdminConfig | null
-  setValue: (value: AdminConfig) => void
+  setValue: (value: AdminConfig | null) => void
   onSubmit: () => void
 }): React.ReactNode => {
+  const [changed, setChanged] = useState<boolean>(false)
+  const updateSiteDirectory = (): void => {
+    window.api
+      .selectSiteDirectory()
+      .then((data) => {
+        if (data === undefined) {
+          alert('No directory selected')
+          return
+        }
+        if (data && typeof data === 'string') {
+          setValue({ ...formData, pathToSite: data } as AdminConfig)
+          setChanged(true)
+        }
+        return
+      })
+      .catch((err: Error) => {
+        alert(err.message || 'Failed to select directory')
+      })
+  }
   return (
     <Stack gap={4}>
-      <Heading paddingInline={4}>Currently Selected Site Folder:</Heading>
-      <Text textAlign="center" paddingInline={4}>
-        {formData?.pathToSite || 'No config found'}
+      <Text paddingInline={4}>
+        Currently Selected Site Folder:{' '}
+        <em style={{ fontWeight: 'bold', fontSize: '1.25rem' }}>
+          {formData?.pathToSite || 'No config found'}
+        </em>
       </Text>
       <Field.Root p={4}>
         <HStack alignItems="center">
           <Field.Label w={48}>Select a Site To Edit:</Field.Label>
-          <Button
-            onClick={() => {
-              window.api
-                .selectSiteDirectory()
-                .then((data: string | unknown) => {
-                  if (data && typeof data === 'string') {
-                    setValue({ ...formData, pathToSite: data } as AdminConfig)
-                  } else {
-                    alert('No directory selected')
-                  }
-                })
-                .catch((err: Error) => {
-                  alert(err.message || 'Failed to select directory')
-                })
-            }}
-          >
-            Select Site Directory
-          </Button>
+          <Button onClick={updateSiteDirectory}>Select Site Directory</Button>
         </HStack>
       </Field.Root>
-      <Center>
-        <HStack gap={4}>
-          <Button recipe={buttonRecipe} onClick={() => onSubmit()}>
-            Submit Changes
-          </Button>
-        </HStack>
-      </Center>
+      <HStack justifyContent="end">
+        <Button disabled={!changed} recipe={buttonRecipe} onClick={() => onSubmit()}>
+          Submit Changes
+        </Button>
+      </HStack>
     </Stack>
   )
 }

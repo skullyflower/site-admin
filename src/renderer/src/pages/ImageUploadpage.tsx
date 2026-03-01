@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
-import ImageUpload from '../forms/image-upload-form'
+import AddImagesForm from '../forms/addImagesForm'
 import {
   Button,
   Checkbox,
@@ -8,6 +8,7 @@ import {
   HStack,
   Image,
   NativeSelect,
+  Box,
   Separator,
   VStack
 } from '@chakra-ui/react'
@@ -25,7 +26,7 @@ const getImages = (
     .getStagedImages()
     .then((response: ApiMessageResponse | string[]) => {
       if (typeof response === 'object' && 'message' in response) {
-        setMessages(response.message)
+        console.log(response.message)
       } else {
         setFilesToMove(response as string[])
       }
@@ -41,7 +42,8 @@ const getDirectories = (
     .getImageFolders()
     .then((response) => {
       if (typeof response === 'object' && 'message' in response) {
-        setMessages(response.message)
+        console.log(response.message)
+        setToDirectories([])
       } else {
         setToDirectories(response as string[])
       }
@@ -61,7 +63,7 @@ const ImagesUploadPage: React.FC = () => {
   const [messages, setMessages] = useState<string | null>(null)
   // read from api based on gallery/shop/etc files. standardize image loacations.
   const [toDirectories, setToDirectories] = useState<string[]>([])
-  const [allImages, setAllImages] = useState<string[]|null>(null)
+  const [allImages, setAllImages] = useState<string[] | null>(null)
   const { control, register, handleSubmit, setValue, getValues } = useForm<{
     destination: string
     filesToMove: string[]
@@ -99,9 +101,14 @@ const ImagesUploadPage: React.FC = () => {
     if (!allImages && !messages) {
       getImages(setAllImages, setMessages)
     }
-  }, [allImages, messages, setMessages, toDirectories])
+  }, [])
 
   const doDelete = (imageurl: string): void => {
+    setValue(
+      'filesToMove',
+      filesToMove?.filter((file) => file !== imageurl.substring(imageurl.lastIndexOf('/') + 1)) ||
+        []
+    )
     window.api
       .deleteImage(imageurl.replace('http://localhost:3000/', ''))
       .then((response) => {
@@ -122,7 +129,7 @@ const ImagesUploadPage: React.FC = () => {
     >
       {showForm && (
         <FormContainer>
-          <ImageUpload
+          <AddImagesForm
             isOpen={showForm}
             hideForm={() => {
               setShowForm(false)
@@ -132,62 +139,91 @@ const ImagesUploadPage: React.FC = () => {
           />
         </FormContainer>
       )}
-      <VStack gap={4} textAlign="center">
+      <VStack gap={4}>
         <Separator />
-        <Heading size="sm">Staged Images to Move</Heading>
-        <Checkbox.Group
-          value={filesToMove}
-          onValueChange={(value: string[]) => setValue('filesToMove', value)}
-        >
-          <HStack maxW="1000px" alignItems="stretch" wrap="wrap">
-            {allImages &&
-              allImages.length > 0 &&
-              allImages.map((file, i) => (
-                <VStack key={i} style={{ padding: '5px' }}>
-                  <Button recipe={buttonRecipe} size="sm" onClick={() => doDelete(`/temp/${file}`)}>
-                    delete
-                  </Button>
-                  <Image
-                    src={`http://localhost:3000/temp/${file}`}
-                    alt={file}
-                    width={75}
-                    style={{ verticalAlign: 'middle', padding: '0 10px' }}
-                  />
-                  <Checkbox.Root value={file}>
-                    <Checkbox.HiddenInput />
-                    <Checkbox.Control>
-                      <Checkbox.Indicator />
-                    </Checkbox.Control>
-                    <Checkbox.Label>{file}</Checkbox.Label>
-                  </Checkbox.Root>
-                </VStack>
-              ))}
-          </HStack>
-        </Checkbox.Group>
-        <Button recipe={buttonRecipe} onClick={checkForImages}>
-          Check For Staged Images
-        </Button>
+        {allImages && allImages.length > 0 ? (
+          <>
+            <Heading size="sm" textAlign="start">
+              Staged Images to Move
+            </Heading>
+            <Box
+              width={'100%'}
+              flexGrow={3}
+              borderWidth={1}
+              borderStyle="solid"
+              borderRadius={4}
+              borderColor="gray.300"
+              p={5}
+            >
+              <Heading size="sm" textAlign="start">
+                Select the images you want to move
+              </Heading>
+              <Checkbox.Group
+                value={filesToMove}
+                onValueChange={(value: string[]) => setValue('filesToMove', value)}
+              >
+                <HStack maxW="1000px" alignItems="stretch" wrap="wrap">
+                  {allImages &&
+                    allImages.length > 0 &&
+                    allImages.map((file, i) => (
+                      <VStack key={i} style={{ padding: '5px' }}>
+                        <Button
+                          recipe={buttonRecipe}
+                          size="sm"
+                          onClick={() => doDelete(`/temp/${file}`)}
+                        >
+                          delete
+                        </Button>
+                        <Image
+                          src={`http://localhost:3000/temp/${file}`}
+                          alt={file}
+                          width={75}
+                          style={{ verticalAlign: 'middle', padding: '0 10px' }}
+                        />
+                        <Checkbox.Root value={file}>
+                          <Checkbox.HiddenInput />
+                          <Checkbox.Control>
+                            <Checkbox.Indicator />
+                          </Checkbox.Control>
+                          <Checkbox.Label>{file}</Checkbox.Label>
+                        </Checkbox.Root>
+                      </VStack>
+                    ))}
+                </HStack>
+              </Checkbox.Group>
+            </Box>
+          </>
+        ) : (
+          <Button recipe={buttonRecipe} onClick={checkForImages}>
+            Check For Staged Images
+          </Button>
+        )}
         <Separator />
-        <Heading size="sm">Destination</Heading>
-        <HStack>
-          <NativeSelect.Root>
-            <NativeSelect.Field placeholder="Pick a Destination" {...register('destination')}>
-              {toDirectories.map((dir, i) => (
-                <option value={dir} key={i}>
-                  {dir}
-                </option>
-              ))}
-            </NativeSelect.Field>
-            <NativeSelect.Indicator />
-          </NativeSelect.Root>
-        </HStack>
-        <Button
-          disabled={!filesToMove?.length}
-          recipe={buttonRecipe}
-          onClick={handleSubmit(onSubmit)}
-        >
-          Move The images.
-        </Button>
+        {filesToMove && filesToMove.length > 0 && (
+          <>
+            <Heading size="sm">Select a Destination</Heading>
+            <HStack>
+              <NativeSelect.Root>
+                <NativeSelect.Field placeholder="Pick a Destination" {...register('destination')}>
+                  <option value=".">images</option>
+                  {toDirectories.map((dir, i) => (
+                    <option value={dir} key={i}>
+                      {dir}
+                    </option>
+                  ))}
+                </NativeSelect.Field>
+                <NativeSelect.Indicator />
+              </NativeSelect.Root>
+            </HStack>
+            <Button
+              disabled={!filesToMove?.length}
+              recipe={buttonRecipe}
+              onClick={handleSubmit(onSubmit)}
+            >
+              Move The images.
+            </Button>{' '}
+          </>
+        )}
       </VStack>
     </PageLayout>
   )
