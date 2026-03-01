@@ -222,12 +222,8 @@ export const getImageFolders = (): string => {
   const files = fs.readdirSync(imagesPath)
   const filtered = files.filter((file) => fs.statSync(path.join(imagesPath, file)).isDirectory())
 
-  if (filtered.length) {
-    return JSON.stringify(filtered)
-  }
-  return JSON.stringify({ message: 'No image folders to get.' })
+  return JSON.stringify(filtered)
 }
-
 /**
  * Gets the images in a folder.
  * @param directory - The top level directory.

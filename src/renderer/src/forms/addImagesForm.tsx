@@ -3,7 +3,7 @@ import { Heading, HStack, Button, Stack } from '@chakra-ui/react'
 import FloatingFormWrapper from '../components/floatingformwrap'
 import { buttonRecipe } from '@renderer/themeRecipes/button.recipe'
 
-export default function ImageUpload({
+export default function AddImagesForm({
   isOpen,
   hideForm
 }: {
@@ -13,7 +13,7 @@ export default function ImageUpload({
 }): React.JSX.Element {
   return (
     <FloatingFormWrapper isOpen={isOpen} onClose={hideForm}>
-      <Stack>
+      <Stack gap={4} justifyContent="center">
         <HStack justifyContent="space-between">
           <Heading size="md">Upload Images</Heading>
           <Button recipe={buttonRecipe} onClick={hideForm}>

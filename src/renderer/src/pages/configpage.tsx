@@ -57,7 +57,7 @@ const ConfigPage = (): React.ReactNode => {
       <FormContainer>
         <ConfigForm
           formData={config as AdminConfig}
-          setValue={(value: AdminConfig) => setConfig(value)}
+          setValue={(value: AdminConfig | null) => setConfig(value as AdminConfig)}
           onSubmit={onSubmit}
         />
       </FormContainer>

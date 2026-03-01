@@ -14,7 +14,7 @@ const api = {
   },
   selectSiteDirectory: async () => {
     const response = await ipcRenderer.invoke('select-site-directory')
-    return (response as string) || undefined
+    return response as string | undefined
   },
   // Site Info API functions
   getSiteInfo: async () => {

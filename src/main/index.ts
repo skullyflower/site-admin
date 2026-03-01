@@ -131,7 +131,11 @@ ipcMain.handle('select-site-directory', () => {
   const directory: Promise<OpenDialogReturnValue> = dialog.showOpenDialog({
     properties: ['openDirectory']
   })
-  return directory.then((result) => result.filePaths[0].replace(`${app.getPath('home')}`, ''))
+  return directory.then((result) => {
+    if (result?.filePaths && result.filePaths.length > 0)
+      return result.filePaths[0].replace(`${app.getPath('home')}`, '')
+    return undefined
+  })
 })
 // Blog API functions
 ipcMain.handle('get-blogs', getBlog)
