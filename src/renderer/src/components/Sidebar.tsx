@@ -31,6 +31,7 @@ const NavButton = ({ path, icon, children, minimized }: NavButtonProps): React.R
     <Button
       onClick={onClick}
       size="xs"
+      width="100%"
       border={0}
       color={useMatch(path) ? 'green.300' : 'green.900'}
       backgroundColor={useMatch(path) ? 'slate.700' : 'slate.500'}
@@ -64,7 +65,8 @@ const SideBar = ({ minimized }: { minimized?: boolean }): React.ReactNode => {
       justifyContent={'start'}
       alignItems="stretch"
       gap={2}
-      width={minimized ? '50px' : '200px'}
+      width="100%"
+      p={2}
     >
       <NavButton path="/home" icon={<HouseIcon weight="fill" />} minimized={minimized}>
         Home
