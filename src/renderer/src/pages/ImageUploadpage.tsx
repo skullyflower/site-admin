@@ -104,6 +104,11 @@ const ImagesUploadPage: React.FC = () => {
   }, [])
 
   const doDelete = (imageurl: string): void => {
+    setValue(
+      'filesToMove',
+      filesToMove?.filter((file) => file !== imageurl.substring(imageurl.lastIndexOf('/') + 1)) ||
+        []
+    )
     window.api
       .deleteImage(imageurl.replace('http://localhost:3000/', ''))
       .then((response) => {
@@ -136,7 +141,7 @@ const ImagesUploadPage: React.FC = () => {
       )}
       <VStack gap={4}>
         <Separator />
-        {allImages && allImages.length > 0 && (
+        {allImages && allImages.length > 0 ? (
           <>
             <Heading size="sm" textAlign="start">
               Staged Images to Move
@@ -150,6 +155,9 @@ const ImagesUploadPage: React.FC = () => {
               borderColor="gray.300"
               p={5}
             >
+              <Heading size="sm" textAlign="start">
+                Select the images you want to move
+              </Heading>
               <Checkbox.Group
                 value={filesToMove}
                 onValueChange={(value: string[]) => setValue('filesToMove', value)}
@@ -185,32 +193,37 @@ const ImagesUploadPage: React.FC = () => {
               </Checkbox.Group>
             </Box>
           </>
+        ) : (
+          <Button recipe={buttonRecipe} onClick={checkForImages}>
+            Check For Staged Images
+          </Button>
         )}
-        <Button recipe={buttonRecipe} onClick={checkForImages}>
-          Check For Staged Images
-        </Button>
         <Separator />
-        <Heading size="sm">Destination</Heading>
-        <HStack>
-          <NativeSelect.Root>
-            <NativeSelect.Field placeholder="Pick a Destination" {...register('destination')}>
-              <option value=".">images</option>
-              {toDirectories.map((dir, i) => (
-                <option value={dir} key={i}>
-                  {dir}
-                </option>
-              ))}
-            </NativeSelect.Field>
-            <NativeSelect.Indicator />
-          </NativeSelect.Root>
-        </HStack>
-        <Button
-          disabled={!filesToMove?.length}
-          recipe={buttonRecipe}
-          onClick={handleSubmit(onSubmit)}
-        >
-          Move The images.
-        </Button>
+        {filesToMove && filesToMove.length > 0 && (
+          <>
+            <Heading size="sm">Select a Destination</Heading>
+            <HStack>
+              <NativeSelect.Root>
+                <NativeSelect.Field placeholder="Pick a Destination" {...register('destination')}>
+                  <option value=".">images</option>
+                  {toDirectories.map((dir, i) => (
+                    <option value={dir} key={i}>
+                      {dir}
+                    </option>
+                  ))}
+                </NativeSelect.Field>
+                <NativeSelect.Indicator />
+              </NativeSelect.Root>
+            </HStack>
+            <Button
+              disabled={!filesToMove?.length}
+              recipe={buttonRecipe}
+              onClick={handleSubmit(onSubmit)}
+            >
+              Move The images.
+            </Button>{' '}
+          </>
+        )}
       </VStack>
     </PageLayout>
   )
