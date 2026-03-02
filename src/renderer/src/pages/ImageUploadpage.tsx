@@ -10,6 +10,7 @@ import {
   NativeSelect,
   Box,
   Separator,
+  Text,
   VStack
 } from '@chakra-ui/react'
 import PageLayout from '../components/layout/PageLayout'
@@ -71,6 +72,7 @@ const ImagesUploadPage: React.FC = () => {
     defaultValues
   })
   const filesToMove = useWatch({ control, name: 'filesToMove' })
+  const destination = useWatch({ control, name: 'destination' })
 
   const onSubmit = (): void => {
     const values = getValues()
@@ -170,35 +172,41 @@ const ImagesUploadPage: React.FC = () => {
                         key={i}
                         minW="200px"
                         w={{ sm: '100%', md: '200px' }}
-                        backgroundColor="blackAlpha.200"
+                        backgroundColor={
+                          filesToMove.includes(file) ? 'blackAlpha.500' : 'blackAlpha.200'
+                        }
                         p={2}
                         m={2}
                         borderRadius={4}
                         _hover={{ background: 'blackAlpha.500' }}
-                        overflow="hidden"
                       >
-                        <VStack gap={2}>
-                          <Image
-                            src={`http://localhost:3000/temp/${file}`}
-                            alt={file}
-                            width={75}
-                            style={{ verticalAlign: 'middle', padding: '0 10px' }}
-                          />
+                        <VStack
+                          justifyContent="space-between"
+                          height="100%"
+                          maxW="190px"
+                          overflow="auto"
+                        >
+                          <Image src={`http://localhost:3000/temp/${file}`} alt={file} />
+                          <Text>{file}</Text>
 
-                          <Checkbox.Root value={file} alignSelf="start">
-                            <Checkbox.HiddenInput />
-                            <Checkbox.Control>
-                              <Checkbox.Indicator />
-                            </Checkbox.Control>
-                            <Checkbox.Label>{file}</Checkbox.Label>
-                          </Checkbox.Root>
-                          <Button
-                            recipe={buttonRecipe}
-                            size="sm"
-                            onClick={() => doDelete(`/temp/${file}`)}
-                          >
-                            delete
-                          </Button>
+                          <VStack gap={2}>
+                            <Checkbox.Root value={file}>
+                              <Checkbox.HiddenInput />
+                              <Checkbox.Control>
+                                <Checkbox.Indicator />
+                              </Checkbox.Control>
+                              <Checkbox.Label>
+                                {filesToMove.includes(file) ? 'Selected' : ' Select'}
+                              </Checkbox.Label>
+                            </Checkbox.Root>
+                            <Button
+                              recipe={buttonRecipe}
+                              size="sm"
+                              onClick={() => doDelete(`/temp/${file}`)}
+                            >
+                              delete
+                            </Button>
+                          </VStack>
                         </VStack>
                       </Box>
                     ))}
@@ -229,12 +237,12 @@ const ImagesUploadPage: React.FC = () => {
               </NativeSelect.Root>
             </HStack>
             <Button
-              disabled={!filesToMove?.length}
+              disabled={!destination || !filesToMove?.length}
               recipe={buttonRecipe}
               onClick={handleSubmit(onSubmit)}
             >
               Move The images.
-            </Button>{' '}
+            </Button>
           </>
         )}
       </VStack>
