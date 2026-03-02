@@ -1,6 +1,6 @@
 import { IconButton, Image, Stack, Splitter } from '@chakra-ui/react'
 import { Link, Outlet } from 'react-router-dom'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { LuChevronLeft, LuMenu } from 'react-icons/lu'
 import Sidebar from '../Sidebar'
 import logo from '@renderer/assets/SiteAdmin.png'
@@ -9,6 +9,8 @@ const SIDEBAR_WIDTH_EXPANDED = 20
 const CONTENT_WIDTH_EXPANDED = 80
 const SIDEBAR_WIDTH_COLLAPSED = 5
 const CONTENT_WIDTH_COLLAPSED = 95
+
+const SIDEBAR_EXPANDED_CUTOFF_PIXELS = 170
 
 export default function SiteLayout(): React.JSX.Element {
   const [sidebarOpen, setSidebarOpen] = useState(true)
@@ -23,8 +25,22 @@ export default function SiteLayout(): React.JSX.Element {
     }
   }
 
+  const handleWindowResize = (): void => {
+    const sidebarWidthInPixels = (sizes[0] / 100) * window.innerWidth
+    if (sidebarWidthInPixels > SIDEBAR_EXPANDED_CUTOFF_PIXELS) {
+      setSidebarOpen(true)
+    } else {
+      setSidebarOpen(false)
+    }
+  }
+  useEffect(() => {
+    window.addEventListener('resize', handleWindowResize)
+    return () => window.removeEventListener('resize', handleWindowResize)
+  }, [sizes])
+
   const onResize = (details: Splitter.ResizeDetails): void => {
     setSizes(details.size)
+    //sizes are really percentages. Need to calculate sidebar width in pixels and check if it's greater than the cutoff pixels
     if (details.size[0] > SIDEBAR_WIDTH_EXPANDED / 2) {
       setSidebarOpen(true)
     } else {

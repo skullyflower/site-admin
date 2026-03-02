@@ -120,7 +120,7 @@ export const getGalleryImages = (galleryId): string => {
   const { pathToPublic } = getPaths()
   try {
     const galleriesJson = getGalleries()
-    const galleries = JSON.parse(galleriesJson)
+    const { galleries } = JSON.parse(galleriesJson)
     if (!Array.isArray(galleries)) {
       throw new Error('Cannot Get Galleries')
     }

@@ -166,28 +166,41 @@ const ImagesUploadPage: React.FC = () => {
                   {allImages &&
                     allImages.length > 0 &&
                     allImages.map((file, i) => (
-                      <VStack key={i} style={{ padding: '5px' }}>
-                        <Button
-                          recipe={buttonRecipe}
-                          size="sm"
-                          onClick={() => doDelete(`/temp/${file}`)}
-                        >
-                          delete
-                        </Button>
-                        <Image
-                          src={`http://localhost:3000/temp/${file}`}
-                          alt={file}
-                          width={75}
-                          style={{ verticalAlign: 'middle', padding: '0 10px' }}
-                        />
-                        <Checkbox.Root value={file}>
-                          <Checkbox.HiddenInput />
-                          <Checkbox.Control>
-                            <Checkbox.Indicator />
-                          </Checkbox.Control>
-                          <Checkbox.Label>{file}</Checkbox.Label>
-                        </Checkbox.Root>
-                      </VStack>
+                      <Box
+                        key={i}
+                        minW="200px"
+                        w={{ sm: '100%', md: '200px' }}
+                        backgroundColor="blackAlpha.200"
+                        p={2}
+                        m={2}
+                        borderRadius={4}
+                        _hover={{ background: 'blackAlpha.500' }}
+                        overflow="hidden"
+                      >
+                        <VStack gap={2}>
+                          <Image
+                            src={`http://localhost:3000/temp/${file}`}
+                            alt={file}
+                            width={75}
+                            style={{ verticalAlign: 'middle', padding: '0 10px' }}
+                          />
+
+                          <Checkbox.Root value={file} alignSelf="start">
+                            <Checkbox.HiddenInput />
+                            <Checkbox.Control>
+                              <Checkbox.Indicator />
+                            </Checkbox.Control>
+                            <Checkbox.Label>{file}</Checkbox.Label>
+                          </Checkbox.Root>
+                          <Button
+                            recipe={buttonRecipe}
+                            size="sm"
+                            onClick={() => doDelete(`/temp/${file}`)}
+                          >
+                            delete
+                          </Button>
+                        </VStack>
+                      </Box>
                     ))}
                 </HStack>
               </Checkbox.Group>

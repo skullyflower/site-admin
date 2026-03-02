@@ -1,4 +1,4 @@
-import { CloseButton, HStack, Image } from '@chakra-ui/react'
+import { Box, CloseButton, HStack, Image } from '@chakra-ui/react'
 
 const PreviewImage = ({
   image,
@@ -8,10 +8,26 @@ const PreviewImage = ({
   deleteImage: (image: string) => void
 }): React.ReactNode => {
   return (
-    <HStack align={'start'}>
-      <Image className="image" src={image} alt={'Image'} width={150} style={{ padding: '10px' }} />
-      <CloseButton size={'sm'} onClick={() => deleteImage(image)} />
-    </HStack>
+    <Box
+      minW="200px"
+      w={{ sm: '100%', md: '200px' }}
+      backgroundColor="blackAlpha.200"
+      p={2}
+      m={2}
+      borderRadius={4}
+      _hover={{ background: 'blackAlpha.500' }}
+    >
+      <HStack align={'start'}>
+        <Image
+          className="image"
+          src={image}
+          alt={'Image'}
+          width={150}
+          style={{ padding: '10px' }}
+        />
+        <CloseButton size={'sm'} onClick={() => deleteImage(image)} />
+      </HStack>
+    </Box>
   )
 }
 

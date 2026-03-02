@@ -19,7 +19,7 @@ const colors = {
     600: { value: '#6FAC20' },
     700: { value: '#538118' },
     800: { value: '#375610' },
-    900: { value: '#1C2B08' }
+    900: { value: '#152106' }
   },
   orange: {
     50: { value: '#FFEFE6' },
