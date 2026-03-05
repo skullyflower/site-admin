@@ -62,7 +62,7 @@ const SideBar = ({ minimized }: { minimized?: boolean }): React.ReactNode => {
     <Stack
       direction="column"
       className="sidebar"
-      justifyContent={'start'}
+      justify="start"
       alignItems="stretch"
       gap={2}
       width="100%"

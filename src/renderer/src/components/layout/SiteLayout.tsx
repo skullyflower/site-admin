@@ -74,17 +74,18 @@ export default function SiteLayout(): React.JSX.Element {
       onResize={onResize}
       minH="100"
     >
-      <Splitter.Panel id="sidebar">
+      <Splitter.Panel id="sidebar" minW="20px">
         <Stack
           direction="column"
           align="center"
           justify="start"
+          justifyContent="start"
           gap={1}
           paddingTop={2}
           height={'98vh'}
           overflowY={'auto'}
         >
-          <Link to="/" style={{ flex: 1, minWidth: '20px', display: 'block' }}>
+          <Link to="/" style={{ minWidth: '20px', display: 'block' }}>
             <Image src={logo} className="App-logo" alt="WebSite Config" maxW="120px" w="100%" />
           </Link>
           <IconButton aria-label="Toggle sidebar" size="sm" variant="ghost" onClick={toggleSidebar}>
