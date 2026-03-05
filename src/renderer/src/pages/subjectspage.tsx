@@ -113,35 +113,34 @@ const SubjectsPage = (): React.JSX.Element => {
           )}
           <Stack>
             {subjects?.map((cat) => (
-              <HStack
-                key={cat.id}
-                p={5}
-                border="1px solid"
-                borderRadius={5}
-                w="100%"
-                alignItems="start"
-                justifyContent="space-between"
-              >
-                <Stack>
-                  <Heading size="sm" lineHeight={2}>
-                    {cat.name}
-                  </Heading>
-                  <SemiSafeContent rawContent={cat.description} />
-                </Stack>
-                <HStack gap={4}>
-                  <Button variant="ghost" size="sm" value={cat.id} onClick={() => doDelete(cat.id)}>
-                    X
-                  </Button>
-                  <Button
-                    recipe={buttonRecipe}
-                    size="sm"
-                    value={cat.id}
-                    onClick={() => toggleSubjectForm(cat.id)}
-                  >
-                    Edit
-                  </Button>
+              <Box key={cat.id} p={5} border="1px solid" borderRadius={5} w="100%">
+                <HStack justifyContent="space-between">
+                  <Stack>
+                    <Heading size="sm" lineHeight={2}>
+                      {cat.name}
+                    </Heading>
+                    <SemiSafeContent rawContent={cat.description} />
+                  </Stack>
+                  <HStack gap={4}>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      value={cat.id}
+                      onClick={() => doDelete(cat.id)}
+                    >
+                      X
+                    </Button>
+                    <Button
+                      recipe={buttonRecipe}
+                      size="sm"
+                      value={cat.id}
+                      onClick={() => toggleSubjectForm(cat.id)}
+                    >
+                      Edit
+                    </Button>
+                  </HStack>
                 </HStack>
-              </HStack>
+              </Box>
             ))}
             <Center>
               <Button

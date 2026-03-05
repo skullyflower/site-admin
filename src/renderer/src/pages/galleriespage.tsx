@@ -8,7 +8,6 @@ import EditGallery from '../forms/galleryeditor'
 import PageLayout from '../components/layout/PageLayout'
 import { GalleryInfo, GalleryImage, GalleryResponse } from 'src/shared/types'
 import { buttonRecipe } from '@renderer/themeRecipes'
-import FormContainer from '@renderer/components/formcontainer'
 
 export const newGalleryId = 'new-gallery'
 
@@ -225,16 +224,14 @@ const GalleryPage: React.FC = () => {
           </Stack>
         )}
         {activeGallery && (
-          <FormContainer>
-            <EditGallery
-              selectedGallery={activeGallery}
-              toggleForm={() => {
-                setActiveGallery(null)
-                toggleShowAdd()
-              }}
-              isOpen={showAddEdit}
-            />
-          </FormContainer>
+          <EditGallery
+            selectedGallery={activeGallery}
+            toggleForm={() => {
+              setActiveGallery(null)
+              toggleShowAdd()
+            }}
+            isOpen={showAddEdit}
+          />
         )}
       </Stack>
     </PageLayout>

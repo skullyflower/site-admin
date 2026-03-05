@@ -104,43 +104,44 @@ const CategoriesPage = (): React.JSX.Element => {
           )}
           <Stack>
             {categories?.map((cat) => (
-              <HStack
-                key={cat.id}
-                p={5}
-                border="1px solid"
-                borderRadius={5}
-                w="100%"
-                alignItems="start"
-                justifyContent="space-between"
-              >
-                <Image
-                  src={`http://localhost:3000/${cat.img}`}
-                  boxSize="75px"
-                  alt={`${cat.name} - http://localhost:3000/${cat.img}`}
-                  onError={(e) => {
-                    e.currentTarget.src = imageLoading
-                  }}
-                />
-                <Stack>
-                  <Heading size="sm" lineHeight={2}>
-                    {cat.name}
-                  </Heading>
-                  <SemiSafeContent rawContent={cat.description} />
-                </Stack>
-                <HStack gap={4}>
-                  <Button variant="ghost" size="sm" value={cat.id} onClick={() => doDelete(cat.id)}>
-                    X
-                  </Button>
-                  <Button
-                    recipe={buttonRecipe}
-                    size="sm"
-                    value={cat.id}
-                    onClick={() => toggleCatForm(cat.id)}
-                  >
-                    Edit
-                  </Button>
+              <Box key={cat.id} p={5} border="1px solid" borderRadius={5} w="100%">
+                <HStack justifyContent="space-between">
+                  <HStack alignItems="start" justify="start">
+                    <Image
+                      src={`http://localhost:3000/${cat.img}`}
+                      boxSize="75px"
+                      alt={`${cat.name} - http://localhost:3000/${cat.img}`}
+                      onError={(e) => {
+                        e.currentTarget.src = imageLoading
+                      }}
+                    />
+                    <Stack>
+                      <Heading size="sm" lineHeight={2}>
+                        {cat.name}
+                      </Heading>
+                      <SemiSafeContent rawContent={cat.description} />
+                    </Stack>
+                  </HStack>
+                  <HStack gap={4}>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      value={cat.id}
+                      onClick={() => doDelete(cat.id)}
+                    >
+                      X
+                    </Button>
+                    <Button
+                      recipe={buttonRecipe}
+                      size="sm"
+                      value={cat.id}
+                      onClick={() => toggleCatForm(cat.id)}
+                    >
+                      Edit
+                    </Button>
+                  </HStack>
                 </HStack>
-              </HStack>
+              </Box>
             ))}
             <Center>
               <Button recipe={buttonRecipe} value="newcat" onClick={() => toggleCatForm(null)}>

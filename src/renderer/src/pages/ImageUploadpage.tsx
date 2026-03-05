@@ -165,7 +165,7 @@ const ImagesUploadPage: React.FC = () => {
                 value={filesToMove}
                 onValueChange={(value: string[]) => setValue('filesToMove', value)}
               >
-                <HStack maxW="1000px" alignItems="stretch" wrap="wrap">
+                <HStack alignItems="stretch" justifyContent="space-evenly" wrap="wrap">
                   {allImages &&
                     allImages.length > 0 &&
                     allImages.map((file, i) => (
@@ -183,6 +183,7 @@ const ImagesUploadPage: React.FC = () => {
                       >
                         <VStack
                           justifyContent="space-between"
+                          alignItems="center"
                           height="100%"
                           maxW="190px"
                           overflow="auto"

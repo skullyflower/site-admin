@@ -1,9 +1,10 @@
-import { IconButton, Image, Stack, Splitter } from '@chakra-ui/react'
+import { IconButton, Image, Stack, Splitter, Heading } from '@chakra-ui/react'
 import { Link, Outlet } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import { LuChevronLeft, LuMenu } from 'react-icons/lu'
 import Sidebar from '../Sidebar'
 import logo from '@renderer/assets/SiteAdmin.png'
+import { AdminConfig } from 'src/shared/types'
 
 const SIDEBAR_WIDTH_EXPANDED = 20
 const CONTENT_WIDTH_EXPANDED = 80
@@ -12,9 +13,21 @@ const CONTENT_WIDTH_COLLAPSED = 95
 
 const SIDEBAR_EXPANDED_CUTOFF_PIXELS = 170
 
+const getAdminConfig = async (
+  setAdminConfig: (adminConfig: AdminConfig) => void
+): Promise<void> => {
+  const response = await window.api.getAdminConfig()
+  setAdminConfig(response as AdminConfig)
+}
+
 export default function SiteLayout(): React.JSX.Element {
   const [sidebarOpen, setSidebarOpen] = useState(true)
+  const [adminConfig, setAdminConfig] = useState<AdminConfig | null>(null)
   const [sizes, setSizes] = useState([SIDEBAR_WIDTH_EXPANDED, CONTENT_WIDTH_EXPANDED])
+
+  useEffect(() => {
+    getAdminConfig(setAdminConfig)
+  }, [setAdminConfig])
 
   const toggleSidebar = (): void => {
     setSidebarOpen(!sidebarOpen)
@@ -36,6 +49,7 @@ export default function SiteLayout(): React.JSX.Element {
   useEffect(() => {
     window.addEventListener('resize', handleWindowResize)
     return () => window.removeEventListener('resize', handleWindowResize)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sizes])
 
   const onResize = (details: Splitter.ResizeDetails): void => {
@@ -61,7 +75,15 @@ export default function SiteLayout(): React.JSX.Element {
       minH="100"
     >
       <Splitter.Panel id="sidebar">
-        <Stack direction="column" align="center" justify="start" gap={1} paddingTop={2}>
+        <Stack
+          direction="column"
+          align="center"
+          justify="start"
+          gap={1}
+          paddingTop={2}
+          height={'98vh'}
+          overflowY={'auto'}
+        >
           <Link to="/" style={{ flex: 1, minWidth: '20px', display: 'block' }}>
             <Image src={logo} className="App-logo" alt="WebSite Config" maxW="120px" w="100%" />
           </Link>
@@ -73,6 +95,9 @@ export default function SiteLayout(): React.JSX.Element {
       </Splitter.Panel>
       <Splitter.ResizeTrigger id="sidebar:content" />
       <Splitter.Panel id="content">
+        <Heading size="lg" textAlign="center" p={2}>
+          Editing: {adminConfig?.pathToSite}
+        </Heading>
         <Outlet />
       </Splitter.Panel>
     </Splitter.Root>

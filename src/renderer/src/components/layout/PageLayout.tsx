@@ -41,7 +41,7 @@ const PageLayout = ({
       color="slate.100"
       w={'auto'}
       maxW={'98%'}
-      height={'98vh'}
+      height={'88vh'}
       overflowY={'auto'}
       marginInline={'auto'}
     >
