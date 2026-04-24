@@ -1,7 +1,8 @@
-import { Button, HStack, Image, useDisclosure, Stack, IconButton } from '@chakra-ui/react'
+import { HStack, Image, useDisclosure, Stack, IconButton } from '@chakra-ui/react'
 import ConfirmDelete from './ConfirmDelete'
 import { RiDeleteBin6Line } from 'react-icons/ri'
 import { buttonRecipe } from '@renderer/themeRecipes'
+import { PencilIcon, CopyIcon } from '@phosphor-icons/react'
 
 interface OneProductProps {
   product: {
@@ -53,29 +54,32 @@ const OneProduct = ({ product, toggleForm, doDelete }: OneProductProps): React.R
           aria-label="Delete product"
           aria-labelledby="Delete product"
           size="sm"
+          padding={2}
           recipe={buttonRecipe}
           value={product.id}
           onClick={onOpen}
         >
           <RiDeleteBin6Line />
         </IconButton>
-        <Button
+        <IconButton
           size="sm"
+          padding={2}
           recipe={buttonRecipe}
           value={product.id}
           onClick={() => toggleForm(product.id)}
         >
-          Edit
-        </Button>
-        <Button
+          <PencilIcon />
+        </IconButton>
+        <IconButton
           size="sm"
+          padding={2}
           recipe={buttonRecipe}
           name="copy"
           value={product.id}
           onClick={() => toggleForm(`${product.id}-copy`)}
         >
-          copy
-        </Button>
+          <CopyIcon />
+        </IconButton>
       </HStack>
       <ConfirmDelete what={product.name} action={doDelete} onClose={onClose} isOpen={open} />
     </HStack>

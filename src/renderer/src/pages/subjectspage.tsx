@@ -1,11 +1,12 @@
 import { useCallback, useEffect, useState } from 'react'
-import { Box, Button, Center, HStack, Heading, Skeleton, Stack } from '@chakra-ui/react'
+import { Box, Button, Center, HStack, Heading, IconButton, Skeleton, Stack } from '@chakra-ui/react'
 import { Subject } from 'src/shared/types'
 import EditSubject from '../forms/subjectseditor'
 import PageLayout from '../components/layout/PageLayout'
 import { buttonRecipe } from '@renderer/themeRecipes'
 import SemiSafeContent from '../components/SemiSafeContent'
 import FormContainer from '@renderer/components/formcontainer'
+import { PencilIcon, TrashIcon } from '@phosphor-icons/react'
 
 const getSubjects = (
   setSubjects: (subjects: Subject[]) => void,
@@ -118,23 +119,27 @@ const SubjectsPage = (): React.JSX.Element => {
                     </Heading>
                     <SemiSafeContent rawContent={cat.description} />
                   </Stack>
-                  <HStack gap={4}>
-                    <Button
-                      variant="ghost"
+                  <HStack gap={2}>
+                    <IconButton
+                      aria-label="Delete subject"
                       size="sm"
+                      padding={2}
+                      recipe={buttonRecipe}
                       value={cat.id}
                       onClick={() => doDelete(cat.id)}
                     >
-                      X
-                    </Button>
-                    <Button
-                      recipe={buttonRecipe}
+                      <TrashIcon />
+                    </IconButton>
+                    <IconButton
+                      aria-label="Edit subject"
                       size="sm"
+                      padding={2}
+                      recipe={buttonRecipe}
                       value={cat.id}
                       onClick={() => toggleSubjectForm(cat.id)}
                     >
-                      Edit
-                    </Button>
+                      <PencilIcon />
+                    </IconButton>
                   </HStack>
                 </HStack>
               </Box>

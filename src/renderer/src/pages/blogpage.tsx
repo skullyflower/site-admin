@@ -1,12 +1,13 @@
 import { useCallback, useEffect, useState } from 'react'
 import EditBlogEntry from '../forms/blogentryeditor'
 import EditBlogData from '../forms/blogdataeditor'
-import { Box, Button, HStack, Heading, Image, Stack } from '@chakra-ui/react'
+import { Box, IconButton, HStack, Heading, Image, Stack } from '@chakra-ui/react'
 import PageLayout from '../components/layout/PageLayout'
 import { buttonRecipe } from '@renderer/themeRecipes/button.recipe'
 import { BlogEntry, BlogInfo, SiteInfo } from 'src/shared/types'
 import FormContainer from '../components/formcontainer'
 import { convertDate } from '@renderer/components/datetimebit'
+import { PencilIcon, TrashIcon } from '@phosphor-icons/react'
 
 const getSiteInfo = async (setSiteData: (siteData: SiteInfo) => void): Promise<void> => {
   const response = await window.api.getSiteInfo()
@@ -171,23 +172,27 @@ const BlogPage = (): React.JSX.Element => {
                             <p>{blog.date}</p>
                           </div>
                         </Stack>
-                        <HStack gap={4}>
-                          <Button
+                        <HStack gap={2}>
+                          <IconButton
+                            aria-label="Delete blog entry"
+                            aria-labelledby="Delete blog entry"
+                            padding={2}
                             size="sm"
                             recipe={buttonRecipe}
                             value={blog.id}
                             onClick={doDelete}
                           >
-                            X
-                          </Button>
-                          <Button
+                            <TrashIcon />
+                          </IconButton>
+                          <IconButton
                             size="sm"
                             recipe={buttonRecipe}
+                            padding={2}
                             value={blog.id}
                             onClick={() => toggleForm(blog)}
                           >
-                            Edit
-                          </Button>
+                            <PencilIcon />
+                          </IconButton>
                         </HStack>
                       </HStack>
                     )
