@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Button, HStack, Heading, Skeleton, Stack } from '@chakra-ui/react'
 import PageLayout from '../components/layout/PageLayout'
-import { ApiMessageResponse, PageInfo } from 'src/shared/types'
+import { PageInfo } from 'src/shared/types'
 import FormContainer from '@renderer/components/formcontainer'
 import PageForm from '@renderer/forms/contentpageeditor'
 
@@ -13,16 +13,16 @@ const getPages = (
   setLoading(true)
   window.api
     .getPages()
-    .then((response: ApiMessageResponse | string[]) => {
-      if ((response as ApiMessageResponse).message) {
-        setMessages((response as ApiMessageResponse).message)
+    .then((response) => {
+      if (!response.success) {
+        setMessages(response.message || '')
       } else {
-        setPagesData(response as string[])
+        setPagesData(response.data || [])
       }
       setLoading(false)
     })
     .catch((err) => {
-      setMessages((err as ApiMessageResponse).message || "Couldn't get page data.")
+      setMessages((err as Error).message || "Couldn't get page data.")
     })
   setLoading(false)
 }
@@ -37,15 +37,15 @@ export default function PageContent(): React.JSX.Element {
     if (!pagesData && !messages) {
       window.api
         .getPages()
-        .then((response: ApiMessageResponse | string[]) => {
-          if ((response as ApiMessageResponse).message) {
-            setMessages((response as ApiMessageResponse).message)
+        .then((response) => {
+          if (!response.success) {
+            setMessages(response.message || '')
           } else {
-            setPagesData(response as string[])
+            setPagesData(response.data || [])
           }
         })
         .catch((err) => {
-          setMessages((err as ApiMessageResponse).message || "Couldn't get page data.")
+          setMessages((err as Error).message || "Couldn't get page data.")
         })
         .finally(() => setLoading(false))
     }
@@ -60,12 +60,9 @@ export default function PageContent(): React.JSX.Element {
     setLoading(true)
     window.api
       .updatePage(pageId, values)
-      .then((response: ApiMessageResponse | PageInfo) => {
-        if ((response as ApiMessageResponse).message) {
-          setMessages((response as ApiMessageResponse).message)
-        } else {
-          setActivePage(null)
-        }
+      .then((response) => {
+        setMessages(response.message || '')
+        if (response.success) setActivePage(null)
         getPages(setLoading, setMessages, setPagesData)
       })
       .catch((err: Error) => {
@@ -76,11 +73,11 @@ export default function PageContent(): React.JSX.Element {
   const onPageClick = (pageId: string): void => {
     window.api
       .getPage(pageId)
-      .then((response: ApiMessageResponse | PageInfo) => {
-        if ((response as ApiMessageResponse).message) {
-          setMessages((response as ApiMessageResponse).message)
+      .then((response) => {
+        if (!response.success) {
+          setMessages(response.message || '')
         } else {
-          setActivePage(response as PageInfo)
+          setActivePage(response.data || null)
         }
       })
       .catch((err: Error) => {

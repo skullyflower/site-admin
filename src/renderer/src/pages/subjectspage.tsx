@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import { Box, Button, Center, HStack, Heading, Skeleton, Stack } from '@chakra-ui/react'
-import { ApiMessageResponse, Subject } from 'src/shared/types'
+import { Subject } from 'src/shared/types'
 import EditSubject from '../forms/subjectseditor'
 import PageLayout from '../components/layout/PageLayout'
 import { buttonRecipe } from '@renderer/themeRecipes'
@@ -16,19 +16,11 @@ const getSubjects = (
   setSubjects([])
   window.api
     .getSubjects()
-    .then((response: ApiMessageResponse | Subject[]) => {
-      if (typeof response === 'object' && 'message' in response) {
-        console.log('message', response.message)
-        setSubjects([])
-      } else if (
-        typeof response === 'object' &&
-        'subjects' in response &&
-        Array.isArray(response.subjects)
-      ) {
-        setSubjects(
-          response.subjects.sort((a: Subject, b: Subject) => a.name.localeCompare(b.name))
-        )
+    .then((response) => {
+      if (response.success && Array.isArray(response.data)) {
+        setSubjects(response.data.sort((a: Subject, b: Subject) => a.name.localeCompare(b.name)))
       } else {
+        if (!response.success) console.log('message', response.message)
         setSubjects([])
       }
       setLoading(false)
@@ -49,12 +41,9 @@ const SubjectsPage = (): React.JSX.Element => {
     setLoading(true)
     window.api
       .updateSubject(values)
-      .then((response: ApiMessageResponse | Subject[]) => {
-        if (Array.isArray(response)) {
-          setSubjects(response)
-        } else {
-          setMessages(response.message as string)
-        }
+      .then((response) => {
+        setMessages(response.message || '')
+        if (response.success) getSubjects(setSubjects, setMessages, setLoading)
       })
       .catch((err: Error) => {
         setMessages(err.message || "Couldn't update subjects.")
@@ -65,8 +54,8 @@ const SubjectsPage = (): React.JSX.Element => {
     if (window.confirm('Are you sure you want to do this?')) {
       window.api
         .deleteSubject(catid)
-        .then((response: ApiMessageResponse) => {
-          setMessages(response.message as string)
+        .then((response) => {
+          setMessages(response.message || '')
           getSubjects(setSubjects, setMessages, setLoading)
         })
         .catch((err: Error) => {

@@ -1,8 +1,9 @@
 import { existsSync, readdirSync, readFileSync, unlinkSync, writeFileSync } from 'fs'
 import getPathsFromConfig, { checkFile } from '../utilities/pathData'
-import { ApiMessageResponse, PageInfo } from '../../shared/types'
+import { PageInfo } from '../../shared/types'
 import { moveImages } from './imagesRouter'
 import { join } from 'path'
+import { ok, okMessage, fail } from '../utilities/apiResponse'
 
 const getPaths = (): { rootdir: string } => {
   const { pathToPublic } = getPathsFromConfig()
@@ -38,19 +39,18 @@ const updatePagesData = (): void => {
 export const getPages = (): string => {
   const pageFiles = getPageFiles()
   const pages = pageFiles.map((file) => file.replace('-page.json', ''))
-
-  return JSON.stringify(pages || [])
+  return JSON.stringify(ok(pages || []))
 }
 
-export const getPage = (pageId: string): PageInfo | string => {
+export const getPage = (pageId: string): string => {
   const { rootdir } = getPaths()
   const pagefilepath = `${rootdir}/${pageId}-page.json`
   checkFile(pagefilepath, { page_title: '', page_description: '', page_content: '' })
   const pageDataJson = readFileSync(pagefilepath, 'utf8')
   if (pageDataJson) {
-    return pageDataJson
+    return JSON.stringify(ok(JSON.parse(pageDataJson) as PageInfo))
   }
-  return JSON.stringify({ message: 'Page not found.' })
+  return JSON.stringify(fail('Page not found.'))
 }
 
 export const updatePage = (page, body): string => {
@@ -72,13 +72,13 @@ export const updatePage = (page, body): string => {
       const newpageData = { ...oldpageObject, ...body }
       writeFileSync(pagefilepath, JSON.stringify(newpageData))
       updatePagesData()
-      return JSON.stringify({ message: 'Updated page!' })
+      return JSON.stringify(okMessage('Updated page!'))
     } catch (err) {
       console.log(err)
-      return JSON.stringify({ message: 'page update failed.' })
+      return JSON.stringify(fail('page update failed.'))
     }
   } else {
-    return JSON.stringify({ message: 'You must fill out all fields.' })
+    return JSON.stringify(fail('You must fill out all fields.'))
   }
 }
 
@@ -94,7 +94,7 @@ export const createPage = (pageId: string): string => {
   }
   writeFileSync(pagefilepath, JSON.stringify(pageData))
   updatePagesData()
-  return JSON.stringify({ message: 'Page created!' } as ApiMessageResponse)
+  return JSON.stringify(okMessage('Page created!'))
 }
 
 export const deletePage = (pageId: string): string => {
@@ -103,9 +103,9 @@ export const deletePage = (pageId: string): string => {
   if (existsSync(pagefilepath)) {
     unlinkSync(pagefilepath)
     updatePagesData()
-    return JSON.stringify({ message: 'Page deleted!' })
+    return JSON.stringify(okMessage('Page deleted!'))
   } else {
-    return JSON.stringify({ message: 'Page not found.' })
+    return JSON.stringify(fail('Page not found.'))
   }
 }
 //TODO get list of pages, create pages, delete pages as well as get and set page. I think this could be easily achieved with a pages subdirectory in data/

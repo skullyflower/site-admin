@@ -1,5 +1,6 @@
 import fs from 'fs'
 import getPathsFromConfig, { checkFile } from '../utilities/pathData'
+import { ok, okMessage, fail } from '../utilities/apiResponse'
 
 const getPaths = (): { pathToPublic: string; shopfilepath: string } => {
   const { pathToPublic } = getPathsFromConfig()
@@ -16,13 +17,13 @@ export const setSale = (sale): string => {
       const oldShopObject = JSON.parse(oldShopDataString)
       const newShopData = { ...oldShopObject, sale: Number(sale) }
       fs.writeFileSync(shopfilepath, JSON.stringify(newShopData))
-      return JSON.stringify({ message: 'Updated Sale!' })
+      return JSON.stringify(okMessage('Updated Sale!'))
     } catch (err) {
       console.log(err)
-      return JSON.stringify({ message: 'Sale update failed.' })
+      return JSON.stringify(fail('Sale update failed.'))
     }
   } else {
-    return JSON.stringify({ message: 'You must fill out all fields.' })
+    return JSON.stringify(fail('You must fill out all fields.'))
   }
 }
 
@@ -31,5 +32,5 @@ export const getSale = (): string => {
   checkFile(shopfilepath, { sale: 0 })
   const shopData = fs.readFileSync(shopfilepath, 'utf8')
   const shop = JSON.parse(shopData)
-  return JSON.stringify({ sale: shop.sale })
+  return JSON.stringify(ok({ sale: shop.sale }))
 }

@@ -3,76 +3,71 @@ import {
   AdminConfig,
   BlogInfo,
   BlogEntry,
-  BlogResponse,
   SiteInfo,
-  ApiMessageResponse,
-  GalleryImage,
-  GalleryResponse
+  ApiResponse,
+  GalleryImages,
+  GalleryInfo,
+  ProductType,
+  Subject,
+  CategoryType,
+  PageInfo
 } from '../shared/types'
 
+export interface ProcessedImage {
+  relativeUrl: string
+  filename: string
+}
+
 export interface Api {
-  getAdminConfig: () => Promise<ApiMessageResponse | AdminConfig>
-  setAdminConfig: (config: AdminConfig) => Promise<ApiMessageResponse>
+  getAdminConfig: () => Promise<ApiResponse<AdminConfig>>
+  setAdminConfig: (config: AdminConfig) => Promise<ApiResponse>
   selectSiteDirectory: () => Promise<string[] | undefined>
-  getSiteInfo: () => Promise<ApiMessageResponse | SiteInfo>
-  getBlogEntries: () => Promise<ApiMessageResponse | BlogResponse>
-  updateSiteInfo: (values: SiteInfo) => Promise<ApiMessageResponse>
+  getSiteInfo: () => Promise<ApiResponse<SiteInfo>>
+  updateSiteInfo: (values: SiteInfo) => Promise<ApiResponse>
   // Content Page API functions
-  getPages: () => Promise<ApiMessageResponse | string[]>
-  getPage: (pageId: string) => Promise<ApiMessageResponse | PageInfo>
-  updatePage: (pageId: string, values: PageInfo) => Promise<ApiMessageResponse>
-  createPage: (pageId: string) => Promise<ApiMessageResponse>
-  deletePage: (pageId: string) => Promise<ApiMessageResponse>
+  getPages: () => Promise<ApiResponse<string[]>>
+  getPage: (pageId: string) => Promise<ApiResponse<PageInfo>>
+  updatePage: (pageId: string, values: PageInfo) => Promise<ApiResponse>
+  createPage: (pageId: string) => Promise<ApiResponse>
+  deletePage: (pageId: string) => Promise<ApiResponse>
   // Blog API functions
-  updateBlogInfo: (values: BlogInfo) => Promise<ApiMessageResponse>
-  updateBlogPost: (entry: BlogEntry, files: FileList | []) => Promise<ApiMessageResponse>
-  submitBlogEntry: (id: string, formData: FormData) => Promise<ApiMessageResponse>
-  deleteBlogEntry: (id: string) => Promise<ApiMessageResponse>
-
+  getBlogEntries: () => Promise<ApiResponse<BlogInfo>>
+  updateBlogInfo: (values: BlogInfo) => Promise<ApiResponse>
+  updateBlogPost: (entry: BlogEntry, files: FileList | []) => Promise<ApiResponse>
+  deleteBlogEntry: (id: string) => Promise<ApiResponse>
   // Shop API functions
-  getProducts: () => Promise<ApiMessageResponse | ProductResponse>
-  updateProduct: (product: Product) => Promise<ApiMessageResponse>
-  deleteProduct: (prodid: string) => Promise<ApiMessageResponse>
-  getSubjects: () => Promise<ApiMessageResponse | SubjectResponse>
-  updateSubject: (subject: Subject) => Promise<ApiMessageResponse>
-  deleteSubject: (subjectid: string) => Promise<ApiMessageResponse>
-  getCategories: () => Promise<ApiMessageResponse | CategoryResponse>
-  updateCategory: (category: Category) => Promise<ApiMessageResponse>
-  deleteCategory: (catid: string) => Promise<ApiMessageResponse>
-  getSale: () => Promise<ApiMessageResponse | number>
-  setSale: (sale: number) => Promise<ApiMessageResponse>
-
+  getProducts: () => Promise<ApiResponse<ProductType[]>>
+  updateProduct: (product: ProductType) => Promise<ApiResponse>
+  deleteProduct: (prodid: string) => Promise<ApiResponse>
+  getSubjects: () => Promise<ApiResponse<Subject[]>>
+  updateSubject: (subject: Subject) => Promise<ApiResponse>
+  deleteSubject: (subjectid: string) => Promise<ApiResponse>
+  getCategories: () => Promise<ApiResponse<CategoryType[]>>
+  updateCategory: (category: CategoryType) => Promise<ApiResponse>
+  deleteCategory: (catid: string) => Promise<ApiResponse>
+  getSale: () => Promise<ApiResponse<{ sale: number }>>
+  setSale: (sale: number) => Promise<ApiResponse>
   // Gallery API functions
-  getGalleries: () => Promise<ApiMessageResponse | GalleryResponse>
-  getGalleryImages: (gallery_id: string) => Promise<ApiMessageResponse | GalleryImage[]>
-  updateGallery: (gallery: Gallery) => Promise<ApiMessageResponse>
-  resetGallery: (galleryId: string) => Promise<ApiMessageResponse | GalleryImage[]>
+  getGalleries: () => Promise<ApiResponse<GalleryInfo[]>>
+  getGalleryImages: (gallery_id: string) => Promise<ApiResponse<GalleryImages>>
+  updateGallery: (gallery: GalleryInfo) => Promise<ApiResponse>
+  resetGallery: (galleryId: string) => Promise<ApiResponse<GalleryImages>>
   // Image API functions
-  getImageFolders: () => Promise<ApiMessageResponse | string[]>
-  // Returns list of image paths in temp directory - waiting for final destination.
-  getStagedImages: () => Promise<string[]>
-  // not sure what this for yet
-  getPreviewImages: (files: File[]) => Promise<string[]>
-  // this is more of a move image function because the files are on the same computer.
+  getImageFolders: () => Promise<ApiResponse<string[]>>
+  getStagedImages: () => Promise<ApiResponse<string[]>>
+  getPreviewImages: (files: File[]) => Promise<ApiResponse<string[]>>
   uploadImage: (
     filePath: string,
     destination?: string
-  ) => Promise<{ relativeUrl: string; filename: string; message?: string; error?: string }>
-  uploadImages: (
-    files: string[],
-    destination: string
-  ) => Promise<{ messages: string; filePaths: string[] }>
+  ) => Promise<ApiResponse<{ relativeUrl: string; filename: string }>>
+  uploadImages: (files: string[], destination: string) => Promise<ApiResponse<ProcessedImage[]>>
   processUploadedImages: (
     fileDataArray: File[]
-  ) => Promise<{ previewUrls: string[]; filePaths: string[]; message: string }>
-  // this one moves staged images to a new location.
-  moveImages: (filesToMove: string[], destination: string) => Promise<ApiMessageResponse>
-  // this one renames an image.
-  renameImage: (imageurl: string, newname: string) => Promise<ApiMessageResponse>
-  // this one deletes an image.
-  deleteImage: (imageurl: string) => Promise<ApiMessageResponse>
-  // this one gets the images in a folder for a category.
-  getFolderImages: (toplevel: string) => Promise<ApiMessageResponse | string[]>
+  ) => Promise<ApiResponse<{ previewUrls: string[]; filePaths: string[] }>>
+  moveImages: (filesToMove: string[], destination: string) => Promise<ApiResponse>
+  renameImage: (imageurl: string, newname: string) => Promise<ApiResponse>
+  deleteImage: (imageurl: string) => Promise<ApiResponse>
+  getFolderImages: (toplevel: string) => Promise<ApiResponse<string[]>>
 }
 
 declare global {

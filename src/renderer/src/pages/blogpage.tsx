@@ -5,15 +5,13 @@ import { Box, Button, HStack, Heading, Image, Stack } from '@chakra-ui/react'
 import PageLayout from '../components/layout/PageLayout'
 import { buttonRecipe } from '@renderer/themeRecipes/button.recipe'
 import { BlogEntry, BlogInfo, SiteInfo } from 'src/shared/types'
-import { ApiMessageResponse, BlogResponse } from 'src/shared/types'
 import FormContainer from '../components/formcontainer'
 import { convertDate } from '@renderer/components/datetimebit'
 
 const getSiteInfo = async (setSiteData: (siteData: SiteInfo) => void): Promise<void> => {
   const response = await window.api.getSiteInfo()
-
-  if ((response as SiteInfo).page_title) {
-    setSiteData(response as SiteInfo)
+  if (response.success && response.data?.page_title) {
+    setSiteData(response.data)
   }
 }
 
@@ -23,19 +21,18 @@ const getBlogEntries = async (
   setBlogInfo: (info: BlogInfo) => void
 ): Promise<void> => {
   try {
-    const json = (await window.api.getBlogEntries()) as ApiMessageResponse | BlogResponse
-    const info = json as BlogInfo
-    setBlogInfo(info)
-    setBlogEntries(info.entries)
+    const json = await window.api.getBlogEntries()
+    if (json.success && json.data) {
+      setBlogInfo(json.data)
+      setBlogEntries(json.data.entries)
+    } else {
+      setMessages(json.message || "Couldn't get blog entries.")
+      setBlogEntries([])
+    }
   } catch (error) {
-    setMessages(((error as ApiMessageResponse).message as string) || "Couldn't get blog entries.")
+    setMessages("Couldn't get blog entries.")
     setBlogEntries([])
-    setBlogInfo({
-      page_title: '',
-      page_description: '',
-      page_content: '',
-      entries: []
-    })
+    setBlogInfo({ page_title: '', page_description: '', page_content: '', entries: [] })
   }
 }
 
@@ -68,9 +65,9 @@ const BlogPage = (): React.JSX.Element => {
     setMessages(null as unknown as string)
     try {
       const json = await window.api.updateBlogInfo(values)
-      setMessages((json as ApiMessageResponse).message as string)
+      setMessages(json.message || '')
     } catch (err) {
-      setMessages(((err as ApiMessageResponse).message as string) || 'There was a problem.')
+      setMessages((err as Error).message || 'There was a problem.')
     } finally {
       getBlogEntries(setBlogEntries, setMessages, setBlogInfo)
     }
@@ -79,11 +76,11 @@ const BlogPage = (): React.JSX.Element => {
   const onSubmit = async (values: BlogEntry): Promise<void> => {
     try {
       const json = await window.api.updateBlogPost(values, [])
-      setMessages((json as ApiMessageResponse).message as string)
+      setMessages(json.message || '')
       getBlogEntries(setBlogEntries, setMessages, setBlogInfo)
       toggleForm(null)
     } catch (err) {
-      setMessages((err as ApiMessageResponse).message || 'there was a problem.')
+      setMessages((err as Error).message || 'there was a problem.')
     }
   }
   const doDelete = useCallback(async (e) => {
@@ -91,11 +88,11 @@ const BlogPage = (): React.JSX.Element => {
       const blogid = e?.target?.value
       try {
         const json = await window.api.deleteBlogEntry(blogid)
-        setMessages(json.message)
+        setMessages(json.message || '')
         getBlogEntries(setBlogEntries, setMessages, setBlogInfo)
       } catch (err) {
         setMessages(
-          (err as ApiMessageResponse).message || 'There was a problem deleting the entry.'
+          (err as Error).message || 'There was a problem deleting the entry.'
         )
       }
     }

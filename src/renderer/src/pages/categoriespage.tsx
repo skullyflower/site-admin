@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { Box, Button, Center, HStack, Heading, Image, Skeleton, Stack } from '@chakra-ui/react'
 import EditCategory from '../forms/categoryeditor'
 import PageLayout from '../components/layout/PageLayout'
-import { ApiMessageResponse, CategoryType } from 'src/shared/types'
+import { CategoryType } from 'src/shared/types'
 import { buttonRecipe } from '@renderer/themeRecipes'
 import imageLoading from '@renderer/assets/image-loading.svg'
 import SemiSafeContent from '../components/SemiSafeContent'
@@ -17,12 +17,12 @@ const getCategories = (
   setCategories([])
   window.api
     .getCategories()
-    .then((response: ApiMessageResponse | CategoryType[]) => {
-      if (Array.isArray(response)) {
-        setCategories(response)
+    .then((response) => {
+      if (response.success) {
+        setCategories(response.data || [])
       } else {
         setCategories([])
-        setMessages(response.message as string)
+        setMessages(response.message || '')
       }
       setLoading(false)
     })
@@ -42,8 +42,8 @@ const CategoriesPage = (): React.JSX.Element => {
     setLoading(true)
     window.api
       .updateCategory(values)
-      .then((response: ApiMessageResponse) => {
-        setMessages(response.message as string)
+      .then((response) => {
+        setMessages(response.message || '')
         getCategories(setCategories, setMessages, setLoading)
         toggleCatForm(null)
       })
@@ -56,8 +56,8 @@ const CategoriesPage = (): React.JSX.Element => {
     if (window.confirm('Are you sure you want to do this?')) {
       window.api
         .deleteCategory(catid)
-        .then((response: ApiMessageResponse) => {
-          setMessages(response.message as string)
+        .then((response) => {
+          setMessages(response.message || '')
           getCategories(setCategories, setMessages, setLoading)
         })
         .catch((err: Error) => {

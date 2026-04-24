@@ -79,7 +79,7 @@ const api = {
   },
   updateProduct: async (product: ProductType) => {
     const response = await ipcRenderer.invoke('update-product', product)
-    return JSON.parse(response)
+    return response
   },
   deleteProduct: async (productid: string) => {
     const response = await ipcRenderer.invoke('delete-product', productid)
@@ -91,7 +91,7 @@ const api = {
   },
   updateSubject: async (subject: string) => {
     const response = await ipcRenderer.invoke('update-subject', subject)
-    return JSON.parse(response)
+    return response
   },
   deleteSubject: async (subjectid: string) => {
     const response = await ipcRenderer.invoke('delete-subject', subjectid)
@@ -138,7 +138,7 @@ const api = {
   getPreviewImages: async (files: File[]) => {
     const fileArray = files.map((file) => webUtils.getPathForFile(file))
     const response = await ipcRenderer.invoke('get-preview-images', fileArray)
-    return response as string[]
+    return response
   },
   processUploadedImages: async (fileDataArray: File[]) => {
     const fileArray = fileDataArray.map((file) => webUtils.getPathForFile(file))
@@ -167,16 +167,11 @@ const api = {
   },
   uploadImage: async (filePath: string, destination: string) => {
     const response = await ipcRenderer.invoke('upload-image', filePath, destination)
-    return JSON.parse(response) as {
-      relativeUrl: string
-      filename: string
-      message?: string
-      error?: string
-    }
+    return JSON.parse(response)
   },
   uploadImages: async (files: string[], destination: string) => {
     const response = await ipcRenderer.invoke('upload-images', files, destination)
-    return JSON.parse(response) as { messages: string; filePaths: string[] }
+    return response
   }
 }
 

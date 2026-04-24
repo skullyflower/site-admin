@@ -1,4 +1,4 @@
-import { IconButton, Image, Stack, Splitter, Heading } from '@chakra-ui/react'
+import { IconButton, Image, Stack, Splitter, Text } from '@chakra-ui/react'
 import { Link, Outlet } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import { LuChevronLeft, LuMenu } from 'react-icons/lu'
@@ -17,7 +17,7 @@ const getAdminConfig = async (
   setAdminConfig: (adminConfig: AdminConfig) => void
 ): Promise<void> => {
   const response = await window.api.getAdminConfig()
-  setAdminConfig(response as AdminConfig)
+  if (response.success && response.data) setAdminConfig(response.data)
 }
 
 export default function SiteLayout(): React.JSX.Element {
@@ -96,9 +96,10 @@ export default function SiteLayout(): React.JSX.Element {
       </Splitter.Panel>
       <Splitter.ResizeTrigger id="sidebar:content" />
       <Splitter.Panel id="content">
-        <Heading size="lg" textAlign="center" p={2}>
-          Editing: {adminConfig?.pathToSite}
-        </Heading>
+        <Text textAlign="center" p={2}>
+          Currently Editing:{' '}
+          <em style={{ fontWeight: 'bold', fontSize: '1.25rem' }}>{adminConfig?.pathToSite}</em>
+        </Text>
         <Outlet />
       </Splitter.Panel>
     </Splitter.Root>

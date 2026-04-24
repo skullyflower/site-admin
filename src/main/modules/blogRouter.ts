@@ -5,6 +5,7 @@ import getPathsFromConfig, { checkFile, checkPath } from '../utilities/pathData.
 import { blogFile, blogRSSFile, defaultBlogInfo } from '../../shared/constants'
 import path, { join } from 'path'
 import processFile from '../utilities/imageProcessor'
+import { ok, okMessage, fail } from '../utilities/apiResponse'
 
 const getPaths = (): {
   tempPath: string
@@ -27,26 +28,26 @@ export const getBlog = (): string => {
     const blogData = fs.readFileSync(blogfilepath)
     const blogObject: BlogInfo = JSON.parse(blogData.toString()) as BlogInfo
     if (blogObject) {
-      return JSON.stringify(blogObject)
+      return JSON.stringify(ok(blogObject))
     } else {
-      return JSON.stringify(defaultBlogInfo as BlogInfo)
+      return JSON.stringify(ok(defaultBlogInfo as BlogInfo))
     }
   } catch (error) {
     console.log(error)
-    return JSON.stringify(defaultBlogInfo as BlogInfo)
+    return JSON.stringify(ok(defaultBlogInfo as BlogInfo))
   }
 }
 
 export const updateBlogInfo = (blogInfo: BlogInfo): string => {
   const { blogfilepath } = getPaths()
   try {
-    const oldpageObject: BlogInfo = JSON.parse(getBlog())
+    const oldpageObject: BlogInfo = JSON.parse(getBlog()).data
     const newpageData: BlogInfo = { ...oldpageObject, ...blogInfo }
     writeFileSync(blogfilepath, JSON.stringify(newpageData))
-    return JSON.stringify({ message: 'Updated Blog page!' })
+    return JSON.stringify(okMessage('Updated Blog page!'))
   } catch (error) {
     console.log(error)
-    return JSON.stringify({ message: 'Failed to update blog info.' })
+    return JSON.stringify(fail('Failed to update blog info.'))
   }
 }
 
@@ -55,7 +56,7 @@ export const updateBlogPost = (entry: BlogEntry): string => {
   if (entry) {
     try {
       checkFile(blogfilepath, defaultBlogInfo)
-      const blogObject: BlogInfo = JSON.parse(getBlog()) as BlogInfo
+      const blogObject: BlogInfo = JSON.parse(getBlog()).data as BlogInfo
       const entries = blogObject.entries || []
       const updateIndex = entries.findIndex(
         (entry) => entry.id === entry.id || entry.title === entry.title
@@ -84,13 +85,13 @@ export const updateBlogPost = (entry: BlogEntry): string => {
 
       const RSS = processRss(blogObject)
       fs.writeFileSync(blogRSSpath, RSS)
-      return JSON.stringify({ message: 'Updated Blog!' })
+      return JSON.stringify(okMessage('Updated Blog!'))
     } catch (error) {
       console.log(error)
-      return JSON.stringify({ message: 'Blog update failed.' })
+      return JSON.stringify(fail('Blog update failed.'))
     }
   } else {
-    return JSON.stringify({ message: 'You must fill out all fields.' })
+    return JSON.stringify(fail('You must fill out all fields.'))
   }
 }
 
@@ -103,16 +104,16 @@ export const deletEntry = (blogid: string): string => {
     const blogData: BlogInfo = JSON.parse(blogJSONString.toString()) as BlogInfo
     const entryToDelete = blogData.entries.find((entry) => entry.id === blogid)
     if (!entryToDelete) {
-      return JSON.stringify({ message: `Entry not found: ${blogid}` })
+      return JSON.stringify(fail(`Entry not found: ${blogid}`))
     }
     const newblogEntries = blogData.entries.filter((entry) => entry.id !== blogid)
     const newblogData: BlogInfo = { ...blogData, entries: newblogEntries || [] }
     fs.writeFileSync(blogfilepath, JSON.stringify(newblogData))
     const RSS = processRss(newblogData)
     fs.writeFileSync(blogRSSpath, RSS)
-    return JSON.stringify({ message: `Removed entry: ${entryToDelete?.title}` })
+    return JSON.stringify(okMessage(`Removed entry: ${entryToDelete?.title}`))
   } catch (error) {
     console.log(error)
-    return JSON.stringify({ message: `Failed to remove entry: ${blogid}` })
+    return JSON.stringify(fail(`Failed to remove entry: ${blogid}`))
   }
 }

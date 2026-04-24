@@ -3,7 +3,7 @@ import { Box, Button, Center, HStack, Heading, Skeleton, Stack } from '@chakra-u
 import EditProduct from '../forms/producteditor'
 import PageLayout from '../components/layout/PageLayout'
 import OneProduct from '../components/oneProduct'
-import { ApiMessageResponse, CategoryType, ProductType, Subject } from 'src/shared/types'
+import { CategoryType, ProductType, Subject } from 'src/shared/types'
 import { buttonRecipe } from '@renderer/themeRecipes'
 import FormContainer from '@renderer/components/formcontainer'
 
@@ -20,35 +20,26 @@ const getShopData = async (
 ): Promise<void> => {
   setLoading(true)
   const siteInfo = await window.api.getSiteInfo()
-  if (typeof siteInfo === 'object' && 'message' in siteInfo) {
-    setMessages((siteInfo as ApiMessageResponse).message as string)
+  if (!siteInfo.success) {
+    setMessages(siteInfo.message || '')
     setLoading(false)
     return
   }
-  if (typeof siteInfo === 'object' && 'features' in siteInfo && Array.isArray(siteInfo.features)) {
+  if (siteInfo.data?.features && Array.isArray(siteInfo.data.features)) {
     let products: ProductType[] = []
     let categories: CategoryType[] = []
     let subjects: Subject[] = []
-    if (siteInfo.features.includes('products')) {
-      products = (await window.api.getProducts()) as ProductType[]
+    if (siteInfo.data.features.includes('products')) {
+      const r = await window.api.getProducts()
+      products = r.data || []
     }
-    if (siteInfo.features.includes('categories')) {
-      categories = await window.api.getCategories()
-      if (typeof categories === 'object' && !('message' in categories)) {
-        categories = categories.filter(
-          (cat: CategoryType) => cat.subcat.length === 0
-        ) as CategoryType[]
-      } else {
-        categories = []
-      }
+    if (siteInfo.data.features.includes('categories')) {
+      const r = await window.api.getCategories()
+      categories = r.success ? (r.data || []).filter((cat) => cat.subcat.length === 0) : []
     }
-    if (siteInfo.features.includes('subjects')) {
-      subjects = await window.api.getSubjects()
-      if (typeof subjects === 'object' && !('message' in subjects)) {
-        subjects = subjects as Subject[]
-      } else {
-        subjects = []
-      }
+    if (siteInfo.data.features.includes('subjects')) {
+      const r = await window.api.getSubjects()
+      subjects = r.success ? (r.data || []) : []
     }
     setShopData({
       products: products || [],
@@ -86,8 +77,8 @@ const ProductsPage = (): React.JSX.Element => {
 
     window.api
       .updateProduct(change)
-      .then((response: ApiMessageResponse) => {
-        setMessages(response.message as string)
+      .then((response) => {
+        setMessages(response.message || '')
         getShopData(setShopData, setMessages, setLoading)
         if (filter && shopData?.products) {
           setFilteredProducts(
@@ -103,7 +94,7 @@ const ProductsPage = (): React.JSX.Element => {
 
   const doDelete = (prodid: string) => () => {
     window.api.deleteProduct(prodid).then((json) => {
-      setMessages(json.message)
+      setMessages(json.message || '')
       getShopData(setShopData, setMessages, setLoading)
       if (filter && shopData?.products) {
         setFilteredProducts(shopData.products.filter((prod) => prod.cat.includes(filter)))

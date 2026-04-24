@@ -3,7 +3,7 @@ import { Skeleton, Stack } from '@chakra-ui/react'
 import PageLayout from '../components/layout/PageLayout'
 import HomePageForm from '../forms/homepageForm'
 import HomePagePreview from '../forms/homepagePreview'
-import { SiteInfo, ApiMessageResponse } from 'src/shared/types'
+import { SiteInfo } from 'src/shared/types'
 import FormContainer from '@renderer/components/formcontainer'
 
 const getSiteData = async (
@@ -13,15 +13,15 @@ const getSiteData = async (
 ): Promise<void> => {
   setLoading(true)
   const pathToSite = await window.api.getAdminConfig()
-  if (pathToSite && 'pathToSite' in pathToSite) {
+  if (pathToSite.success && pathToSite.data?.pathToSite) {
     const response = await window.api.getSiteInfo()
-    if ((response as ApiMessageResponse).message) {
-      setMessages((response as ApiMessageResponse).message as string)
+    if (!response.success) {
+      setMessages(response.message || '')
       setLoading(false)
       return
     }
-    if ((response as SiteInfo).page_title) {
-      setPageData(response as SiteInfo)
+    if (response.data?.page_title) {
+      setPageData(response.data)
     } else {
       setMessages('No site data found.')
       setLoading(false)
@@ -62,7 +62,7 @@ export default function HomePage(): React.JSX.Element {
       formData.append('newsitelogo', file as Blob | string)
     }
     const response = await window.api.updateSiteInfo(values as SiteInfo)
-    setMessages((response as ApiMessageResponse).message)
+    setMessages(response.message || '')
     setLoading(false)
     getSiteData(setLoading, setMessages, setPageData)
   }

@@ -2,6 +2,8 @@ import fs from 'fs'
 import path, { join } from 'path'
 import processFile, { ProcessedImage } from '../utilities/imageProcessor'
 import getPathsFromConfig, { checkPath } from '../utilities/pathData'
+import { ApiResponse } from '../../shared/types'
+import { ok, okMessage, fail } from '../utilities/apiResponse'
 
 const getPaths = (): {
   pathToPublic: string
@@ -23,7 +25,7 @@ const getPaths = (): {
  * @param files - An array of file paths. // File objects are converted to paths in the preload file.
  * @returns An array of updated file paths for previewing.
  */
-export const getPreviewImages = async (files: string[]): Promise<string[]> => {
+export const getPreviewImages = async (files: string[]): Promise<ApiResponse<string[]>> => {
   const { tempPath, pathToPublic } = getPaths()
   checkPath(tempPath)
   if (files.length > 0) {
@@ -35,33 +37,32 @@ export const getPreviewImages = async (files: string[]): Promise<string[]> => {
           return newFilePath.replace(pathToPublic, 'http://localhost:3000/') //preview url
         })
       )
-      return newFilePaths
+      return ok(newFilePaths)
     } catch (err) {
       console.error('Failed to get preview images:', err)
-      return []
+      return ok([])
     }
   }
-  return []
+  return ok([])
 }
 /**
  * Process "uploaded" images, resize and move to temp directory - saves files from renderer to temp location and returns preview URLs
  * @param files - An array of file paths. // File objects are converted to paths in the preload file.
- * @returns A JSON string containing the preview URLs and file paths.
+ * @returns An ApiResponse containing the preview URLs and file paths.
  */
 export const processUploadedImages = async (
   files: string[]
-): Promise<{ previewUrls: string[]; filePaths: string[]; message: string }> => {
+): Promise<ApiResponse<{ previewUrls: string[]; filePaths: string[] }>> => {
   const { tempPath } = getPaths()
   checkPath(tempPath)
 
   const previewUrls: string[] = []
   const filePaths: string[] = []
-  let message = ''
+  let errorMessage = ''
 
   if (files.length > 0) {
     for (const fileData of files) {
       try {
-        // resize and move to temp directory
         const bigResult = await processFile(fileData, 850, tempPath)
         const smallResult = await processFile(fileData, 450, join(tempPath, 'smaller'))
         if (typeof bigResult === 'object' && 'relativeUrl' in bigResult && bigResult.relativeUrl) {
@@ -77,12 +78,15 @@ export const processUploadedImages = async (
           filePaths.push(smallResult.relativeUrl)
         }
       } catch (err) {
-        message = message + `Failed to process file ${fileData}: ${err}`
+        errorMessage = errorMessage + `Failed to process file ${fileData}: ${err}`
       }
     }
-    return { previewUrls, filePaths, message: message }
+    if (errorMessage) {
+      return { success: false, message: errorMessage, data: { previewUrls, filePaths } }
+    }
+    return ok({ previewUrls, filePaths })
   }
-  return { previewUrls, filePaths, message: message || 'No files to process.' }
+  return { success: false, message: 'No files to process.' }
 }
 
 /**
@@ -104,16 +108,16 @@ export const getStagedImages = (): string => {
           file.endsWith('.gif')
       )
       if (filtered.length) {
-        return JSON.stringify(filtered)
+        return JSON.stringify(ok(filtered))
       }
-      return JSON.stringify({ message: 'No images to move.' })
+      return JSON.stringify(fail('No images to move.'))
     }
   } catch (err) {
     if (err) {
-      return JSON.stringify({ message: "Couldn't read directory." })
+      return JSON.stringify(fail("Couldn't read directory."))
     }
   }
-  return JSON.stringify({ message: 'No images to move.' })
+  return JSON.stringify(fail('No images to move.'))
 }
 
 /**
@@ -138,14 +142,12 @@ export const moveImages = (filesToMove: string[], destination: string): string =
     }
     filearray.forEach((file) => {
       try {
-        /** move to public */
         fs.renameSync(`${bigSourcePath}${file}`, `${bigDestPath}${file}`)
       } catch (err) {
         message += `Failed to move big ${bigSourcePath}${file} to  ${bigDestPath}${file}:${err}\n`
       }
       if (smallfiles.includes(file)) {
         try {
-          /** move to public */
           fs.renameSync(`${smallSourcePath}${file}`, `${smallDestPath}${file}`)
         } catch (err) {
           console.log(err, `Failed to copy small ${file} file\n`)
@@ -157,9 +159,12 @@ export const moveImages = (filesToMove: string[], destination: string): string =
       }
     })
     console.log(message)
-    return JSON.stringify({ message: message })
+    if (message.includes('Failed')) {
+      return JSON.stringify(fail(message))
+    }
+    return JSON.stringify(okMessage(message))
   }
-  return JSON.stringify({ message: 'You must fill out all fields.' })
+  return JSON.stringify(fail('You must fill out all fields.'))
 }
 
 export const renameImage = (imageurl, newname): string => {
@@ -171,24 +176,22 @@ export const renameImage = (imageurl, newname): string => {
       relativePath.lastIndexOf('/')
     )}/smaller${relativePath.substring(relativePath.lastIndexOf('/'))}`
     try {
-      /** small file in public */
       fs.renameSync(
         `${pathToPublic}${relativePath}`,
         `${pathToPublic}${relativePath.substring(0, relativePath.lastIndexOf('/'))}/${newname}`
       )
-      /** smaller file in public */
       fs.renameSync(
         `${pathToPublic}${smallerRelativePath}`,
         `${pathToPublic}${smallerRelativePath.substring(0, smallerRelativePath.lastIndexOf('/'))}/smaller${
           newname
         }`
       )
-      return JSON.stringify({ message: `Successfully renamed ${imageurl}` })
+      return JSON.stringify(okMessage(`Successfully renamed ${imageurl}`))
     } catch (error) {
-      return JSON.stringify({ message: `Failed to rename ${imageurl}: ${error}` })
+      return JSON.stringify(fail(`Failed to rename ${imageurl}: ${error}`))
     }
   }
-  return JSON.stringify({ message: `Nothing to rename.` })
+  return JSON.stringify(fail('Nothing to rename.'))
 }
 
 export const deleteImage = (imageurl): string => {
@@ -203,17 +206,17 @@ export const deleteImage = (imageurl): string => {
       console.log(relativePath)
       if (relativePath.includes('files')) {
         fs.rmSync(`./public${relativePath}`)
-        return JSON.stringify({ message: `Successfully removed ${imageurl}` })
+        return JSON.stringify(okMessage(`Successfully removed ${imageurl}`))
       } else {
         fs.rmSync(`${pathToPublic}/${relativePath}`)
         fs.rmSync(`${pathToPublic}${smallerRelativePath}`)
       }
-      return JSON.stringify({ message: `Successfully removed ${imageurl}` })
+      return JSON.stringify(okMessage(`Successfully removed ${imageurl}`))
     } catch (error) {
-      return JSON.stringify({ message: `Failed to remove ${imageurl}: ${error}` })
+      return JSON.stringify(fail(`Failed to remove ${imageurl}: ${error}`))
     }
   }
-  return JSON.stringify({ message: `Nothng to remove.` })
+  return JSON.stringify(fail('Nothing to remove.'))
 }
 
 export const getImageFolders = (): string => {
@@ -221,8 +224,7 @@ export const getImageFolders = (): string => {
   checkPath(imagesPath)
   const files = fs.readdirSync(imagesPath)
   const filtered = files.filter((file) => fs.statSync(path.join(imagesPath, file)).isDirectory())
-
-  return JSON.stringify(filtered)
+  return JSON.stringify(ok(filtered))
 }
 /**
  * Gets the images in a folder.
@@ -237,12 +239,12 @@ export const getFolderImages = (directory: string): string => {
     const files = fs.readdirSync(`${pathToPublic}/${directory}`)
     if (files) {
       const filtered = files.filter((file) => dirpattern.test(file))
-      return JSON.stringify(filtered)
+      return JSON.stringify(ok(filtered))
     }
   } catch (err) {
-    return JSON.stringify({ message: `Can't get the files in the directory: ${directory}: ${err}` })
+    return JSON.stringify(fail(`Can't get the files in the directory: ${directory}: ${err}`))
   }
-  return JSON.stringify('No Files to get.')
+  return JSON.stringify(fail('No files to get.'))
 }
 
 /**
@@ -253,7 +255,7 @@ export const uploadBlogImage = async (
   destination: string = 'blog'
 ): Promise<string> => {
   if (!filePath) {
-    return JSON.stringify({ error: 'No file path provided' })
+    return JSON.stringify(fail('No file path provided'))
   }
 
   try {
@@ -261,38 +263,37 @@ export const uploadBlogImage = async (
     const bigDestPath = `${pathToPublic}/images/${destination}/`
     const smallDestPath = `${pathToPublic}/images/${destination}/smaller/`
 
-    // Process the image - create big and small versions
     const bigResult = await processFile(filePath, 850, bigDestPath)
     const smallResult = await processFile(filePath, 450, smallDestPath)
 
     if (typeof bigResult === 'string' || typeof smallResult === 'string') {
-      return JSON.stringify({ error: bigResult || smallResult })
+      const errMsg =
+        typeof bigResult === 'string' && bigResult
+          ? bigResult
+          : typeof smallResult === 'string' && smallResult
+            ? smallResult
+            : 'Failed to process image'
+      return JSON.stringify(fail(errMsg))
     }
 
     const bigImage = bigResult as ProcessedImage
 
-    // Return the relative URL for the big image (used in blog entries)
-    return JSON.stringify({
-      relativeUrl: bigImage.relativeUrl,
-      filename: bigImage.filename,
-      message: 'Image uploaded successfully'
-    })
+    return JSON.stringify(ok({ relativeUrl: bigImage.relativeUrl, filename: bigImage.filename }))
   } catch (err) {
     console.error('Failed to upload blog image:', err)
-    return JSON.stringify({ error: `Failed to upload image: ${err}` })
+    return JSON.stringify(fail(`Failed to upload image: ${err}`))
   }
 }
 /**
  * "Uploads" multiple images to a destination folder. These should already be in the temp directory.
  * @param filePaths - An array of file paths.
  * @param destination - The destination folder.
- * @returns A JSON string containing the message and the paths of the "uploaded" images.
- * image handling needs to be improved.
+ * @returns An ApiResponse containing the processed images.
  */
 export const uploadImages = async (
   filePaths: string[],
   destination: string
-): Promise<ProcessedImage[]> => {
+): Promise<ApiResponse<ProcessedImage[]>> => {
   const processedImages: ProcessedImage[] = []
   const { imagesPath, tempPath } = getPaths()
   if (filePaths) {
@@ -320,14 +321,15 @@ export const uploadImages = async (
       }
     }
   }
-  return processedImages || []
+  return ok(processedImages || [])
 }
+
 export const uploadImage = async (filePath: string, destination: string): Promise<string> => {
   const { tempPath, imagesPath } = getPaths()
   const result = await processFile(`${tempPath}/${filePath}`, 750, `${imagesPath}/${destination}`)
 
   if (typeof result === 'string') {
-    return JSON.stringify({ error: result })
+    return JSON.stringify(fail(result))
   }
-  return JSON.stringify({ relativeUrl: result.relativeUrl, filename: result.filename })
+  return JSON.stringify(ok({ relativeUrl: result.relativeUrl, filename: result.filename }))
 }

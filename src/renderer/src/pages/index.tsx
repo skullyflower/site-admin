@@ -1,7 +1,7 @@
 import { Text } from '@chakra-ui/react'
 import { useEffect, useState } from 'react'
 import PageLayout from '../components/layout/PageLayout'
-import { AdminConfig, ApiMessageResponse, SiteInfo } from 'src/shared/types'
+import { SiteInfo } from 'src/shared/types'
 import ConfigForm from '@renderer/forms/configeditor'
 import FormContainer from '@renderer/components/formcontainer'
 
@@ -11,22 +11,22 @@ const WelcomePage = (): React.JSX.Element => {
   const [pathToSite, setPathToSite] = useState<string | null>(null)
   useEffect(() => {
     // Check if the config exists
-    window.api.getAdminConfig().then((response: ApiMessageResponse | AdminConfig) => {
-      if (typeof response === 'object' && 'pathToSite' in response) {
-        setPathToSite(response.pathToSite as string)
+    window.api.getAdminConfig().then((response) => {
+      if (response.success && response.data?.pathToSite) {
+        setPathToSite(response.data.pathToSite)
       } else {
-        setMessages((response as ApiMessageResponse).message as string)
+        setMessages(response.message || '')
       }
     })
   }, [])
   useEffect(() => {
     if (pathToSite) {
-      window.api.getSiteInfo().then((response: ApiMessageResponse | SiteInfo) => {
-        if (typeof response === 'object' && 'sitename' in response) {
-          setSitename(response.sitename as string)
+      window.api.getSiteInfo().then((response) => {
+        if (response.success && response.data && 'sitename' in response.data) {
+          setSitename((response.data as SiteInfo & { sitename?: string }).sitename || 'Spa-Shop')
         } else {
           setSitename('Spa-Shop')
-          setMessages((response as ApiMessageResponse).message as string)
+          if (!response.success) setMessages(response.message || '')
         }
       })
     }

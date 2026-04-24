@@ -12,7 +12,7 @@ export const getPathsFromConfig = (): {
   try {
     const configJson = getAdminConfig()
     const config = JSON.parse(configJson)
-    const pathToSite = config.pathToSite
+    const pathToSite = config.data?.pathToSite
     const pathToPublic = join(app.getPath('home'), pathToSite, 'public')
 
     return { pathToPublic }

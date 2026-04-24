@@ -1,7 +1,8 @@
 import fs from 'fs'
 import getPathsFromConfig, { checkFile } from '../utilities/pathData'
-import { ProductType } from '../../shared/types'
+import { ProductType, ApiResponse } from '../../shared/types'
 import processFile from '../utilities/imageProcessor'
+import { ok, okMessage, fail } from '../utilities/apiResponse'
 
 const getPaths = (): { pathToPublic: string; shopfilepath: string } => {
   const { pathToPublic } = getPathsFromConfig()
@@ -9,7 +10,7 @@ const getPaths = (): { pathToPublic: string; shopfilepath: string } => {
   return { pathToPublic, shopfilepath }
 }
 
-export const updateProduct = async (product: ProductType): Promise<string> => {
+export const updateProduct = async (product: ProductType): Promise<ApiResponse> => {
   const { pathToPublic, shopfilepath } = getPaths()
   if (product) {
     try {
@@ -23,23 +24,6 @@ export const updateProduct = async (product: ProductType): Promise<string> => {
           try {
             processFile(filePath, 850, bigDestPath)
             processFile(filePath, 450, smallDestPath)
-            // fs.copyFileSync(
-            //   `${smallDestPath}${filePath.filename}`,
-            //   `${smallDestPath.replace('public', 'build')}`
-            // )
-            // fs.linkSync(
-            //   `${smallDestPath}${file.filename}`,
-            //   `${smallDestPath.replace('skullyflower', 'skullyflowerTS')}${file.filename}`
-            // )
-            // fs.copyFileSync(
-            //   `${bigDestPath}${file.filename}`,
-            //   `${bigDestPath.replace('public', 'build')}`
-            // )
-            // fs.linkSync(
-            //   `${bigDestPath}${file.filename}`,
-            //   `${bigDestPath.replace('skullyflower', 'skullyflowerTS')}${file.filename}`
-            // )
-            // product.img = `${bigDestPath.replace('../skullyflower/public', '')}${file.filename}`
           } catch (err) {
             console.log(`Failed: file upload: ${filePath}: ${err}`)
           }
@@ -60,13 +44,13 @@ export const updateProduct = async (product: ProductType): Promise<string> => {
       const newShopData = { products: productArray }
       fs.writeFileSync(shopfilepath, JSON.stringify(newShopData))
       fs.writeFileSync(shopfilepath.replace('public', 'build'), JSON.stringify(newShopData))
-      return JSON.stringify({ message: 'Updated Products!' })
+      return okMessage('Updated Products!')
     } catch (err) {
       console.log(err)
-      return JSON.stringify({ message: 'Products update failed.' })
+      return fail('Products update failed.')
     }
   } else {
-    return JSON.stringify({ message: 'You must fill out all fields.' })
+    return fail('You must fill out all fields.')
   }
 }
 
@@ -76,9 +60,9 @@ export const getProducts = (): string => {
   const shopData = fs.readFileSync(shopfilepath, 'utf8')
   const shop = JSON.parse(shopData)
   if (shop.products) {
-    return JSON.stringify(shop.products)
+    return JSON.stringify(ok(shop.products))
   }
-  return JSON.stringify({ message: `No product to show.` })
+  return JSON.stringify(fail('No product to show.'))
 }
 
 export const deleteProduct = (prodId): string => {
@@ -96,11 +80,10 @@ export const deleteProduct = (prodId): string => {
       const newShopData = JSON.stringify(newShopObj)
       fs.writeFileSync(shopfilepath, newShopData)
       fs.writeFileSync(shopfilepath.replace('public', 'build'), JSON.stringify(newShopData))
-      return JSON.stringify({ message: `Successfully deleted ${prodToDelete}` })
+      return JSON.stringify(okMessage(`Successfully deleted ${prodToDelete}`))
     }
-    JSON.stringify({ message: `Couldn't find ${prodId} in the list.` })
+    return JSON.stringify(fail(`Couldn't find ${prodId} in the list.`))
   } catch (err) {
-    return JSON.stringify({ message: `Failed to delete ${prodId}: ${err}` })
+    return JSON.stringify(fail(`Failed to delete ${prodId}: ${err}`))
   }
-  return JSON.stringify({ message: `Failed to delete ${prodId}` })
 }

@@ -20,10 +20,11 @@ const UploadInput = ({
     if (e.target.files) {
       const imageArray = Array.from(e.target.files).map((file: File) => file)
       window.api.getPreviewImages(imageArray).then((result) => {
-        setPreviewImages(result)
-        onUpload(result) // sets image url data in the formdata object.
+        const images = result.data || []
+        setPreviewImages(images)
+        onUpload(images)
         if (setImageCount) {
-          setImageCount(result.length)
+          setImageCount(images.length)
         }
       })
     }

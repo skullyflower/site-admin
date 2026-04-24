@@ -3,18 +3,17 @@ import { useForm } from 'react-hook-form'
 import PageLayout from '../components/layout/PageLayout'
 import { Button, Center, Field, HStack, Input, Stack } from '@chakra-ui/react'
 import InfoBubble from '../components/info-bubble'
-import { ApiMessageResponse } from 'src/shared/types'
 import { buttonRecipe } from '@renderer/themeRecipes'
 
 const getSale = (
   setSale: (sale: number) => void,
   setMessages: (messages: string) => void
 ): void => {
-  window.api.getSale().then((response: ApiMessageResponse | number) => {
-    if (typeof response === 'object' && 'message' in response) {
-      setMessages(response.message as string)
+  window.api.getSale().then((response) => {
+    if (!response.success) {
+      setMessages(response.message || '')
     } else {
-      setSale(response as number)
+      setSale(response.data?.sale ?? 0)
     }
   })
 }
@@ -32,8 +31,8 @@ const Sale = (): React.JSX.Element => {
   const onSubmit = (values: number): void => {
     window.api
       .setSale(values)
-      .then((response: ApiMessageResponse) => {
-        setMessages(response.message)
+      .then((response) => {
+        setMessages(response.message || '')
         getSale(setSale, setMessages)
       })
       .catch((err) => {

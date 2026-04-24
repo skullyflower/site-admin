@@ -1,7 +1,7 @@
 import fs from 'fs'
 import getPathsFromConfig, { checkFile } from '../utilities/pathData'
-//import processFile from '../utilities/imageProcessor'
 import { CategoryType } from '../../shared/types'
+import { ok, okMessage, fail } from '../utilities/apiResponse'
 
 const getPaths = (): { shopfilepath: string } => {
   const { pathToPublic } = getPathsFromConfig()
@@ -11,42 +11,14 @@ const getPaths = (): { shopfilepath: string } => {
 
 export const updateCategories = (category: CategoryType): string => {
   const { shopfilepath } = getPaths()
-  //upload('newImage', 1)
   if (category) {
-    // const bigDestPath = `${pathToPublic}/shop/categories/${category.id}/`
-    // //check for path. if it doesn't exist create it.
-    // const smallDestPath = `${pathToPublic}/shop/categories/smaller/${category.id}/`
-    //check for path. if it doesn't exitst, create it.
     try {
-      // if (files) {
-      //   for (const file of files) {
-      //     try {
-      //       processFile(file, 850, bigDestPath)
-      //       processFile(file, 450, smallDestPath)
-      //       // skullyflower only for copying to the local build
-      //       fs.copyFileSync(
-      //         `${smallDestPath}${file.filename}`,
-      //         `${smallDestPath.replace('public', 'build')}`
-      //       )
-      //       fs.copyFileSync(
-      //         `${bigDestPath}${file.filename}`,
-      //         `${bigDestPath.replace('public', 'build')}`
-      //       )
-
-      //       category.img = `${bigDestPath.replace(pathToPublic, '')}${file.filename}`
-      //     } catch (err) {
-      //       console.log(`Failed: file upload: ${err}`)
-      //     }
-      //   }
-      // }
       checkFile(shopfilepath, { categories: [] })
       checkFile(shopfilepath.replace('public', 'build'), { categories: [] })
       const oldShopDataString = fs.readFileSync(shopfilepath)
       const oldShopObject = JSON.parse(oldShopDataString.toString())
-      //categories:[]
       const newCategories = [...oldShopObject.categories]
       const newCatIndex = newCategories.findIndex((cat) => cat.id === category.id)
-      //updates else adds
       if (newCatIndex !== -1) {
         newCategories[newCatIndex] = category
       } else {
@@ -55,13 +27,13 @@ export const updateCategories = (category: CategoryType): string => {
       const newShopData = { categories: newCategories }
       fs.writeFileSync(shopfilepath, JSON.stringify(newShopData))
       fs.writeFileSync(shopfilepath.replace('public', 'build'), JSON.stringify(newShopData))
-      return JSON.stringify({ message: 'Updated Shop Categories!' })
+      return JSON.stringify(okMessage('Updated Shop Categories!'))
     } catch (err) {
       console.log(err)
-      return JSON.stringify({ message: 'Categories update failed.' })
+      return JSON.stringify(fail('Categories update failed.'))
     }
   } else {
-    return JSON.stringify({ message: 'You must fill out all fields.' })
+    return JSON.stringify(fail('You must fill out all fields.'))
   }
 }
 
@@ -71,9 +43,9 @@ export const getAllCategories = (): string => {
   const shopData = fs.readFileSync(shopfilepath)
   const shop = JSON.parse(shopData.toString())
   if (shop.categories) {
-    return JSON.stringify(shop.categories)
+    return JSON.stringify(ok(shop.categories))
   }
-  return JSON.stringify({ message: 'No categories found.' })
+  return JSON.stringify(fail('No categories found.'))
 }
 
 // TODO: add check for prods with the category
@@ -93,11 +65,11 @@ export const deleteCategory = (catId): string => {
       const newShopObj = { ...shop, categories: newCategoryData }
       const newShopData = JSON.stringify(newShopObj)
       fs.writeFileSync(shopfilepath, newShopData)
-      return JSON.stringify({ message: `Successfully deleted ${catToDelete}` })
+      return JSON.stringify(okMessage(`Successfully deleted ${catToDelete}`))
     }
-    return JSON.stringify({ message: `Couldn't find ${catId} in the list.` })
+    return JSON.stringify(fail(`Couldn't find ${catId} in the list.`))
   } catch (err) {
     console.log(err)
-    return JSON.stringify({ message: `Failed to delete ${catId}` })
+    return JSON.stringify(fail(`Failed to delete ${catId}`))
   }
 }

@@ -1,7 +1,7 @@
 import { Button, Stack } from '@chakra-ui/react'
 import { useEffect, useState } from 'react'
 import { useLocation, useMatch, useNavigate } from 'react-router-dom'
-import { SiteInfo, ApiMessageResponse } from 'src/shared/types'
+import { SiteInfo } from 'src/shared/types'
 import {
   CatIcon,
   CirclesFourIcon,
@@ -53,8 +53,8 @@ const SideBar = ({ minimized }: { minimized?: boolean }): React.ReactNode => {
   const [config, setConfig] = useState<SiteInfo | null>(null)
   const location = useLocation()
   useEffect(() => {
-    window.api.getSiteInfo().then((response: ApiMessageResponse | SiteInfo) => {
-      setConfig(response as SiteInfo)
+    window.api.getSiteInfo().then((response) => {
+      if (response.success && response.data) setConfig(response.data)
     })
   }, [location])
 

@@ -33,8 +33,8 @@ export default function PageForm({
   const handleUploadImage = async (image: string): Promise<string> => {
     const imageName = image.split('/').pop() || image
     const response = await window.api.uploadImage(imageName, `${id}`)
-    if (response.relativeUrl) {
-      return response.relativeUrl
+    if (response.success && response.data?.relativeUrl) {
+      return response.data.relativeUrl
     }
     return image
   }

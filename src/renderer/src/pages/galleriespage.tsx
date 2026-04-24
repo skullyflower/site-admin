@@ -6,7 +6,7 @@ import FloatingFormWrapper from '../components/floatingformwrap'
 import GalleryGrid from '../components/galleryGrid'
 import EditGallery from '../forms/galleryeditor'
 import PageLayout from '../components/layout/PageLayout'
-import { GalleryInfo, GalleryImage, GalleryResponse } from 'src/shared/types'
+import { GalleryInfo, GalleryImage } from 'src/shared/types'
 import { buttonRecipe } from '@renderer/themeRecipes'
 
 export const newGalleryId = 'new-gallery'
@@ -16,11 +16,10 @@ const getGalleries = (
   setMessages: (message: string) => void
 ): void => {
   window.api.getGalleries().then((res) => {
-    if (typeof res === 'object' && 'message' in res) {
-      setMessages((res.message as string) || '')
+    if (!res.success) {
+      setMessages(res.message || '')
     } else {
-      const galleries = (res as GalleryResponse).galleries
-      setGalleries(galleries)
+      setGalleries(res.data || [])
     }
   })
 }
@@ -31,10 +30,10 @@ const getGalleryImages = async (
   setMessages: (message: string) => void
 ): Promise<void> => {
   window.api.getGalleryImages(gallery_id).then((res) => {
-    if (typeof res === 'object' && 'message' in res) {
-      setMessages(res.message)
+    if (!res.success) {
+      setMessages(res.message || '')
     } else {
-      setter(Object.values(res) as GalleryImage[])
+      setter(Object.values(res.data || {}) as GalleryImage[])
     }
   })
 }
@@ -81,9 +80,7 @@ const GalleryPage: React.FC = () => {
     window.api
       .resetGallery(gallery.id)
       .then((res) => {
-        if (typeof res === 'object' && 'message' in res) {
-          setMessages(res.message)
-        }
+        setMessages(res.message || '')
         getGalleryImages(gallery.id, setImages, setMessages)
       })
       .catch((err) => {
@@ -91,24 +88,31 @@ const GalleryPage: React.FC = () => {
       })
   }
 
-  const addGalleryImages = async (): Promise<void> => {
-    if (!activeGallery) {
+  async function addGalleryImages(): Promise<void> {
+    if (!activeGallery?.path) {
       setMessages('No gallery selected.')
       return
     }
-    const result = await window.api.uploadImages(newImages, activeGallery?.path || 'artwork')
-    setMessages(result.messages)
+    const result = await window.api.uploadImages(
+      newImages?.map((img) => img.replace('http://localhost:3000//temp/', '')) || [],
+      activeGallery?.path || 'artwork'
+    )
+    if (!result.success || !result.data?.length) {
+      setMessages('There was a problem uploading the images.')
+      return
+    }
+    setMessages('Images uploaded successfully.')
     doResetGallery(activeGallery)
     setShowUpload(false)
   }
 
-  const updateImage = (imageurl: string, date: string, name: string): void => {
+  function updateImage(imageurl: string, date: string, name: string): void {
     const extention = imageurl.split('.').pop()
     const newName = `${date}${name.replaceAll(' ', '')}${extention}`
     window.api
       .renameImage(imageurl, newName)
       .then((res) => {
-        setMessages(res.message)
+        setMessages(res.message || '')
         doResetGallery(activeGallery as GalleryInfo)
       })
       .catch((err) => {
@@ -120,11 +124,8 @@ const GalleryPage: React.FC = () => {
     window.api
       .deleteImage(imageurl)
       .then((res) => {
-        if (typeof res === 'object' && 'message' in res) {
-          setMessages(res.message)
-        } else {
-          return doResetGallery(activeGallery as GalleryInfo)
-        }
+        setMessages(res.message || '')
+        if (res.success) doResetGallery(activeGallery as GalleryInfo)
       })
       .catch((err) => {
         setMessages(err.message || 'There was a problem.')

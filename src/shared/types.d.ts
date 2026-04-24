@@ -92,6 +92,13 @@ export interface GalleryImage {
 }
 export interface GalleryImages extends Record<string, GalleryImage> {}
 
+export interface ApiResponse<T = undefined> {
+  success: boolean
+  message?: string
+  data?: T
+}
+
+/** @deprecated Use ApiResponse instead */
 export interface ApiMessageResponse {
   message: string
 }

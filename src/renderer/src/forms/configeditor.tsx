@@ -1,4 +1,4 @@
-import { Button, Field, HStack, Text } from '@chakra-ui/react'
+import { Box, Button, Field, HStack, Text } from '@chakra-ui/react'
 import { Stack } from '@chakra-ui/react'
 import { AdminConfig } from 'src/shared/types'
 import { buttonRecipe } from '@renderer/themeRecipes'
@@ -33,19 +33,21 @@ const ConfigForm = ({
       })
   }
   return (
-    <Stack gap={4}>
+    <Stack alignItems="center" justifyContent="center" gap={4}>
       <Text paddingInline={4}>
         Currently Selected Site Folder:{' '}
         <em style={{ fontWeight: 'bold', fontSize: '1.25rem' }}>
           {formData?.pathToSite || 'No config found'}
         </em>
       </Text>
-      <Field.Root p={4}>
-        <HStack alignItems="center">
-          <Field.Label w={48}>Select a Site To Edit:</Field.Label>
-          <Button onClick={updateSiteDirectory}>Select Site Directory</Button>
-        </HStack>
-      </Field.Root>
+      <Box border="1px solid" borderColor="slate.300" padding={4} borderRadius={4}>
+        <Field.Root p={4}>
+          <HStack alignItems="center">
+            <Field.Label w={48}>Select a Site To Edit:</Field.Label>
+            <Button onClick={updateSiteDirectory}>Select Site Directory</Button>
+          </HStack>
+        </Field.Root>
+      </Box>
       <HStack justifyContent="end">
         <Button disabled={!changed} recipe={buttonRecipe} onClick={() => onSubmit()}>
           Submit Changes

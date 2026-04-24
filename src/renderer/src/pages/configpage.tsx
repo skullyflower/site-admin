@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import PageLayout from '../components/layout/PageLayout'
 import ConfigForm from '@renderer/forms/configeditor'
-import { AdminConfig, ApiMessageResponse } from 'src/shared/types'
+import { AdminConfig } from 'src/shared/types'
 import FormContainer from '@renderer/components/formcontainer'
 const getConfig = (
   setConfig: (config: AdminConfig | null) => void,
@@ -9,11 +9,11 @@ const getConfig = (
 ): void => {
   window.api
     .getAdminConfig()
-    .then((data: ApiMessageResponse | AdminConfig) => {
-      if (typeof data === 'object' && 'message' in data) {
-        setMessages(data.message as string)
+    .then((data) => {
+      if (!data.success) {
+        setMessages(data.message || '')
       } else {
-        setConfig(data as unknown as AdminConfig)
+        setConfig(data.data || null)
       }
     })
     .catch((err: Error) => {
@@ -38,8 +38,8 @@ const ConfigPage = (): React.ReactNode => {
     }
     window.api
       .setAdminConfig(config as AdminConfig)
-      .then((data: ApiMessageResponse) => {
-        setMessages(data.message as string)
+      .then((data) => {
+        setMessages(data.message || '')
         getConfig(setConfig, setMessages)
       })
       .catch((err: Error) => {

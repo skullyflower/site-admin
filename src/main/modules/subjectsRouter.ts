@@ -1,5 +1,7 @@
 import fs from 'fs'
 import getPathsFromConfig, { checkFile } from '../utilities/pathData'
+import { ApiResponse } from '../../shared/types'
+import { ok, okMessage, fail } from '../utilities/apiResponse'
 
 const getPaths = (): { subjectFilePath: string } => {
   const { pathToPublic } = getPathsFromConfig()
@@ -7,7 +9,7 @@ const getPaths = (): { subjectFilePath: string } => {
   return { subjectFilePath }
 }
 
-export const updateSubject = async (subject): Promise<string> => {
+export const updateSubject = async (subject): Promise<ApiResponse> => {
   const { subjectFilePath } = getPaths()
   if (subject) {
     try {
@@ -15,10 +17,8 @@ export const updateSubject = async (subject): Promise<string> => {
       checkFile(subjectFilePath.replace('public', 'build'), { designs: [] })
       const oldShopDataString = fs.readFileSync(subjectFilePath, 'utf8')
       const oldShopObject = JSON.parse(oldShopDataString)
-      //categories:[]
       const newCategories = [...oldShopObject.designs]
       const newCatIndex = newCategories.findIndex((cat) => cat.id === subject.id)
-      //updates else adds
       if (newCatIndex !== -1) {
         newCategories[newCatIndex] = subject
       } else {
@@ -27,13 +27,13 @@ export const updateSubject = async (subject): Promise<string> => {
       const newShopData = { designs: newCategories }
       fs.writeFileSync(subjectFilePath, JSON.stringify(newShopData))
       fs.writeFileSync(subjectFilePath.replace('public', 'build'), JSON.stringify(newShopData))
-      return JSON.stringify({ message: 'Updated Shop Subjects!' })
+      return okMessage('Updated Shop Subjects!')
     } catch (err) {
       console.log(err)
-      return JSON.stringify({ message: 'Subjects update failed.' })
+      return fail('Subjects update failed.')
     }
   } else {
-    return JSON.stringify({ message: 'You must fill out all fields.' })
+    return fail('You must fill out all fields.')
   }
 }
 
@@ -43,9 +43,9 @@ export const getSubjects = (): string => {
   const shopData = fs.readFileSync(subjectFilePath)
   const shop = JSON.parse(shopData.toString())
   if (shop.designs) {
-    return JSON.stringify(shop.designs)
+    return JSON.stringify(ok(shop.designs))
   }
-  return JSON.stringify({ message: 'No Subjects to show' })
+  return JSON.stringify(fail('No Subjects to show'))
 }
 
 // TODO: add check for prods with the category
@@ -65,11 +65,11 @@ export const deleteSubject = (catId): string => {
       const newShopObj = { ...shop, categories: newCategoryData }
       const newShopData = JSON.stringify(newShopObj)
       fs.writeFileSync(subjectFilePath, newShopData)
-      return JSON.stringify({ message: `Successfully deleted ${catToDelete}` })
+      return JSON.stringify(okMessage(`Successfully deleted ${catToDelete}`))
     }
-    return JSON.stringify({ message: `Couldn't find ${catId} in the list.` })
+    return JSON.stringify(fail(`Couldn't find ${catId} in the list.`))
   } catch (err) {
     console.log(err)
-    return JSON.stringify({ message: `Failed to delete ${catId}` })
+    return JSON.stringify(fail(`Failed to delete ${catId}`))
   }
 }

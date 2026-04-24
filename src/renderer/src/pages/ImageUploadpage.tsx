@@ -15,7 +15,6 @@ import {
 } from '@chakra-ui/react'
 import PageLayout from '../components/layout/PageLayout'
 import { buttonRecipe } from '@renderer/themeRecipes'
-import { ApiMessageResponse } from 'src/shared/types'
 import FormContainer from '@renderer/components/formcontainer'
 
 const getImages = (
@@ -25,11 +24,11 @@ const getImages = (
   setFilesToMove([])
   window.api
     .getStagedImages()
-    .then((response: ApiMessageResponse | string[]) => {
-      if (typeof response === 'object' && 'message' in response) {
-        console.log(response.message)
+    .then((response) => {
+      if (response.success) {
+        setFilesToMove(response.data || [])
       } else {
-        setFilesToMove(response as string[])
+        console.log(response.message)
       }
     })
     .catch((err) => setMessages(err.message || "Couldn't get images."))
@@ -42,11 +41,11 @@ const getDirectories = (
   window.api
     .getImageFolders()
     .then((response) => {
-      if (typeof response === 'object' && 'message' in response) {
+      if (response.success) {
+        setToDirectories(response.data || [])
+      } else {
         console.log(response.message)
         setToDirectories([])
-      } else {
-        setToDirectories(response as string[])
       }
     })
     .catch((err) => {
@@ -79,7 +78,7 @@ const ImagesUploadPage: React.FC = () => {
     window.api
       .uploadImages(values.filesToMove, values.destination)
       .then((response) => {
-        setMessages(response.messages)
+        setMessages(response.message || '')
         getImages(
           (files) => setValue('filesToMove', files),
           () => {}
@@ -115,7 +114,7 @@ const ImagesUploadPage: React.FC = () => {
     window.api
       .deleteImage(imageurl.replace('http://localhost:3000/', ''))
       .then((response) => {
-        setMessages(response.message)
+        setMessages(response.message || '')
         checkForImages()
       })
       .catch((err) => {

@@ -1,6 +1,7 @@
 import fs from 'fs'
 import getPathsFromConfig, { checkFile } from '../utilities/pathData'
 import { siteFile, defaultSiteData } from '../../shared/constants'
+import { ok, okMessage, fail } from '../utilities/apiResponse'
 
 export const getSiteInfo = (): string => {
   const { pathToPublic } = getPathsFromConfig()
@@ -9,10 +10,10 @@ export const getSiteInfo = (): string => {
     if (!homefilepath) throw new Error('No path to site found.')
     checkFile(homefilepath, defaultSiteData)
     const homeData = fs.readFileSync(homefilepath, 'utf8') || JSON.stringify(defaultSiteData)
-    return homeData
+    return JSON.stringify(ok(JSON.parse(homeData)))
   } catch (err) {
     console.log(err)
-    return JSON.stringify(defaultSiteData)
+    return JSON.stringify(ok(defaultSiteData))
   }
 }
 
@@ -29,12 +30,12 @@ export const updateSiteInfo = (siteInfo): string => {
       const oldHomeObject = JSON.parse(oldHomeDataString)
       const newHomeData = { ...oldHomeObject, ...values }
       fs.writeFileSync(homefilepath, JSON.stringify(newHomeData))
-      return JSON.stringify({ message: 'Updated Homepage data!' })
+      return JSON.stringify(okMessage('Updated Homepage data!'))
     } catch (err) {
       console.log(err)
-      return JSON.stringify({ message: 'Homepage data update failed.' })
+      return JSON.stringify(fail('Homepage data update failed.'))
     }
   } else {
-    return JSON.stringify({ message: 'You must fill out all fields.' })
+    return JSON.stringify(fail('You must fill out all fields.'))
   }
 }
