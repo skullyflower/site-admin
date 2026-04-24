@@ -17,9 +17,7 @@ export const getPathsFromConfig = (): {
 
     return { pathToPublic }
   } catch (err) {
-    console.log(
-      `No config.json file found. Please create one in the root directory of your site. : ${err}`
-    )
+    console.log(`No config.json file found. : ${err}`)
     return { pathToPublic: '' }
   }
 }
