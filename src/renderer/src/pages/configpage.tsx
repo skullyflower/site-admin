@@ -3,6 +3,7 @@ import PageLayout from '../components/layout/PageLayout'
 import ConfigForm from '@renderer/forms/configeditor'
 import { AdminConfig } from 'src/shared/types'
 import FormContainer from '@renderer/components/formcontainer'
+import { useAdminConfig } from '@renderer/context/AdminConfigContext'
 const getConfig = (
   setConfig: (config: AdminConfig | null) => void,
   setMessages: (message: string) => void,
@@ -28,6 +29,7 @@ const ConfigPage = (): React.ReactNode => {
   const [config, setConfig] = useState<AdminConfig | null>(null)
   const [messages, setMessages] = useState<string | null>(null)
   const [messageType, setMessageType] = useState<'info' | 'warning' | 'error' | 'success'>('info')
+  const { refreshAdminConfig } = useAdminConfig()
 
   useEffect(() => {
     if (config === null && messages === null) {
@@ -46,6 +48,7 @@ const ConfigPage = (): React.ReactNode => {
       .then((data) => {
         setMessageType(data.success ? 'success' : 'error')
         setMessages(data.message || '')
+        refreshAdminConfig()
         getConfig(setConfig, setMessages, setMessageType)
       })
       .catch((err: Error) => {

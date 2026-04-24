@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { LuChevronLeft, LuMenu } from 'react-icons/lu'
 import Sidebar from '../Sidebar'
 import logo from '@renderer/assets/SiteAdmin.png'
-import { AdminConfig } from 'src/shared/types'
+import { AdminConfigProvider, useAdminConfig } from '@renderer/context/AdminConfigContext'
 
 const SIDEBAR_WIDTH_EXPANDED = 20
 const CONTENT_WIDTH_EXPANDED = 80
@@ -13,21 +13,10 @@ const CONTENT_WIDTH_COLLAPSED = 95
 
 const SIDEBAR_EXPANDED_CUTOFF_PIXELS = 170
 
-const getAdminConfig = async (
-  setAdminConfig: (adminConfig: AdminConfig) => void
-): Promise<void> => {
-  const response = await window.api.getAdminConfig()
-  if (response.success && response.data) setAdminConfig(response.data)
-}
-
-export default function SiteLayout(): React.JSX.Element {
+function SiteLayoutInner(): React.JSX.Element {
+  const { adminConfig } = useAdminConfig()
   const [sidebarOpen, setSidebarOpen] = useState(true)
-  const [adminConfig, setAdminConfig] = useState<AdminConfig | null>(null)
   const [sizes, setSizes] = useState([SIDEBAR_WIDTH_EXPANDED, CONTENT_WIDTH_EXPANDED])
-
-  useEffect(() => {
-    getAdminConfig(setAdminConfig)
-  }, [setAdminConfig])
 
   const toggleSidebar = (): void => {
     setSidebarOpen(!sidebarOpen)
@@ -103,5 +92,13 @@ export default function SiteLayout(): React.JSX.Element {
         <Outlet />
       </Splitter.Panel>
     </Splitter.Root>
+  )
+}
+
+export default function SiteLayout(): React.JSX.Element {
+  return (
+    <AdminConfigProvider>
+      <SiteLayoutInner />
+    </AdminConfigProvider>
   )
 }

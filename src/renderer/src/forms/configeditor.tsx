@@ -23,8 +23,8 @@ const ConfigForm = ({
           return
         }
         if (data && typeof data === 'string') {
+          if (data !== formData?.pathToSite) setChanged(true)
           setValue({ ...formData, pathToSite: data } as AdminConfig)
-          setChanged(true)
         }
         return
       })

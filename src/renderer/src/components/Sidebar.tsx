@@ -2,6 +2,7 @@ import { Button, Stack } from '@chakra-ui/react'
 import { useEffect, useState } from 'react'
 import { useLocation, useMatch, useNavigate } from 'react-router-dom'
 import { SiteInfo } from 'src/shared/types'
+import { useAdminConfig } from '@renderer/context/AdminConfigContext'
 import {
   CatIcon,
   CirclesFourIcon,
@@ -52,11 +53,12 @@ const NavButton = ({ path, icon, children, minimized }: NavButtonProps): React.R
 const SideBar = ({ minimized }: { minimized?: boolean }): React.ReactNode => {
   const [config, setConfig] = useState<SiteInfo | null>(null)
   const location = useLocation()
+  const { adminConfig } = useAdminConfig()
   useEffect(() => {
     window.api.getSiteInfo().then((response) => {
       if (response.success && response.data) setConfig(response.data)
     })
-  }, [location])
+  }, [location, adminConfig?.pathToSite])
 
   return (
     <Stack
