@@ -134,6 +134,22 @@ const ImagesUploadPage: React.FC = () => {
       })
   }
 
+  const doDeleteSelected = (): void => {
+    if (!filesToMove?.length) return
+    Promise.all(filesToMove.map((file) => window.api.deleteImage(`temp/${file}`)))
+      .then((responses) => {
+        const allOk = responses.every((r) => r.success)
+        setMessageType(allOk ? 'success' : 'error')
+        setMessages(allOk ? 'Selected images deleted.' : 'Some images could not be deleted.')
+        setValue('filesToMove', [])
+        checkForImages()
+      })
+      .catch((err) => {
+        setMessageType('error')
+        setMessages(err.message || 'Failed to delete images.')
+      })
+  }
+
   return (
     <PageLayout
       messages={messages}
@@ -170,9 +186,33 @@ const ImagesUploadPage: React.FC = () => {
               borderColor="gray.300"
               p={5}
             >
-              <Heading size="sm" textAlign="start">
-                Select the images you want to move
-              </Heading>
+              <HStack justifyContent="space-between" alignItems="center" mb={2} wrap="wrap">
+                <Heading size="sm" textAlign="start">
+                  Select the images you want to move
+                </Heading>
+                <HStack>
+                  <Button
+                    recipe={buttonRecipe}
+                    size="sm"
+                    onClick={() =>
+                      setValue(
+                        'filesToMove',
+                        filesToMove?.length === allImages?.length ? [] : (allImages ?? [])
+                      )
+                    }
+                  >
+                    {filesToMove?.length === allImages?.length ? 'Deselect All' : 'Select All'}
+                  </Button>
+                  <Button
+                    recipe={buttonRecipe}
+                    size="sm"
+                    disabled={!filesToMove?.length}
+                    onClick={doDeleteSelected}
+                  >
+                    Delete Selected
+                  </Button>
+                </HStack>
+              </HStack>
               <Checkbox.Group
                 value={filesToMove}
                 onValueChange={(value: string[]) => setValue('filesToMove', value)}

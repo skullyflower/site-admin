@@ -19,6 +19,7 @@ export const buttonRecipe = defineRecipe({
         borderColor: '{colors.slate.500}',
         fontFamily: '"Slackey", "Comic Sans MS", sans-serif',
         paddingInline: '20px',
+        lineHeight: 2,
         textTransform: 'uppercase',
         fontWeight: 'bold',
         _hover: { bg: 'orange.600' }

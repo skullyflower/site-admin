@@ -33,7 +33,7 @@ const UploadInput = ({
   return (
     <Stack width="100%" gap={4} alignItems="center">
       {previewImages?.length > 0 ? (
-        <HStack>
+        <HStack alignItems="stretch" justifyContent="space-evenly" wrap="wrap">
           <ImagePreview
             images={previewImages}
             updateImages={(images: string[]) => setPreviewImages(images)}

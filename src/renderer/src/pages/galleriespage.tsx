@@ -224,7 +224,7 @@ const GalleryPage: React.FC = () => {
                     <Skeleton height="50px" />
                   </Stack>
                 ) : (
-                  <>
+                  <Stack gap={4} alignItems="center" justifyContent="center">
                     <UploadInput
                       multiple={true}
                       onUpload={setNewImages}
@@ -233,7 +233,7 @@ const GalleryPage: React.FC = () => {
                     <Button recipe={buttonRecipe} disabled={!imageCount} onClick={addGalleryImages}>
                       Upload and Resize
                     </Button>
-                  </>
+                  </Stack>
                 )}
               </Stack>
             </FloatingFormWrapper>
