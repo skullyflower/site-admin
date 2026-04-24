@@ -19,7 +19,8 @@ import FormContainer from '@renderer/components/formcontainer'
 
 const getImages = (
   setFilesToMove: (files: string[]) => void,
-  setMessages: (message: string | null) => void
+  setMessages: (message: string | null) => void,
+  setMessageType: (type: 'info' | 'warning' | 'error' | 'success') => void
 ): void => {
   setFilesToMove([])
   window.api
@@ -31,12 +32,16 @@ const getImages = (
         console.log(response.message)
       }
     })
-    .catch((err) => setMessages(err.message || "Couldn't get images."))
+    .catch((err) => {
+      setMessageType('error')
+      setMessages(err.message || "Couldn't get images.")
+    })
 }
 
 const getDirectories = (
   setToDirectories: (directories: string[]) => void,
-  setMessages: (message: string) => void
+  setMessages: (message: string) => void,
+  setMessageType: (type: 'info' | 'warning' | 'error' | 'success') => void
 ): void => {
   window.api
     .getImageFolders()
@@ -49,6 +54,7 @@ const getDirectories = (
       }
     })
     .catch((err) => {
+      setMessageType('error')
       setMessages(err.message || "Couldn't get image directories.")
     })
 }
@@ -61,6 +67,7 @@ const defaultValues: { destination: string; filesToMove: string[] } = {
 const ImagesUploadPage: React.FC = () => {
   const [showForm, setShowForm] = useState(false)
   const [messages, setMessages] = useState<string | null>(null)
+  const [messageType, setMessageType] = useState<'info' | 'warning' | 'error' | 'success'>('info')
   // read from api based on gallery/shop/etc files. standardize image loacations.
   const [toDirectories, setToDirectories] = useState<string[]>([])
   const [allImages, setAllImages] = useState<string[] | null>(null)
@@ -78,29 +85,32 @@ const ImagesUploadPage: React.FC = () => {
     window.api
       .uploadImages(values.filesToMove, values.destination)
       .then((response) => {
+        setMessageType(response.success ? 'success' : 'error')
         setMessages(response.message || '')
         getImages(
           (files) => setValue('filesToMove', files),
-          () => {}
+          () => {},
+          setMessageType
         )
       })
       .catch((err) => {
+        setMessageType('error')
         setMessages(err.message || 'Failed to move images.')
       })
   }
 
   const checkForImages = (): void => {
     setMessages(null)
-    getImages(setAllImages, setMessages)
+    getImages(setAllImages, setMessages, setMessageType)
   }
   //const setFilesToMove = (files: string[]): void => setValue('filesToMove', files)
 
   useEffect(() => {
     if (!toDirectories.length) {
-      getDirectories(setToDirectories, setMessages)
+      getDirectories(setToDirectories, setMessages, setMessageType)
     }
     if (!allImages && !messages) {
-      getImages(setAllImages, setMessages)
+      getImages(setAllImages, setMessages, setMessageType)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
@@ -114,10 +124,12 @@ const ImagesUploadPage: React.FC = () => {
     window.api
       .deleteImage(imageurl.replace('http://localhost:3000/', ''))
       .then((response) => {
+        setMessageType(response.success ? 'success' : 'error')
         setMessages(response.message || '')
         checkForImages()
       })
       .catch((err) => {
+        setMessageType('error')
         setMessages(err.message || 'Failed to delete image.')
       })
   }
@@ -126,6 +138,7 @@ const ImagesUploadPage: React.FC = () => {
     <PageLayout
       messages={messages}
       setMessages={setMessages}
+      messageType={messageType}
       title="Add Images"
       button={{ action: () => setShowForm(!showForm), text: 'Add new ones', value: 'newcat' }}
     >

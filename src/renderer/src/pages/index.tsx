@@ -8,6 +8,7 @@ import FormContainer from '@renderer/components/formcontainer'
 const WelcomePage = (): React.JSX.Element => {
   const [sitename, setSitename] = useState('Spa-Shop')
   const [messages, setMessages] = useState<string | null>(null)
+  const [messageType, setMessageType] = useState<'info' | 'warning' | 'error' | 'success'>('info')
   const [pathToSite, setPathToSite] = useState<string | null>(null)
   useEffect(() => {
     // Check if the config exists
@@ -15,6 +16,7 @@ const WelcomePage = (): React.JSX.Element => {
       if (response.success && response.data?.pathToSite) {
         setPathToSite(response.data.pathToSite)
       } else {
+        setMessageType('error')
         setMessages(response.message || '')
       }
     })
@@ -26,7 +28,10 @@ const WelcomePage = (): React.JSX.Element => {
           setSitename((response.data as SiteInfo & { sitename?: string }).sitename || 'Spa-Shop')
         } else {
           setSitename('Spa-Shop')
-          if (!response.success) setMessages(response.message || '')
+          if (!response.success) {
+            setMessageType('error')
+            setMessages(response.message || '')
+          }
         }
       })
     }
@@ -34,7 +39,7 @@ const WelcomePage = (): React.JSX.Element => {
 
   if (pathToSite) {
     return (
-      <PageLayout title={`Welcome to the Admin`} messages={messages} setMessages={setMessages}>
+      <PageLayout title={`Welcome to the Admin`} messages={messages} setMessages={setMessages} messageType={messageType}>
         <Text>
           <em>Currently editing:</em> {sitename} at {pathToSite}
         </Text>
@@ -48,6 +53,7 @@ const WelcomePage = (): React.JSX.Element => {
         title={`Welcome to the ${sitename} Admin`}
         messages={messages}
         setMessages={setMessages}
+        messageType={messageType}
       >
         <FormContainer>
           <ConfigForm

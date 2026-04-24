@@ -29,7 +29,7 @@ const getBlogEntries = async (
       setMessages(json.message || "Couldn't get blog entries.")
       setBlogEntries([])
     }
-  } catch (error) {
+  } catch {
     setMessages("Couldn't get blog entries.")
     setBlogEntries([])
     setBlogInfo({ page_title: '', page_description: '', page_content: '', entries: [] })
@@ -40,6 +40,7 @@ const BlogPage = (): React.JSX.Element => {
   const [blogEntries, setBlogEntries] = useState<BlogEntry[] | null>(null)
   const [blogInfo, setBlogInfo] = useState<BlogInfo | null>(null)
   const [messages, setMessages] = useState<string | null>(null)
+  const [messageType, setMessageType] = useState<'info' | 'warning' | 'error' | 'success'>('error')
   const [showForm, setShowForm] = useState(false)
   const [activeBlog, setActiveBlog] = useState<BlogEntry | null>(null)
   const [sitedata, setSiteData] = useState<SiteInfo | null>()
@@ -66,8 +67,10 @@ const BlogPage = (): React.JSX.Element => {
     try {
       const json = await window.api.updateBlogInfo(values)
       setMessages(json.message || '')
+      setMessageType(json.success ? 'success' : 'error')
     } catch (err) {
       setMessages((err as Error).message || 'There was a problem.')
+      setMessageType('error')
     } finally {
       getBlogEntries(setBlogEntries, setMessages, setBlogInfo)
     }
@@ -81,6 +84,7 @@ const BlogPage = (): React.JSX.Element => {
       toggleForm(null)
     } catch (err) {
       setMessages((err as Error).message || 'there was a problem.')
+      setMessageType('error')
     }
   }
   const doDelete = useCallback(async (e) => {
@@ -89,11 +93,11 @@ const BlogPage = (): React.JSX.Element => {
       try {
         const json = await window.api.deleteBlogEntry(blogid)
         setMessages(json.message || '')
+        setMessageType(json.success ? 'success' : 'error')
         getBlogEntries(setBlogEntries, setMessages, setBlogInfo)
       } catch (err) {
-        setMessages(
-          (err as Error).message || 'There was a problem deleting the entry.'
-        )
+        setMessages((err as Error).message || 'There was a problem deleting the entry.')
+        setMessageType('error')
       }
     }
   }, [])
@@ -115,6 +119,7 @@ const BlogPage = (): React.JSX.Element => {
       title="Update Yer Blarrgh"
       messages={messages}
       setMessages={setMessages}
+      messageType={messageType}
       button={{ action: addNewBlogEntry, text: 'Add a new one', value: null }}
     >
       <div className="content">

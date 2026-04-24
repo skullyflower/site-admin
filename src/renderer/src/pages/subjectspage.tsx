@@ -10,7 +10,8 @@ import FormContainer from '@renderer/components/formcontainer'
 const getSubjects = (
   setSubjects: (subjects: Subject[]) => void,
   setMessages: (message: string) => void,
-  setLoading: (loading: boolean) => void
+  setLoading: (loading: boolean) => void,
+  setMessageType: (type: 'info' | 'warning' | 'error' | 'success') => void
 ): void => {
   setLoading(true)
   setSubjects([])
@@ -26,6 +27,7 @@ const getSubjects = (
       setLoading(false)
     })
     .catch((err) => {
+      setMessageType('error')
       setMessages(err.message || "Couldn't get subjects.")
     })
 }
@@ -33,6 +35,7 @@ const getSubjects = (
 const SubjectsPage = (): React.JSX.Element => {
   const [subjects, setSubjects] = useState<Subject[] | null>(null)
   const [messages, setMessages] = useState<string | null>(null)
+  const [messageType, setMessageType] = useState<'info' | 'warning' | 'error' | 'success'>('info')
   const [showCatForm, setShowCatForm] = useState(false)
   const [activeCat, setActiveCat] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
@@ -42,10 +45,12 @@ const SubjectsPage = (): React.JSX.Element => {
     window.api
       .updateSubject(values)
       .then((response) => {
+        setMessageType(response.success ? 'success' : 'error')
         setMessages(response.message || '')
-        if (response.success) getSubjects(setSubjects, setMessages, setLoading)
+        if (response.success) getSubjects(setSubjects, setMessages, setLoading, setMessageType)
       })
       .catch((err: Error) => {
+        setMessageType('error')
         setMessages(err.message || "Couldn't update subjects.")
       })
   }
@@ -55,10 +60,12 @@ const SubjectsPage = (): React.JSX.Element => {
       window.api
         .deleteSubject(catid)
         .then((response) => {
+          setMessageType(response.success ? 'success' : 'error')
           setMessages(response.message || '')
-          getSubjects(setSubjects, setMessages, setLoading)
+          getSubjects(setSubjects, setMessages, setLoading, setMessageType)
         })
         .catch((err: Error) => {
+          setMessageType('error')
           setMessages(err.message || "Couldn't delete subject.")
         })
     }
@@ -71,7 +78,7 @@ const SubjectsPage = (): React.JSX.Element => {
 
   useEffect(() => {
     if (!subjects && !messages) {
-      getSubjects(setSubjects, setMessages, setLoading)
+      getSubjects(setSubjects, setMessages, setLoading, setMessageType)
     }
   }, [subjects, messages])
 
@@ -80,6 +87,7 @@ const SubjectsPage = (): React.JSX.Element => {
       title="Add, Update, Delete Subjects"
       messages={messages}
       setMessages={setMessages}
+      messageType={messageType}
       button={{ action: () => toggleSubjectForm('newcat'), text: 'Add a new one', value: 'newcat' }}
     >
       {loading ? (

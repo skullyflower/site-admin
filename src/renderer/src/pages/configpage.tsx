@@ -5,18 +5,21 @@ import { AdminConfig } from 'src/shared/types'
 import FormContainer from '@renderer/components/formcontainer'
 const getConfig = (
   setConfig: (config: AdminConfig | null) => void,
-  setMessages: (message: string) => void
+  setMessages: (message: string) => void,
+  setMessageType: (type: 'info' | 'warning' | 'error' | 'success') => void
 ): void => {
   window.api
     .getAdminConfig()
     .then((data) => {
       if (!data.success) {
+        setMessageType('error')
         setMessages(data.message || '')
       } else {
         setConfig(data.data || null)
       }
     })
     .catch((err: Error) => {
+      setMessageType('error')
       setMessages(err.message || "Couldn't get config.")
     })
 }
@@ -24,25 +27,29 @@ const getConfig = (
 const ConfigPage = (): React.ReactNode => {
   const [config, setConfig] = useState<AdminConfig | null>(null)
   const [messages, setMessages] = useState<string | null>(null)
+  const [messageType, setMessageType] = useState<'info' | 'warning' | 'error' | 'success'>('info')
 
   useEffect(() => {
     if (config === null && messages === null) {
-      getConfig(setConfig, setMessages)
+      getConfig(setConfig, setMessages, setMessageType)
     }
   }, [config, messages, setConfig, setMessages])
 
   const onSubmit = (): void => {
     if (!config?.pathToSite) {
+      setMessageType('error')
       setMessages('You must fill out all fields.')
       return
     }
     window.api
       .setAdminConfig(config as AdminConfig)
       .then((data) => {
+        setMessageType(data.success ? 'success' : 'error')
         setMessages(data.message || '')
-        getConfig(setConfig, setMessages)
+        getConfig(setConfig, setMessages, setMessageType)
       })
       .catch((err: Error) => {
+        setMessageType('error')
         setMessages(err.message || 'Failed to save config.')
       })
   }
@@ -51,6 +58,7 @@ const ConfigPage = (): React.ReactNode => {
     <PageLayout
       messages={messages}
       setMessages={setMessages}
+      messageType={messageType}
       title="Set Config"
       button={{ action: onSubmit, text: 'Update', value: '' }}
     >

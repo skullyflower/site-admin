@@ -8,13 +8,15 @@ import PageForm from '@renderer/forms/contentpageeditor'
 const getPages = (
   setLoading: (loading: boolean) => void,
   setMessages: (messages: string) => void,
-  setPagesData: (pagesData: string[]) => void
+  setPagesData: (pagesData: string[]) => void,
+  setMessageType: (type: 'info' | 'warning' | 'error' | 'success') => void
 ): void => {
   setLoading(true)
   window.api
     .getPages()
     .then((response) => {
       if (!response.success) {
+        setMessageType('error')
         setMessages(response.message || '')
       } else {
         setPagesData(response.data || [])
@@ -22,6 +24,7 @@ const getPages = (
       setLoading(false)
     })
     .catch((err) => {
+      setMessageType('error')
       setMessages((err as Error).message || "Couldn't get page data.")
     })
   setLoading(false)
@@ -29,6 +32,7 @@ const getPages = (
 
 export default function PageContent(): React.JSX.Element {
   const [messages, setMessages] = useState<string | null>(null)
+  const [messageType, setMessageType] = useState<'info' | 'warning' | 'error' | 'success'>('info')
   const [pagesData, setPagesData] = useState<string[] | null>(null)
   const [activePage, setActivePage] = useState<PageInfo | null>(null)
   const [loading, setLoading] = useState(true)
@@ -39,12 +43,14 @@ export default function PageContent(): React.JSX.Element {
         .getPages()
         .then((response) => {
           if (!response.success) {
+            setMessageType('error')
             setMessages(response.message || '')
           } else {
             setPagesData(response.data || [])
           }
         })
         .catch((err) => {
+          setMessageType('error')
           setMessages((err as Error).message || "Couldn't get page data.")
         })
         .finally(() => setLoading(false))
@@ -61,11 +67,13 @@ export default function PageContent(): React.JSX.Element {
     window.api
       .updatePage(pageId, values)
       .then((response) => {
+        setMessageType(response.success ? 'success' : 'error')
         setMessages(response.message || '')
         if (response.success) setActivePage(null)
-        getPages(setLoading, setMessages, setPagesData)
+        getPages(setLoading, setMessages, setPagesData, setMessageType)
       })
       .catch((err: Error) => {
+        setMessageType('error')
         setMessages(err.message || 'There was a problem.')
       })
   }
@@ -75,12 +83,14 @@ export default function PageContent(): React.JSX.Element {
       .getPage(pageId)
       .then((response) => {
         if (!response.success) {
+          setMessageType('error')
           setMessages(response.message || '')
         } else {
           setActivePage(response.data || null)
         }
       })
       .catch((err: Error) => {
+        setMessageType('error')
         setMessages(err.message || 'There was a problem.')
       })
   }
@@ -90,6 +100,7 @@ export default function PageContent(): React.JSX.Element {
       title={`Manage pages`}
       messages={messages}
       setMessages={setMessages}
+      messageType={messageType}
       button={{ action: addPage, text: 'Add New Page', value: '' }}
     >
       {loading && (

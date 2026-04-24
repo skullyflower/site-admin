@@ -11,7 +11,8 @@ import FormContainer from '../components/formcontainer'
 const getCategories = (
   setCategories: (categories: CategoryType[]) => void,
   setMessages: (message: string) => void,
-  setLoading: (loading: boolean) => void
+  setLoading: (loading: boolean) => void,
+  setMessageType: (type: 'info' | 'warning' | 'error' | 'success') => void
 ): void => {
   setLoading(true)
   setCategories([])
@@ -22,11 +23,13 @@ const getCategories = (
         setCategories(response.data || [])
       } else {
         setCategories([])
+        setMessageType('error')
         setMessages(response.message || '')
       }
       setLoading(false)
     })
     .catch((err) => {
+      setMessageType('error')
       setMessages(err.message || "Couldn't get categories.")
     })
 }
@@ -34,6 +37,7 @@ const getCategories = (
 const CategoriesPage = (): React.JSX.Element => {
   const [categories, setCategories] = useState<CategoryType[] | null>(null)
   const [messages, setMessages] = useState<string | null>(null)
+  const [messageType, setMessageType] = useState<'info' | 'warning' | 'error' | 'success'>('info')
   const [showCatForm, setShowForm] = useState(false)
   const [activeCat, setActiveCat] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
@@ -43,11 +47,13 @@ const CategoriesPage = (): React.JSX.Element => {
     window.api
       .updateCategory(values)
       .then((response) => {
+        setMessageType(response.success ? 'success' : 'error')
         setMessages(response.message || '')
-        getCategories(setCategories, setMessages, setLoading)
+        getCategories(setCategories, setMessages, setLoading, setMessageType)
         toggleCatForm(null)
       })
       .catch((err: Error) => {
+        setMessageType('error')
         setMessages((err.message as string) || "Couldn't update categories.")
       })
   }
@@ -57,10 +63,12 @@ const CategoriesPage = (): React.JSX.Element => {
       window.api
         .deleteCategory(catid)
         .then((response) => {
+          setMessageType(response.success ? 'success' : 'error')
           setMessages(response.message || '')
-          getCategories(setCategories, setMessages, setLoading)
+          getCategories(setCategories, setMessages, setLoading, setMessageType)
         })
         .catch((err: Error) => {
+          setMessageType('error')
           setMessages((err.message as string) || "Couldn't delete category.")
         })
     }
@@ -73,7 +81,7 @@ const CategoriesPage = (): React.JSX.Element => {
 
   useEffect(() => {
     if (!categories && !messages) {
-      getCategories(setCategories, setMessages, setLoading)
+      getCategories(setCategories, setMessages, setLoading, setMessageType)
     }
   }, [categories, messages])
 
@@ -82,6 +90,7 @@ const CategoriesPage = (): React.JSX.Element => {
       title="Add, Update, Delete Categories"
       messages={messages}
       setMessages={setMessages}
+      messageType={messageType}
       button={{ action: () => toggleCatForm('newcat'), text: 'Add a new one', value: 'newcat' }}
     >
       {loading ? (

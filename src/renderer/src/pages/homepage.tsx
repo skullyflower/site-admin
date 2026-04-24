@@ -9,13 +9,15 @@ import FormContainer from '@renderer/components/formcontainer'
 const getSiteData = async (
   setLoading: (loading: boolean) => void,
   setMessages: (messages: string) => void,
-  setPageData: (pageData: SiteInfo) => void
+  setPageData: (pageData: SiteInfo) => void,
+  setMessageType: (type: 'info' | 'warning' | 'error' | 'success') => void
 ): Promise<void> => {
   setLoading(true)
   const pathToSite = await window.api.getAdminConfig()
   if (pathToSite.success && pathToSite.data?.pathToSite) {
     const response = await window.api.getSiteInfo()
     if (!response.success) {
+      setMessageType('error')
       setMessages(response.message || '')
       setLoading(false)
       return
@@ -23,6 +25,7 @@ const getSiteData = async (
     if (response.data?.page_title) {
       setPageData(response.data)
     } else {
+      setMessageType('error')
       setMessages('No site data found.')
       setLoading(false)
       return
@@ -43,12 +46,13 @@ const emptySiteInfo: SiteInfo = {
 }
 export default function HomePage(): React.JSX.Element {
   const [messages, setMessages] = useState<string | null>(null)
+  const [messageType, setMessageType] = useState<'info' | 'warning' | 'error' | 'success'>('info')
   const [pageData, setPageData] = useState<SiteInfo | null>(null)
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
 
   useEffect(() => {
-    getSiteData(setLoading, setMessages, setPageData)
+    getSiteData(setLoading, setMessages, setPageData, setMessageType)
   }, [])
 
   const onSubmit = async (values: SiteInfo & { newsitelogo: File[] }): Promise<void> => {
@@ -62,9 +66,10 @@ export default function HomePage(): React.JSX.Element {
       formData.append('newsitelogo', file as Blob | string)
     }
     const response = await window.api.updateSiteInfo(values as SiteInfo)
+    setMessageType(response.success ? 'success' : 'error')
     setMessages(response.message || '')
     setLoading(false)
-    getSiteData(setLoading, setMessages, setPageData)
+    getSiteData(setLoading, setMessages, setPageData, setMessageType)
   }
   const toggleForm = (): void => {
     setShowForm(!showForm)
@@ -75,6 +80,7 @@ export default function HomePage(): React.JSX.Element {
       title="Manage Site Data and Homepage"
       messages={messages}
       setMessages={setMessages}
+      messageType={messageType}
       button={{ text: showForm ? 'Show Preview' : 'Show Form', action: toggleForm, value: '' }}
     >
       {loading ? (

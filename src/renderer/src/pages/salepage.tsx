@@ -7,10 +7,12 @@ import { buttonRecipe } from '@renderer/themeRecipes'
 
 const getSale = (
   setSale: (sale: number) => void,
-  setMessages: (messages: string) => void
+  setMessages: (messages: string) => void,
+  setMessageType: (type: 'info' | 'warning' | 'error' | 'success') => void
 ): void => {
   window.api.getSale().then((response) => {
     if (!response.success) {
+      setMessageType('error')
       setMessages(response.message || '')
     } else {
       setSale(response.data?.sale ?? 0)
@@ -21,10 +23,11 @@ const getSale = (
 const Sale = (): React.JSX.Element => {
   const [sale, setSale] = useState<number | null>(null)
   const [messages, setMessages] = useState<string | null>(null)
+  const [messageType, setMessageType] = useState<'info' | 'warning' | 'error' | 'success'>('info')
 
   useEffect(() => {
     if (sale === null) {
-      getSale(setSale, setMessages)
+      getSale(setSale, setMessages, setMessageType)
     }
   }, [sale, setSale, setMessages])
 
@@ -32,10 +35,12 @@ const Sale = (): React.JSX.Element => {
     window.api
       .setSale(values)
       .then((response) => {
+        setMessageType(response.success ? 'success' : 'error')
         setMessages(response.message || '')
-        getSale(setSale, setMessages)
+        getSale(setSale, setMessages, setMessageType)
       })
       .catch((err) => {
+        setMessageType('error')
         setMessages(err.message || 'Failed to save sale.')
       })
   }
@@ -46,6 +51,7 @@ const Sale = (): React.JSX.Element => {
     <PageLayout
       messages={messages}
       setMessages={setMessages}
+      messageType={messageType}
       title="Set Sale"
       button={{ action: onSubmit, text: 'Update', value: '' }}
     >

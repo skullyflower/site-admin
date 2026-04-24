@@ -14,6 +14,7 @@ import { buttonRecipe } from '@renderer/themeRecipes'
 interface PageLayoutProps {
   messages: string | null
   setMessages: (string: string | null) => void
+  messageType?: 'info' | 'warning' | 'error' | 'success'
   title: string
   button?: {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -27,6 +28,7 @@ interface PageLayoutProps {
 const PageLayout = ({
   messages,
   setMessages,
+  messageType,
   title,
   button,
   children
@@ -72,7 +74,7 @@ const PageLayout = ({
                       <Dialog.Title>Submitted</Dialog.Title>
                     </Dialog.Header>
                     <Dialog.Body>
-                      <Alert.Root status="info">{messages}</Alert.Root>
+                      <Alert.Root status={messageType ?? 'info'}>{messages}</Alert.Root>
                     </Dialog.Body>
                     <Dialog.Footer>
                       <Dialog.CloseTrigger asChild>

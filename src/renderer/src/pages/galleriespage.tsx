@@ -13,10 +13,12 @@ export const newGalleryId = 'new-gallery'
 
 const getGalleries = (
   setGalleries: (galleries: GalleryInfo[]) => void,
-  setMessages: (message: string) => void
+  setMessages: (message: string) => void,
+  setMessageType: (type: 'info' | 'warning' | 'error' | 'success') => void
 ): void => {
   window.api.getGalleries().then((res) => {
     if (!res.success) {
+      setMessageType('error')
       setMessages(res.message || '')
     } else {
       setGalleries(res.data || [])
@@ -27,10 +29,12 @@ const getGalleries = (
 const getGalleryImages = async (
   gallery_id: string,
   setter: (images: GalleryImage[]) => void,
-  setMessages: (message: string) => void
+  setMessages: (message: string) => void,
+  setMessageType: (type: 'info' | 'warning' | 'error' | 'success') => void
 ): Promise<void> => {
   window.api.getGalleryImages(gallery_id).then((res) => {
     if (!res.success) {
+      setMessageType('error')
       setMessages(res.message || '')
     } else {
       setter(Object.values(res.data || {}) as GalleryImage[])
@@ -49,6 +53,7 @@ const newgallery = {
 
 const GalleryPage: React.FC = () => {
   const [messages, setMessages] = useState<string | null>(null)
+  const [messageType, setMessageType] = useState<'info' | 'warning' | 'error' | 'success'>('info')
   const [galleries, setGalleries] = useState<GalleryInfo[] | null>(null)
   const [activeGallery, setActiveGallery] = useState<GalleryInfo | null>(null)
   const [images, setImages] = useState<GalleryImage[]>([])
@@ -65,7 +70,7 @@ const GalleryPage: React.FC = () => {
     if (gallery !== undefined) {
       setActiveGallery(gallery)
       setLoading(false)
-      getGalleryImages(gallery.id, setImages, setMessages)
+      getGalleryImages(gallery.id, setImages, setMessages, setMessageType)
     }
   }
 
@@ -80,16 +85,19 @@ const GalleryPage: React.FC = () => {
     window.api
       .resetGallery(gallery.id)
       .then((res) => {
+        setMessageType(res.success ? 'success' : 'error')
         setMessages(res.message || '')
-        getGalleryImages(gallery.id, setImages, setMessages)
+        getGalleryImages(gallery.id, setImages, setMessages, setMessageType)
       })
       .catch((err) => {
+        setMessageType('error')
         setMessages(err.message || 'There was a problem.')
       })
   }
 
   async function addGalleryImages(): Promise<void> {
     if (!activeGallery?.path) {
+      setMessageType('warning')
       setMessages('No gallery selected.')
       return
     }
@@ -98,9 +106,11 @@ const GalleryPage: React.FC = () => {
       activeGallery?.path || 'artwork'
     )
     if (!result.success || !result.data?.length) {
+      setMessageType('error')
       setMessages('There was a problem uploading the images.')
       return
     }
+    setMessageType('success')
     setMessages('Images uploaded successfully.')
     doResetGallery(activeGallery)
     setShowUpload(false)
@@ -112,10 +122,12 @@ const GalleryPage: React.FC = () => {
     window.api
       .renameImage(imageurl, newName)
       .then((res) => {
+        setMessageType(res.success ? 'success' : 'error')
         setMessages(res.message || '')
         doResetGallery(activeGallery as GalleryInfo)
       })
       .catch((err) => {
+        setMessageType('error')
         setMessages(err.message || 'There was a problem.')
       })
   }
@@ -124,17 +136,19 @@ const GalleryPage: React.FC = () => {
     window.api
       .deleteImage(imageurl)
       .then((res) => {
+        setMessageType(res.success ? 'success' : 'error')
         setMessages(res.message || '')
         if (res.success) doResetGallery(activeGallery as GalleryInfo)
       })
       .catch((err) => {
+        setMessageType('error')
         setMessages(err.message || 'There was a problem.')
       })
   }
 
   useEffect(() => {
     if (!galleries && !messages) {
-      getGalleries(setGalleries, setMessages)
+      getGalleries(setGalleries, setMessages, setMessageType)
     }
   }, [galleries, messages])
 
@@ -143,6 +157,7 @@ const GalleryPage: React.FC = () => {
       title="Update a Gallery"
       messages={messages}
       setMessages={setMessages}
+      messageType={messageType}
       button={{
         text: showAddEdit ? 'Never mind' : 'Add new Gallery',
         action: () => {

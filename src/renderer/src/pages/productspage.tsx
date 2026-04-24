@@ -16,11 +16,13 @@ type ShopData = {
 const getShopData = async (
   setShopData: (shopData: ShopData) => void,
   setMessages: (message: string) => void,
-  setLoading: (loading: boolean) => void
+  setLoading: (loading: boolean) => void,
+  setMessageType: (type: 'info' | 'warning' | 'error' | 'success') => void
 ): Promise<void> => {
   setLoading(true)
   const siteInfo = await window.api.getSiteInfo()
   if (!siteInfo.success) {
+    setMessageType('error')
     setMessages(siteInfo.message || '')
     setLoading(false)
     return
@@ -54,6 +56,7 @@ const ProductsPage = (): React.JSX.Element => {
   const [loading, setLoading] = useState(false)
   const [shopData, setShopData] = useState<ShopData | null>(null)
   const [messages, setMessages] = useState<string | null>(null)
+  const [messageType, setMessageType] = useState<'info' | 'warning' | 'error' | 'success'>('info')
   const [showForm, setShowForm] = useState(false)
   const [activeProd, setActiveProd] = useState<string | null>(null)
 
@@ -78,8 +81,9 @@ const ProductsPage = (): React.JSX.Element => {
     window.api
       .updateProduct(change)
       .then((response) => {
+        setMessageType(response.success ? 'success' : 'error')
         setMessages(response.message || '')
-        getShopData(setShopData, setMessages, setLoading)
+        getShopData(setShopData, setMessages, setLoading, setMessageType)
         if (filter && shopData?.products) {
           setFilteredProducts(
             shopData.products.filter((prod: ProductType) => prod.cat.includes(filter as string))
@@ -88,14 +92,16 @@ const ProductsPage = (): React.JSX.Element => {
         toggleForm(null)
       })
       .catch((err: Error) => {
+        setMessageType('error')
         setMessages((err.message as string) || 'there was a problem.')
       })
   }
 
   const doDelete = (prodid: string) => () => {
     window.api.deleteProduct(prodid).then((json) => {
+      setMessageType(json.success ? 'success' : 'error')
       setMessages(json.message || '')
-      getShopData(setShopData, setMessages, setLoading)
+      getShopData(setShopData, setMessages, setLoading, setMessageType)
       if (filter && shopData?.products) {
         setFilteredProducts(shopData.products.filter((prod) => prod.cat.includes(filter)))
       }
@@ -125,7 +131,7 @@ const ProductsPage = (): React.JSX.Element => {
 
   useEffect(() => {
     if (!shopData && !messages) {
-      getShopData(setShopData, setMessages, setLoading)
+      getShopData(setShopData, setMessages, setLoading, setMessageType)
     }
   }, [shopData, messages, setShopData, setMessages, setLoading])
 
@@ -133,6 +139,7 @@ const ProductsPage = (): React.JSX.Element => {
     <PageLayout
       messages={messages}
       setMessages={setMessages}
+      messageType={messageType}
       title="Add, Update, Delete Products"
       button={{ action: () => toggleForm('newcat'), text: 'Add a new one', value: 'newcat' }}
     >
