@@ -1,4 +1,5 @@
-import { Button, Dialog, Portal } from '@chakra-ui/react'
+import { Dialog, IconButton, Portal } from '@chakra-ui/react'
+import { XIcon } from '@phosphor-icons/react'
 import { buttonRecipe } from '@renderer/themeRecipes'
 
 interface FloatingFormWrapperProps {
@@ -36,9 +37,9 @@ const FloatingFormWrapper = ({
             className="content"
           >
             <Dialog.CloseTrigger asChild position="fixed" top={4} right={4}>
-              <Button recipe={buttonRecipe} onClick={onClose}>
-                Never mind
-              </Button>
+              <IconButton recipe={buttonRecipe} onClick={onClose} p={2} aria-label="Close form">
+                <XIcon />
+              </IconButton>
             </Dialog.CloseTrigger>
             <Dialog.Body>{children}</Dialog.Body>
           </Dialog.Content>
