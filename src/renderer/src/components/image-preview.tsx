@@ -20,7 +20,7 @@ const PreviewImage = ({
       <HStack align={'start'}>
         <Image
           className="image"
-          src={image}
+          src={`http://localhost:3000${image}`}
           alt={'Image'}
           width={150}
           style={{ padding: '10px' }}

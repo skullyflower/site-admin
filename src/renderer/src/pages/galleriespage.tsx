@@ -102,7 +102,7 @@ const GalleryPage: React.FC = () => {
       return
     }
     const result = await window.api.uploadImages(
-      newImages?.map((img) => img.replace('http://localhost:3000//temp/', '')) || [],
+      newImages?.map((img) => img.split('/').pop() || img) || [],
       activeGallery?.path || 'artwork'
     )
     if (!result.success || !result.data?.length) {

@@ -6,7 +6,7 @@ import OneProduct from '../components/oneProduct'
 import { CategoryType, ProductType, Subject } from 'src/shared/types'
 import { buttonRecipe } from '@renderer/themeRecipes'
 import FormContainer from '@renderer/components/formcontainer'
-
+import { newprodId } from '@renderer/forms/producteditor'
 type ShopData = {
   products: ProductType[]
   categories: CategoryType[]
@@ -41,7 +41,7 @@ const getShopData = async (
     }
     if (siteInfo.data.features.includes('subjects')) {
       const r = await window.api.getSubjects()
-      subjects = r.success ? (r.data || []) : []
+      subjects = r.success ? r.data || [] : []
     }
     setShopData({
       products: products || [],
@@ -60,9 +60,7 @@ const ProductsPage = (): React.JSX.Element => {
   const [showForm, setShowForm] = useState(false)
   const [activeProd, setActiveProd] = useState<string | null>(null)
 
-  const [filteredFroducts, setFilteredProducts] = useState<ProductType[] | null>(
-    shopData?.products || null
-  )
+  const [filteredFroducts, setFilteredProducts] = useState<ProductType[]>(shopData?.products || [])
   const [filter, setFilter] = useState<string | null>(null)
 
   const onSubmit = (values: ProductType): void => {
@@ -125,7 +123,7 @@ const ProductsPage = (): React.JSX.Element => {
   )
 
   const toggleForm = (productId: string | null): void => {
-    setActiveProd(productId)
+    setActiveProd(productId === newprodId ? null : productId)
     setShowForm(!!productId)
   }
 
@@ -141,7 +139,7 @@ const ProductsPage = (): React.JSX.Element => {
       setMessages={setMessages}
       messageType={messageType}
       title="Add, Update, Delete Products"
-      button={{ action: () => toggleForm('newcat'), text: 'Add a new one', value: 'newcat' }}
+      button={{ action: () => toggleForm(newprodId), text: 'Add one', value: newprodId }}
     >
       {loading ? (
         <Stack>
@@ -155,9 +153,9 @@ const ProductsPage = (): React.JSX.Element => {
               <EditProduct
                 isOpen={showForm}
                 prodId={activeProd as string}
-                categories={shopData?.categories as CategoryType[]}
-                subjects={shopData?.subjects as Subject[]}
-                products={shopData?.products as ProductType[]}
+                categories={shopData?.categories ?? []}
+                subjects={shopData?.subjects ?? []}
+                products={shopData?.products ?? []}
                 toggleForm={toggleForm}
                 onSubmit={onSubmit}
               />
@@ -201,8 +199,8 @@ const ProductsPage = (): React.JSX.Element => {
               ))}
             </Stack>
             <Center p={5}>
-              <Button recipe={buttonRecipe} value="newcat" onClick={() => toggleForm('newcat')}>
-                {showForm ? 'Never mind' : 'Add a new one'}
+              <Button recipe={buttonRecipe} value={newprodId} onClick={() => toggleForm(newprodId)}>
+                {showForm ? 'Never mind' : 'Add one'}
               </Button>
             </Center>
           </Stack>

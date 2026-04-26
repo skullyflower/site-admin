@@ -102,7 +102,7 @@ const CategoriesPage = (): React.JSX.Element => {
       messages={messages}
       setMessages={setMessages}
       messageType={messageType}
-      button={{ action: () => toggleCatForm('newcat'), text: 'Add a new one', value: 'newcat' }}
+      button={{ action: () => toggleCatForm('newcat'), text: 'Add one', value: 'newcat' }}
     >
       {loading ? (
         <Stack>
@@ -128,9 +128,9 @@ const CategoriesPage = (): React.JSX.Element => {
                 <HStack justifyContent="space-between">
                   <HStack alignItems="start" justify="start">
                     <Image
-                      src={`http://localhost:3000/${cat.img}`}
+                      src={`http://localhost:3000${cat.img}`}
                       boxSize="75px"
-                      alt={`${cat.name} - http://localhost:3000/${cat.img}`}
+                      alt={`${cat.name} - http://localhost:3000${cat.img}`}
                       onError={(e) => {
                         e.currentTarget.src = imageLoading
                       }}
@@ -169,7 +169,7 @@ const CategoriesPage = (): React.JSX.Element => {
             ))}
             <Center>
               <Button recipe={buttonRecipe} value="newcat" onClick={() => toggleCatForm(null)}>
-                {showCatForm ? 'Never mind' : 'Add a new one'}
+                {showCatForm ? 'Never mind' : 'Add one'}
               </Button>
             </Center>
           </Stack>

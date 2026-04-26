@@ -118,7 +118,7 @@ export default function EditCategory({
                   width={'100%'}
                 />
                 <Image
-                  src={`http://localhost:3000/shop/GROUPS/${cat.img}`}
+                  src={`http://localhost:3000${cat.img}`}
                   boxSize="100px"
                   onError={(e) => {
                     e.currentTarget.src = imageLoading

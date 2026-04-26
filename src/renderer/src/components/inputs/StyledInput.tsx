@@ -56,7 +56,12 @@ const StyledInput = ({
       overflow="hidden"
     >
       <MDXEditor
-        markdown={value?.replace(/<[/]*p>/g, '').replace(/<[/]*[^>]*>/g, '') || ''}
+        markdown={
+          value
+            ?.replace(/<[/]*p>/g, '')
+            .replace(/<[/]*[^>]*>/g, '')
+            ?.replace('src="', 'src="http://localhost:3000') || ''
+        }
         onChange={onChange}
         placeholder={placeholder}
         className="dark-theme dark-editor"

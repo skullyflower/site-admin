@@ -13,18 +13,18 @@ export const updateSubject = async (subject): Promise<ApiResponse> => {
   const { subjectFilePath } = getPaths()
   if (subject) {
     try {
-      checkFile(subjectFilePath, { designs: [] })
-      checkFile(subjectFilePath.replace('public', 'build'), { designs: [] })
+      checkFile(subjectFilePath, { subjects: [] })
+      checkFile(subjectFilePath.replace('public', 'build'), { subjects: [] })
       const oldShopDataString = fs.readFileSync(subjectFilePath, 'utf8')
       const oldShopObject = JSON.parse(oldShopDataString)
-      const newCategories = [...oldShopObject.designs]
+      const newCategories = [...oldShopObject.subjects]
       const newCatIndex = newCategories.findIndex((cat) => cat.id === subject.id)
       if (newCatIndex !== -1) {
         newCategories[newCatIndex] = subject
       } else {
         newCategories.unshift(subject)
       }
-      const newShopData = { designs: newCategories }
+      const newShopData = { subjects: newCategories }
       fs.writeFileSync(subjectFilePath, JSON.stringify(newShopData))
       fs.writeFileSync(subjectFilePath.replace('public', 'build'), JSON.stringify(newShopData))
       return okMessage('Updated Shop Subjects!')
@@ -39,11 +39,11 @@ export const updateSubject = async (subject): Promise<ApiResponse> => {
 
 export const getSubjects = (): string => {
   const { subjectFilePath } = getPaths()
-  checkFile(subjectFilePath, { designs: [] })
+  checkFile(subjectFilePath, { subjects: [] })
   const shopData = fs.readFileSync(subjectFilePath)
   const shop = JSON.parse(shopData.toString())
-  if (shop.designs) {
-    return JSON.stringify(ok(shop.designs))
+  if (shop.subjects) {
+    return JSON.stringify(ok(shop.subjects))
   }
   return JSON.stringify(fail('No Subjects to show'))
 }
@@ -53,7 +53,7 @@ export const deleteSubject = (catId): string => {
   try {
     const { subjectFilePath } = getPaths()
     const catToDelete = catId
-    checkFile(subjectFilePath, { designs: [] })
+    checkFile(subjectFilePath, { subjects: [] })
     const shopData = fs.readFileSync(subjectFilePath, 'utf8')
     const shop = JSON.parse(shopData)
     if (

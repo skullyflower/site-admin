@@ -89,7 +89,7 @@ const SubjectsPage = (): React.JSX.Element => {
       messages={messages}
       setMessages={setMessages}
       messageType={messageType}
-      button={{ action: () => toggleSubjectForm('newcat'), text: 'Add a new one', value: 'newcat' }}
+      button={{ action: () => toggleSubjectForm('newcat'), text: 'Add one', value: 'newcat' }}
     >
       {loading ? (
         <Stack>
@@ -150,7 +150,7 @@ const SubjectsPage = (): React.JSX.Element => {
                 value="newcat"
                 onClick={() => toggleSubjectForm('newcat')}
               >
-                {showCatForm ? 'Never mind' : 'Add a new one'}
+                {showCatForm ? 'Never mind' : 'Add one'}
               </Button>
             </Center>
           </Stack>

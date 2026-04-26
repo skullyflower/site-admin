@@ -121,7 +121,7 @@ const BlogPage = (): React.JSX.Element => {
       messages={messages}
       setMessages={setMessages}
       messageType={messageType}
-      button={{ action: addNewBlogEntry, text: 'Add a new one', value: null }}
+      button={{ action: addNewBlogEntry, text: 'Add one', value: null }}
     >
       <div className="content">
         {showForm ? (

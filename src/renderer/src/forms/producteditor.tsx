@@ -23,7 +23,8 @@ import StyledInput from '@renderer/components/inputs/StyledInput'
 import TagSelector from '@renderer/components/inputs/TagSelector'
 import imageLoading from '@renderer/assets/image-loading.svg'
 
-const newprodId = 'new-prod-id'
+export const newprodId = 'new-prod-id'
+
 const newproduct = {
   id: newprodId,
   date: convertDate(today, 'input'), // default to current date
@@ -34,6 +35,7 @@ const newproduct = {
   desc: '',
   desc_long: '',
   cat: [],
+  design: [],
   weight: 0,
   handling: 0,
   newImage: []
@@ -41,7 +43,7 @@ const newproduct = {
 
 interface EditProductProps {
   isOpen: boolean
-  prodId: string
+  prodId: string | null
   products: ProductType[]
   categories: CategoryType[]
   subjects: Subject[]
@@ -57,16 +59,13 @@ export default function EditProduct({
   toggleForm,
   onSubmit
 }: EditProductProps): React.JSX.Element {
-  const prodToLoan = !prodId
-    ? null
-    : prodId.endsWith('-copy')
-      ? prodId.replace('-copy', '')
-      : prodId
-  const selectedProduct = !prodToLoan
+  const idToEdit = !prodId ? null : prodId.endsWith('-copy') ? prodId.replace('-copy', '') : prodId
+  const selectedProduct = !idToEdit
     ? newproduct
-    : products.find((prod) => prod.id === prodToLoan) || newproduct
+    : products.find((prod) => prod.id === idToEdit) || newproduct
   const [wysiwygText, setWysiwygText] = useState(selectedProduct.desc)
   const [wysiwygText2, setWysiwygText2] = useState(selectedProduct.desc_long)
+
   const {
     control,
     register,
@@ -84,6 +83,13 @@ export default function EditProduct({
   const soldout = useWatch({ control, name: 'soldout' })
   const prodCategories = useWatch({ control, name: 'cat' })
   const prodSubjects = useWatch({ control, name: 'design' })
+  const disabled =
+    !getValues('id') ||
+    getValues('id') == newprodId ||
+    !getValues('name') ||
+    !getValues('price') ||
+    !!errors.price
+
   const handleTextChange = (formfield) => (newText) => {
     setValue(formfield, newText)
     if (formfield === 'desc') {
@@ -321,7 +327,7 @@ export default function EditProduct({
         </HStack>
       </Field.Root>
       <Center>
-        <Button recipe={buttonRecipe} onClick={handleSubmit(onSubmit)}>
+        <Button disabled={disabled} recipe={buttonRecipe} onClick={handleSubmit(onSubmit)}>
           Submit Changes
         </Button>
       </Center>

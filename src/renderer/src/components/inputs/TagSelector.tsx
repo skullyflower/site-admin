@@ -29,7 +29,7 @@ const TagSelector = ({
   const { contains } = useFilter({ sensitivity: 'base' })
 
   const { collection, filter } = useListCollection({
-    initialItems: defaultOptions || [],
+    initialItems: (defaultOptions || []).filter((item): item is string => item != null),
     filter: contains
   })
 
@@ -38,7 +38,7 @@ const TagSelector = ({
 
   const tags = useTagsInput({
     ids: { input: inputId },
-    defaultValue: value
+    defaultValue: value || []
   })
 
   useEffect(() => {
@@ -73,10 +73,10 @@ const TagSelector = ({
   return (
     <Combobox.RootProvider value={comobobox}>
       <TagsInput.RootProvider value={tags}>
-        {label && <TagsInput.Label>{label }</TagsInput.Label>}
+        {label && <TagsInput.Label>{label}</TagsInput.Label>}
         <TagsInput.Control ref={controlRef}>
           {tags.value.map((tag, index) => (
-            <TagsInput.Item key={index} index={index} value={tag}>
+            <TagsInput.Item key={`${tag}-${index}`} index={index} value={tag}>
               <TagsInput.ItemPreview>
                 <TagsInput.ItemText>{tag}</TagsInput.ItemText>
                 <TagsInput.ItemDeleteTrigger />

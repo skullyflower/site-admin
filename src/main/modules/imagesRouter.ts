@@ -34,7 +34,7 @@ export const getPreviewImages = async (files: string[]): Promise<ApiResponse<str
         files.map(async (file) => {
           const newFilePath = join(tempPath, file.split('/').pop() || '')
           fs.copyFileSync(file, newFilePath)
-          return newFilePath.replace(pathToPublic, 'http://localhost:3000/') //preview url
+          return newFilePath.replace(pathToPublic, '') // relative URL
         })
       )
       return ok(newFilePaths)
