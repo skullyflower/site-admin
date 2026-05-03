@@ -51,7 +51,7 @@ export default function EditCategory({
 
   const handleImageUpload = (paths: string[]): void => {
     if (paths.length > 0) {
-      const catImage = `/shop/categories/${paths[0].split('/').pop()}`
+      const catImage = `/images/shop/categories/${paths[0].split('/').pop()}`
       setValue('img', catImage)
     }
   }

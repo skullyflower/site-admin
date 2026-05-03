@@ -1,4 +1,5 @@
 import fs from 'fs'
+import path from 'path'
 import getPathsFromConfig, { checkFile } from '../utilities/pathData'
 import { ProductType, ApiResponse } from '../../shared/types'
 import processFile from '../utilities/imageProcessor'
@@ -14,16 +15,16 @@ export const updateProduct = async (product: ProductType): Promise<ApiResponse> 
   const { pathToPublic, shopfilepath } = getPaths()
   if (product) {
     try {
-      const categoryId = product.cat[0]
-
-      const smallDestPath = `${pathToPublic}/shop/${categoryId}/`
-      const bigDestPath = `${pathToPublic}/shop/smaller/${categoryId}/`
-      const filePaths = [product.img, ...product.altimgs]
-      if (filePaths.length) {
-        for (const filePath of filePaths) {
+      const bigDestPath = `${pathToPublic}/images/shop/products/`
+      const smallDestPath = `${pathToPublic}/images/shop/products/smaller/`
+      const filePaths = [product.img, ...product.altimgs].filter(Boolean)
+      for (const filePath of filePaths) {
+        const filename = path.basename(filePath)
+        const sourcePath = path.join(pathToPublic, 'temp', filename)
+        if (fs.existsSync(sourcePath)) {
           try {
-            processFile(filePath, 850, bigDestPath)
-            processFile(filePath, 450, smallDestPath)
+            await processFile(sourcePath, 850, bigDestPath)
+            await processFile(sourcePath, 450, smallDestPath)
           } catch (err) {
             console.log(`Failed: file upload: ${filePath}: ${err}`)
           }

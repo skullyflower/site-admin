@@ -104,11 +104,11 @@ export default function EditProduct({
     (paths: string[]): void => {
       if (paths.length > 0) {
         if (key === 'img') {
-          const prodImage = `/shop/${paths[0].split('/').pop()}`
+          const prodImage = `/images/shop/products/${paths[0].split('/').pop()}`
           setValue('img', prodImage)
         } else {
           const altimgs = getValues('altimgs')
-          const newAltImgs = paths.map((path) => `/shop/${path.split('/').pop()}`)
+          const newAltImgs = paths.map((path) => `/images/shop/products/${path.split('/').pop()}`)
           setValue('altimgs', [...altimgs, ...newAltImgs])
         }
       }
@@ -212,7 +212,7 @@ export default function EditProduct({
                   width={'100%'}
                 />
                 <Image
-                  src={`http://localhost:3000/shop/${thumb}`}
+                  src={`http://localhost:3000${thumb}`}
                   boxSize="100px"
                   onError={(e) => {
                     e.currentTarget.src = imageLoading
