@@ -1,11 +1,12 @@
 import fs from 'fs'
+import { join } from 'path'
 import getPathsFromConfig, { checkFile } from '../utilities/pathData'
 import { ApiResponse } from '../../shared/types'
 import { ok, okMessage, fail } from '../utilities/apiResponse'
 
 const getPaths = (): { subjectFilePath: string } => {
   const { pathToPublic } = getPathsFromConfig()
-  const subjectFilePath = `${pathToPublic}/data/subjects.json`
+  const subjectFilePath = join(pathToPublic, 'data', 'subjects.json')
   return { subjectFilePath }
 }
 

@@ -37,7 +37,7 @@ const UploadInput = ({
           <ImagePreview
             images={previewImages}
             updateImages={(images: string[]) => setPreviewImages(images)}
-          />{' '}
+          />
         </HStack>
       ) : (
         <FileUpload.Root

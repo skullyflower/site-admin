@@ -1,5 +1,5 @@
 import fs from 'fs'
-import path from 'path'
+import path, { join } from 'path'
 import getPathsFromConfig, { checkFile } from '../utilities/pathData'
 import { ProductType, ApiResponse } from '../../shared/types'
 import processFile from '../utilities/imageProcessor'
@@ -7,7 +7,7 @@ import { ok, okMessage, fail } from '../utilities/apiResponse'
 
 const getPaths = (): { pathToPublic: string; shopfilepath: string } => {
   const { pathToPublic } = getPathsFromConfig()
-  const shopfilepath = `${pathToPublic}/data/products.json`
+  const shopfilepath = join(pathToPublic, 'data', 'products.json')
   return { pathToPublic, shopfilepath }
 }
 
@@ -15,8 +15,8 @@ export const updateProduct = async (product: ProductType): Promise<ApiResponse> 
   const { pathToPublic, shopfilepath } = getPaths()
   if (product) {
     try {
-      const bigDestPath = `${pathToPublic}/images/shop/products/`
-      const smallDestPath = `${pathToPublic}/images/shop/products/smaller/`
+      const bigDestPath = join(pathToPublic, 'images', 'shop', 'products')
+      const smallDestPath = join(pathToPublic, 'images', 'shop', 'products', 'smaller')
       const filePaths = [product.img, ...product.altimgs].filter(Boolean)
       for (const filePath of filePaths) {
         const filename = path.basename(filePath)

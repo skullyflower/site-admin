@@ -1,10 +1,11 @@
 import fs from 'fs'
+import { join } from 'path'
 import getPathsFromConfig, { checkFile } from '../utilities/pathData'
 import { ok, okMessage, fail } from '../utilities/apiResponse'
 
 const getPaths = (): { pathToPublic: string; shopfilepath: string } => {
   const { pathToPublic } = getPathsFromConfig()
-  const shopfilepath = `${pathToPublic}/data/sale.json`
+  const shopfilepath = join(pathToPublic, 'data', 'sale.json')
   return { pathToPublic, shopfilepath }
 }
 

@@ -36,14 +36,11 @@ const StyledInput = ({
 }): React.ReactNode => {
   const addUploadImages = async (image: File): Promise<string> => {
     const result = await window.api.getPreviewImages([image])
-    if (result && result[0] && onUploadImage) {
-      const imageUrl = await onUploadImage(
-        result[0].replace('http://localhost:3000/', '') || result[0]
-      )
-      console.log('imageUrl', imageUrl)
-      return imageUrl as string // relative url to the image for use in the content block, not the staging url.
+    if (result.data?.[0] && onUploadImage) {
+      const imageUrl = await onUploadImage(result.data[0])
+      return imageUrl as string
     }
-    return result[0]
+    return result.data?.[0] || ''
   }
 
   return (

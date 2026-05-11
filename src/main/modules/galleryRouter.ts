@@ -1,16 +1,17 @@
 import { readFileSync, readdirSync, writeFileSync } from 'fs'
+import { join } from 'path'
 import getPathsFromConfig, { checkFile, checkPath } from '../utilities/pathData'
 import { ok, okMessage, fail } from '../utilities/apiResponse'
 
 const getPaths = (): { pathToPublic: string; galleries_json: string } => {
   const { pathToPublic } = getPathsFromConfig()
-  const galleries_json = `${pathToPublic}/data/galleries_list.json`
+  const galleries_json = join(pathToPublic, 'data', 'galleries_list.json')
   return { pathToPublic, galleries_json }
 }
 
 function getImages(path): string[] {
   const { pathToPublic } = getPaths()
-  const images_path = `${pathToPublic}/images/${path}`
+  const images_path = join(pathToPublic, 'images', path)
   checkPath(images_path)
   const all_images = readdirSync(images_path)
   if (Array.isArray(all_images) && all_images.length) {
@@ -28,7 +29,7 @@ export const resetGallery = (galleryId: string): string => {
     return JSON.stringify(fail(`Gallery ${galleryId} not found.`))
   }
   const { json_path, path, isStory } = gallery
-  const json_file = `${pathToPublic}${json_path}`
+  const json_file = join(pathToPublic, json_path)
   const img_files = {}
   const all_files = getImages(path)
   if (Array.isArray(all_files) && all_files.length) {
@@ -102,7 +103,7 @@ export const updateGallery = (gallery): string => {
         galleries[gall_index] = gallery
       } else {
         galleries.push(gallery)
-        writeFileSync(`${pathToPublic}${json_path}`, JSON.stringify({}))
+        writeFileSync(join(pathToPublic, json_path), JSON.stringify({}))
       }
       writeFileSync(`${galleries_json}`, JSON.stringify({ galleries: galleries }))
       return JSON.stringify(okMessage(`Updated gallery; ${gallery.title}!`))
@@ -126,8 +127,8 @@ export const getGalleryImages = (galleryId): string => {
     }
 
     const galleryFile = gallery?.json_path ?? galleries[0].json_path
-    checkFile(`${pathToPublic}${galleryFile}`, {})
-    const gallery_json = readFileSync(`${pathToPublic}${galleryFile}`, 'utf8')
+    checkFile(join(pathToPublic, galleryFile), {})
+    const gallery_json = readFileSync(join(pathToPublic, galleryFile), 'utf8')
     return JSON.stringify(ok(JSON.parse(gallery_json)))
   } catch (err) {
     return JSON.stringify(fail(`Couldn't read file for ${galleryId} ${err}`))

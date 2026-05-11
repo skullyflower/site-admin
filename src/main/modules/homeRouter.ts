@@ -1,11 +1,12 @@
 import fs from 'fs'
+import { join } from 'path'
 import getPathsFromConfig, { checkFile } from '../utilities/pathData'
 import { siteFile, defaultSiteData } from '../../shared/constants'
 import { ok, okMessage, fail } from '../utilities/apiResponse'
 
 export const getSiteInfo = (): string => {
   const { pathToPublic } = getPathsFromConfig()
-  const homefilepath = pathToPublic ? `${pathToPublic}/data/${siteFile}` : null
+  const homefilepath = pathToPublic ? join(pathToPublic, 'data', siteFile) : null
   try {
     if (!homefilepath) throw new Error('No path to site found.')
     checkFile(homefilepath, defaultSiteData)
@@ -19,7 +20,7 @@ export const getSiteInfo = (): string => {
 
 export const updateSiteInfo = (siteInfo): string => {
   const { pathToPublic } = getPathsFromConfig()
-  const homefilepath = pathToPublic ? `${pathToPublic}/data/${siteFile}` : null
+  const homefilepath = pathToPublic ? join(pathToPublic, 'data', siteFile) : null
   if (!homefilepath) throw new Error('No path to site found.')
   if (JSON.parse(siteInfo)) {
     const values = JSON.parse(siteInfo)

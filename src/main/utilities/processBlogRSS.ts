@@ -1,3 +1,4 @@
+import { join } from 'path'
 import { BlogInfo } from '../../shared/types.d'
 import getPathsFromConfig, { checkFile } from './pathData.js'
 import { blogFile, defaultBlogInfo, defaultSiteData, siteFile } from '../../shared/constants'
@@ -12,17 +13,17 @@ const year = new Date().getUTCFullYear()
 const processRss = (blogData: BlogInfo): string => {
   const { pathToPublic } = getPathsFromConfig()
   if (pathToPublic) {
-    checkFile(`${pathToPublic}/data/${siteFile}`, defaultSiteData)
-    checkFile(`${pathToPublic}/data/${blogFile}`, defaultBlogInfo)
+    checkFile(join(pathToPublic, 'data', siteFile), defaultSiteData)
+    checkFile(join(pathToPublic, 'data', blogFile), defaultBlogInfo)
   } else {
     throw new Error('No path to site or blog data found.')
   }
   const sitedata = pathToPublic
-    ? JSON.parse(fs.readFileSync(`${pathToPublic}/data/${siteFile}`).toString())
+    ? JSON.parse(fs.readFileSync(join(pathToPublic, 'data', siteFile)).toString())
     : null
 
   const blog_data = pathToPublic
-    ? JSON.parse(fs.readFileSync(`${pathToPublic}/data/${blogFile}`).toString())
+    ? JSON.parse(fs.readFileSync(join(pathToPublic, 'data', blogFile)).toString())
     : null
 
   if (!blog_data || !sitedata) throw new Error('No blog data or site data found.')

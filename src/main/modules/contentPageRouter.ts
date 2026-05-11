@@ -7,7 +7,7 @@ import { ok, okMessage, fail } from '../utilities/apiResponse'
 
 const getPaths = (): { rootdir: string } => {
   const { pathToPublic } = getPathsFromConfig()
-  const rootdir = `${pathToPublic}/data`
+  const rootdir = join(pathToPublic, 'data')
   return { rootdir }
 }
 
@@ -24,6 +24,7 @@ export const getPageFiles = (): string[] => {
 }
 
 const updatePagesData = (): void => {
+  //updates pages list data
   const { rootdir } = getPaths()
   const pagesFile = join(rootdir, 'pages-data.json')
   checkFile(pagesFile, [])
@@ -44,7 +45,7 @@ export const getPages = (): string => {
 
 export const getPage = (pageId: string): string => {
   const { rootdir } = getPaths()
-  const pagefilepath = `${rootdir}/${pageId}-page.json`
+  const pagefilepath = join(rootdir, `${pageId}-page.json`)
   checkFile(pagefilepath, { page_title: '', page_description: '', page_content: '' })
   const pageDataJson = readFileSync(pagefilepath, 'utf8')
   if (pageDataJson) {
@@ -54,8 +55,9 @@ export const getPage = (pageId: string): string => {
 }
 
 export const updatePage = (page, body): string => {
+  // updates one page.
   const { rootdir } = getPaths()
-  const pagefilepath = `${rootdir}/${page}-page.json`
+  const pagefilepath = join(rootdir, `${page}-page.json`)
   if (body) {
     try {
       checkFile(pagefilepath, {
@@ -65,7 +67,10 @@ export const updatePage = (page, body): string => {
       })
       if (body.images) {
         const imageNames = body.images.map((image) => image.split('/').pop() || '')
+        console.log('[move images]', imageNames, `images/${page}`)
         moveImages(imageNames, `images/${page}`)
+      } else {
+        console.log('no images to move')
       }
       const oldpageDataString = readFileSync(pagefilepath, 'utf8')
       const oldpageObject = JSON.parse(oldpageDataString)
@@ -84,7 +89,7 @@ export const updatePage = (page, body): string => {
 
 export const createPage = (pageId: string): string => {
   const { rootdir } = getPaths()
-  const pagefilepath = `${rootdir}/${pageId}-page.json`
+  const pagefilepath = join(rootdir, `${pageId}-page.json`)
   checkFile(pagefilepath, { page_title: '', page_description: '', page_content: '' })
   const pageData: PageInfo = {
     page_id: pageId,
@@ -99,7 +104,7 @@ export const createPage = (pageId: string): string => {
 
 export const deletePage = (pageId: string): string => {
   const { rootdir } = getPaths()
-  const pagefilepath = `${rootdir}/${pageId}-page.json`
+  const pagefilepath = join(rootdir, `${pageId}-page.json`)
   if (existsSync(pagefilepath)) {
     unlinkSync(pagefilepath)
     updatePagesData()

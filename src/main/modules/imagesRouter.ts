@@ -130,8 +130,10 @@ export const moveImages = (filesToMove: string[], destination: string): string =
   if (filesToMove && filesToMove.length > 0 && destination) {
     const filearray = !Array.isArray(filesToMove) ? [filesToMove] : filesToMove
 
-    const bigDestPath = `${pathToPublic}/images/${destination}`
-    const smallDestPath = `${pathToPublic}/images/${destination}/smaller`
+    const bigDestPath = join(pathToPublic, 'images', destination)
+    const smallDestPath = join(pathToPublic, 'images', destination, 'smaller')
+    checkPath(smallDestPath)
+    checkPath(bigDestPath)
     let message = ''
     let smallfiles: string[] = []
     try {
@@ -142,13 +144,13 @@ export const moveImages = (filesToMove: string[], destination: string): string =
     }
     filearray.forEach((file) => {
       try {
-        fs.renameSync(`${bigSourcePath}${file}`, `${bigDestPath}${file}`)
+        fs.renameSync(join(bigSourcePath, file), join(bigDestPath, file))
       } catch (err) {
         message += `Failed to move big ${bigSourcePath}${file} to  ${bigDestPath}${file}:${err}\n`
       }
       if (smallfiles.includes(file)) {
         try {
-          fs.renameSync(`${smallSourcePath}${file}`, `${smallDestPath}${file}`)
+          fs.renameSync(join(smallSourcePath, file), join(smallDestPath, file))
         } catch (err) {
           console.log(err, `Failed to copy small ${file} file\n`)
           message += `Failed to copy small ${file} file\n`
@@ -172,20 +174,19 @@ export const renameImage = (imageurl, newname): string => {
   if (imageurl && newname) {
     console.log('[rename image]', imageurl, newname)
     const relativePath = imageurl
-    const smallerRelativePath = `${relativePath.substring(
-      0,
-      relativePath.lastIndexOf('/')
-    )}/smaller${relativePath.substring(relativePath.lastIndexOf('/'))}`
+    const smallerRelativePath = join(
+      path.dirname(relativePath),
+      'smaller',
+      path.basename(relativePath)
+    )
     try {
       fs.renameSync(
-        `${pathToPublic}/${relativePath}`,
-        `${pathToPublic}/${relativePath.substring(0, relativePath.lastIndexOf('/'))}/${newname}`
+        join(pathToPublic, relativePath),
+        join(pathToPublic, path.dirname(relativePath), newname)
       )
       fs.renameSync(
-        `${pathToPublic}/${smallerRelativePath}`,
-        `${pathToPublic}/${smallerRelativePath.substring(0, smallerRelativePath.lastIndexOf('/'))}/smaller${
-          newname
-        }`
+        join(pathToPublic, smallerRelativePath),
+        join(pathToPublic, path.dirname(smallerRelativePath), newname)
       )
       return JSON.stringify(okMessage(`Successfully renamed ${imageurl}`))
     } catch (error) {
@@ -199,18 +200,19 @@ export const deleteImage = (imageurl): string => {
   const { pathToPublic } = getPaths()
   if (imageurl) {
     const relativePath = imageurl
-    const smallerRelativePath = `${relativePath.substring(
-      0,
-      relativePath.lastIndexOf('/')
-    )}/smaller${relativePath.substring(relativePath.lastIndexOf('/'))}`
+    const smallerRelativePath = join(
+      path.dirname(relativePath),
+      'smaller',
+      path.basename(relativePath)
+    )
     try {
       console.log(relativePath)
       if (relativePath.includes('files')) {
         fs.rmSync(`./public${relativePath}`)
         return JSON.stringify(okMessage(`Successfully removed ${imageurl}`))
       } else {
-        fs.rmSync(`${pathToPublic}/${relativePath}`)
-        fs.rmSync(`${pathToPublic}${smallerRelativePath}`)
+        fs.rmSync(join(pathToPublic, relativePath))
+        fs.rmSync(join(pathToPublic, smallerRelativePath))
       }
       return JSON.stringify(okMessage(`Successfully removed ${imageurl}`))
     } catch (error) {
@@ -235,9 +237,9 @@ export const getImageFolders = (): string => {
 export const getFolderImages = (directory: string): string => {
   const { pathToPublic } = getPaths()
   const dirpattern = /^[^.]*$/
-  checkPath(`${pathToPublic}/${directory}`)
+  checkPath(join(pathToPublic, directory))
   try {
-    const files = fs.readdirSync(`${pathToPublic}/${directory}`)
+    const files = fs.readdirSync(join(pathToPublic, directory))
     if (files) {
       const filtered = files.filter((file) => dirpattern.test(file))
       return JSON.stringify(ok(filtered))
@@ -261,8 +263,8 @@ export const uploadBlogImage = async (
 
   try {
     const { pathToPublic } = getPaths()
-    const bigDestPath = `${pathToPublic}/images/${destination}/`
-    const smallDestPath = `${pathToPublic}/images/${destination}/smaller/`
+    const bigDestPath = join(pathToPublic, 'images', destination)
+    const smallDestPath = join(pathToPublic, 'images', destination, 'smaller')
 
     const bigResult = await processFile(filePath, 850, bigDestPath)
     const smallResult = await processFile(filePath, 450, smallDestPath)
@@ -298,19 +300,19 @@ export const uploadImages = async (
   const processedImages: ProcessedImage[] = []
   const { imagesPath, tempPath } = getPaths()
   if (filePaths) {
-    const bigDestPath = destination ? join(imagesPath, destination) : `${imagesPath}/`
+    const bigDestPath = destination ? join(imagesPath, destination) : imagesPath
     const smallDestPath = join(bigDestPath, 'smaller')
 
     for (const filePath of filePaths) {
       try {
-        const result1 = await processFile(`${tempPath}/${filePath}`, 750, bigDestPath)
+        const result1 = await processFile(join(tempPath, filePath), 750, bigDestPath)
         if (typeof result1 === 'string') {
           console.error(`Wrong Big File type.`)
         } else if (result1.relativeUrl) {
           console.log('Big file uploaded to ', tempPath)
           processedImages.push(result1)
         }
-        const result2 = await processFile(`${tempPath}/${filePath}`, 450, smallDestPath)
+        const result2 = await processFile(join(tempPath, filePath), 450, smallDestPath)
         if (typeof result2 === 'string') {
           console.error(`Wrong Small File type.`)
         } else if (result2.relativeUrl) {
@@ -327,7 +329,8 @@ export const uploadImages = async (
 
 export const uploadImage = async (filePath: string, destination: string): Promise<string> => {
   const { tempPath, imagesPath } = getPaths()
-  const result = await processFile(`${tempPath}/${filePath}`, 750, `${imagesPath}/${destination}`)
+  console.log('[upload image]', join(tempPath, filePath), join(imagesPath, destination))
+  const result = await processFile(join(tempPath, filePath), 750, join(imagesPath, destination))
 
   if (typeof result === 'string') {
     return JSON.stringify(fail(result))
