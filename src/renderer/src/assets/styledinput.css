@@ -1,6 +1,7 @@
 .editor-content {
 
-  p {font-family: "Pangolin", "Comic Sans MS";}
+  p {font-family: "Pangolin", "Comic Sans MS";
+  margin-bottom: 1em;}
   a {
     font-family: 'Slackey';
     color: green.500;
