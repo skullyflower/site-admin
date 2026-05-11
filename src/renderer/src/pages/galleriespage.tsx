@@ -118,7 +118,7 @@ const GalleryPage: React.FC = () => {
 
   function updateImage(imageurl: string, date: string, name: string): void {
     const extention = imageurl.split('.').pop()
-    const newName = `${date}${name.replaceAll(' ', '')}${extention}`
+    const newName = `${date}${name.replaceAll(' ', '')}.${extention}`
     window.api
       .renameImage(imageurl, newName)
       .then((res) => {
@@ -132,7 +132,7 @@ const GalleryPage: React.FC = () => {
       })
   }
 
-  const deleteImage = (imageurl): void => {
+  const deleteImage = (imageurl: string): void => {
     window.api
       .deleteImage(imageurl)
       .then((res) => {

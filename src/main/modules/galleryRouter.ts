@@ -10,13 +10,13 @@ const getPaths = (): { pathToPublic: string; galleries_json: string } => {
 
 function getImages(path): string[] {
   const { pathToPublic } = getPaths()
-  const files_path = `${pathToPublic}/${path}`
-  checkPath(files_path)
-  const all_files = readdirSync(files_path)
-  if (Array.isArray(all_files) && all_files.length) {
-    return all_files
+  const images_path = `${pathToPublic}/images/${path}`
+  checkPath(images_path)
+  const all_images = readdirSync(images_path)
+  if (Array.isArray(all_images) && all_images.length) {
+    return all_images
   }
-  console.log(`No files in ${files_path}`)
+  console.log(`No files in ${images_path}`)
   return []
 }
 
@@ -47,19 +47,19 @@ export const resetGallery = (galleryId: string): string => {
 
           const imagebits = breakdownpattern.exec(onefile)
           if (imagebits && imagebits[2]) {
-            img_files[imagename]['imgtitle'] =
+            img_files[imagename].imgtitle =
               imagebits[2]
                 ?.replace(/([A-Z])/g, ' $1')
                 ?.replace(/_/g, ' ')
                 ?.trim() ?? ''
-            img_files[imagename]['imgyear'] = imagebits[1].slice(0, 4)
+            img_files[imagename].imgyear = imagebits[1].slice(0, 4)
           } else {
-            img_files[imagename]['imgtitle'] =
+            img_files[imagename].imgtitle =
               imagename
                 ?.replace(/([A-Z])/g, ' $1')
                 ?.replace(/_/g, ' ')
                 ?.trim() ?? ''
-            img_files[imagename]['imgyear'] = 2007
+            img_files[imagename].imgyear = 2007
           }
         }
       }

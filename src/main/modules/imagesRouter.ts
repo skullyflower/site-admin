@@ -170,6 +170,7 @@ export const moveImages = (filesToMove: string[], destination: string): string =
 export const renameImage = (imageurl, newname): string => {
   const { pathToPublic } = getPaths()
   if (imageurl && newname) {
+    console.log('[rename image]', imageurl, newname)
     const relativePath = imageurl
     const smallerRelativePath = `${relativePath.substring(
       0,
@@ -177,12 +178,12 @@ export const renameImage = (imageurl, newname): string => {
     )}/smaller${relativePath.substring(relativePath.lastIndexOf('/'))}`
     try {
       fs.renameSync(
-        `${pathToPublic}${relativePath}`,
-        `${pathToPublic}${relativePath.substring(0, relativePath.lastIndexOf('/'))}/${newname}`
+        `${pathToPublic}/${relativePath}`,
+        `${pathToPublic}/${relativePath.substring(0, relativePath.lastIndexOf('/'))}/${newname}`
       )
       fs.renameSync(
-        `${pathToPublic}${smallerRelativePath}`,
-        `${pathToPublic}${smallerRelativePath.substring(0, smallerRelativePath.lastIndexOf('/'))}/smaller${
+        `${pathToPublic}/${smallerRelativePath}`,
+        `${pathToPublic}/${smallerRelativePath.substring(0, smallerRelativePath.lastIndexOf('/'))}/smaller${
           newname
         }`
       )

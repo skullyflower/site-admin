@@ -8,7 +8,7 @@ import {
   useListCollection,
   useTagsInput
 } from '@chakra-ui/react'
-import { useEffect, useId, useRef } from 'react'
+import { useId, useRef } from 'react'
 
 interface TagSelectorProps {
   onChange: (tags: string[]) => void
@@ -38,16 +38,11 @@ const TagSelector = ({
 
   const tags = useTagsInput({
     ids: { input: inputId },
-    defaultValue: value || []
-  })
-
-  useEffect(() => {
-    if (value && tags?.value !== value) {
-      console.log('tags.value', tags.value)
-      console.log('value', value)
-      onChange(tags.value)
+    defaultValue: value || [],
+    onValueChange: (details) => {
+      onChange(details.value)
     }
-  }, [tags?.value, onChange, value])
+  })
 
   const comobobox = useCombobox({
     ids: { input: inputId },

@@ -29,7 +29,7 @@ export const GalleryGridImage = ({
 }: GalleryGridImageProps): React.ReactNode => {
   const [title, setTitle] = useState(oneImage.imgtitle)
   const [date, setDate] = useState(oneImage.imgfile?.substring(0, 8) ?? '')
-  const imageurl = `${imgDir}/${oneImage.imgfile ?? ''}`
+  const imageurl = `http://localhost:3000${imgDir}/${oneImage.imgfile ?? ''}`
 
   const imagePath = imageurl.replace('http://localhost:3000/', '')
   const { open, onOpen: onOpenDelete, onClose: onCloseDelete } = useDisclosure()

@@ -18,7 +18,7 @@ const GalleryGrid = ({
   updateImage
 }: GalleryGridProps): React.ReactNode => {
   const dir = gallery.path
-  const imgDir = `http://localhost:3000/${dir}`
+  const imgDir = `/images/${dir}`
 
   if (images?.length > 0) {
     return (
