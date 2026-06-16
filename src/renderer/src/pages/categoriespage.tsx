@@ -17,7 +17,7 @@ import { buttonRecipe } from '@renderer/themeRecipes'
 import imageLoading from '@renderer/assets/image-loading.svg'
 import SemiSafeContent from '../components/SemiSafeContent'
 import FormContainer from '../components/formcontainer'
-import { PencilIcon, TrashIcon } from '@phosphor-icons/react'
+import { DiceThreeIcon, PencilIcon, TrashIcon } from '@phosphor-icons/react'
 
 const getCategories = (
   setCategories: (categories: CategoryType[]) => void,
@@ -135,6 +135,7 @@ const CategoriesPage = (): React.JSX.Element => {
                         e.currentTarget.src = imageLoading
                       }}
                     />
+                    {cat.subcat.length > 0 && <DiceThreeIcon size={24} />}
                     <Stack>
                       <Heading size="sm" lineHeight={2}>
                         {cat.name}

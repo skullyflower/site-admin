@@ -119,6 +119,10 @@ export interface ProductType {
   date: string
 }
 
+export interface saleDataType {
+  sale: number | string
+}
+
 export interface fileObject {
   filename: string
   path: string

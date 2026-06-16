@@ -1,24 +1,8 @@
 import { useEffect, useState } from 'react'
-import { useForm } from 'react-hook-form'
 import PageLayout from '../components/layout/PageLayout'
-import { Button, Center, Field, HStack, Input, Stack } from '@chakra-ui/react'
+import { Button, Center, Field, HStack, Input, InputGroup, Stack } from '@chakra-ui/react'
 import InfoBubble from '../components/info-bubble'
 import { buttonRecipe } from '@renderer/themeRecipes'
-
-const getSale = (
-  setSale: (sale: number) => void,
-  setMessages: (messages: string) => void,
-  setMessageType: (type: 'info' | 'warning' | 'error' | 'success') => void
-): void => {
-  window.api.getSale().then((response) => {
-    if (!response.success) {
-      setMessageType('error')
-      setMessages(response.message || '')
-    } else {
-      setSale(response.data?.sale ?? 0)
-    }
-  })
-}
 
 const Sale = (): React.JSX.Element => {
   const [sale, setSale] = useState<number | null>(null)
@@ -27,21 +11,28 @@ const Sale = (): React.JSX.Element => {
 
   useEffect(() => {
     if (sale === null) {
-      getSale(setSale, setMessages, setMessageType)
+      window.api.getSale().then((response) => {
+        setSale(response.sale ? Number(response.sale) * 100 : 0)
+      })
     }
   }, [sale, setSale, setMessages])
 
-  const onSubmit = (values: number): void => {
+  const onSubmit = (sale: number): void => {
+    const franction = Number(sale) / 100
     window.api
-      .setSale(values)
+      .setSale(franction) // save the decimal
       .then((response) => {
         setMessageType(response.success ? 'success' : 'error')
         setMessages(response.message || '')
-        getSale(setSale, setMessages, setMessageType)
       })
       .catch((err) => {
         setMessageType('error')
         setMessages(err.message || 'Failed to save sale.')
+      })
+      .finally(() => {
+        window.api.getSale().then((response) => {
+          setSale(response.sale ? Number(response.sale) * 100 : 0)
+        })
       })
   }
 
@@ -55,45 +46,41 @@ const Sale = (): React.JSX.Element => {
       title="Set Sale"
       button={{ action: onSubmit, text: 'Update', value: '' }}
     >
-      <SaleForm formData={sale} onSubmit={onSubmit} />
+      <SaleForm saleValue={sale} onSubmit={onSubmit} />
     </PageLayout>
   )
 }
 
 const SaleForm = ({
-  formData,
+  saleValue,
   onSubmit
 }: {
-  formData: number
-  onSubmit: (values: number) => void
+  saleValue: number
+  onSubmit: (sale: number) => void
 }): React.JSX.Element => {
-  const {
-    register,
-    formState: { errors }
-  } = useForm({ defaultValues: { sale: formData }, mode: 'onChange' })
-
+  const [sale, setSale] = useState<number>(saleValue)
   return (
     <Stack gap={4}>
-      <div>Current Sale: {formData}</div>
-      <Field.Root p={4} invalid={errors.sale ? true : false}>
+      <div>Current Sale: {saleValue}</div>
+      <Field.Root p={4} invalid={isNaN(sale) ? true : false}>
         <HStack alignItems="center">
           <Field.Label w={48}>
-            Sale: <InfoBubble message="percent" />
+            Sale: <InfoBubble message="Enter a percentage to discount items." />
           </Field.Label>
-          <Input
-            borderColor="red.300"
-            type="text"
-            placeholder=".00"
-            {...register('sale', {
-              required: true,
-              validate: (value: number) => !isNaN(value)
-            })}
-          />
+          <InputGroup endAddon="%">
+            <Input
+              borderColor="red.300"
+              type="text"
+              placeholder="0"
+              value={sale}
+              onChange={(e) => setSale(Number(e.target.value))}
+            />
+          </InputGroup>
         </HStack>
       </Field.Root>
       <Center>
         <HStack gap={4}>
-          <Button recipe={buttonRecipe} onClick={() => onSubmit(formData)}>
+          <Button recipe={buttonRecipe} onClick={() => onSubmit(sale)}>
             Update Sale
           </Button>
         </HStack>

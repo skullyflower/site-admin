@@ -8,6 +8,7 @@ import {
   GalleryImages,
   GalleryInfo,
   ProductType,
+  saleDataType,
   Subject,
   CategoryType,
   PageInfo
@@ -45,8 +46,8 @@ export interface Api {
   getCategories: () => Promise<ApiResponse<CategoryType[]>>
   updateCategory: (category: CategoryType) => Promise<ApiResponse>
   deleteCategory: (catid: string) => Promise<ApiResponse>
-  getSale: () => Promise<ApiResponse<{ sale: number }>>
-  setSale: (sale: number) => Promise<ApiResponse>
+  getSale: () => Promise<saleDataType>
+  setSale: (sale: string | number) => Promise<ApiResponse>
   // Gallery API functions
   getGalleries: () => Promise<ApiResponse<GalleryInfo[]>>
   getGalleryImages: (gallery_id: string) => Promise<ApiResponse<GalleryImages>>

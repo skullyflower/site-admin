@@ -23,6 +23,8 @@ import '@mdxeditor/editor/style.css'
 import '@radix-ui/colors/slate-dark.css'
 import '@renderer/assets/styledinput.css'
 
+const previewImage = async (imageSource: string): Promise<string> =>
+  `http://localhost:3000${imageSource}`
 const StyledInput = ({
   value,
   onChange,
@@ -79,7 +81,8 @@ const StyledInput = ({
           quotePlugin(),
           thematicBreakPlugin(),
           imagePlugin({
-            imageUploadHandler: addUploadImages
+            imageUploadHandler: addUploadImages,
+            imagePreviewHandler: previewImage
           }),
           markdownShortcutPlugin(),
           toolbarPlugin({

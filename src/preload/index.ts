@@ -69,7 +69,7 @@ const api = {
     const response = await ipcRenderer.invoke('get-sale')
     return JSON.parse(response)
   },
-  setSale: async (sale: string) => {
+  setSale: async (sale: number) => {
     const response = await ipcRenderer.invoke('set-sale', sale)
     return JSON.parse(response)
   },

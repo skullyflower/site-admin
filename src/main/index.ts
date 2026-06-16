@@ -193,4 +193,4 @@ ipcMain.handle('delete-subject', (_event, subjectid: string) => deleteSubject(su
 ipcMain.handle('get-categories', getAllCategories)
 ipcMain.handle('update-category', (_event, category: CategoryType) => updateCategories(category))
 ipcMain.handle('get-sale', getSale)
-ipcMain.handle('set-sale', (_event, sale: string) => setSale(sale))
+ipcMain.handle('set-sale', (_event, sale: number) => setSale(sale))
