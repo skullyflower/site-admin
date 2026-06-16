@@ -154,7 +154,7 @@ const HomePageForm = ({
                     {...register('sitelogo')}
                   />
                   <Image
-                    src={`http://localhost:3000/${pageData.sitelogo}`}
+                    src={`http://localhost:3000${pageData.sitelogo}`}
                     boxSize="100px"
                     onError={(e) => {
                       e.currentTarget.src = imageLoading
