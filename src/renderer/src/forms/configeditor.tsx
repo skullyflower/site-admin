@@ -32,6 +32,20 @@ const ConfigForm = ({
         alert(err.message || 'Failed to select directory')
       })
   }
+  const launchDevServer = (): void => {
+    window.api
+      .runDevServer()
+      .then((data) => {
+        alert(
+          data.success
+            ? data.message || 'Dev server launched!'
+            : data.message || 'Failed to launch dev server.'
+        )
+      })
+      .catch((err: Error) => {
+        alert(err.message || 'Failed to launch dev server.')
+      })
+  }
   return (
     <Stack alignItems="center" justifyContent="center" gap={4}>
       <Text paddingInline={4}>
@@ -49,6 +63,9 @@ const ConfigForm = ({
         </Field.Root>
       </Box>
       <HStack justifyContent="end">
+        <Button recipe={buttonRecipe} disabled={!formData?.pathToSite} onClick={launchDevServer}>
+          Launch Dev Server
+        </Button>
         <Button disabled={!changed} recipe={buttonRecipe} onClick={() => onSubmit()}>
           Submit Changes
         </Button>

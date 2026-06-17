@@ -123,52 +123,54 @@ const CategoriesPage = (): React.JSX.Element => {
             </FormContainer>
           )}
           <Stack>
-            {categories?.map((cat) => (
-              <Box key={cat.id} p={5} border="1px solid" borderRadius={5} w="100%">
-                <HStack justifyContent="space-between">
-                  <HStack alignItems="start" justify="start">
-                    <Image
-                      src={`http://localhost:3000${cat.img}`}
-                      boxSize="75px"
-                      alt={`${cat.name} - http://localhost:3000${cat.img}`}
-                      onError={(e) => {
-                        e.currentTarget.src = imageLoading
-                      }}
-                    />
+            {categories
+              ?.toSorted((c1, c2) => c1.name.localeCompare(c2.name))
+              .map((cat) => (
+                <Box key={cat.id} p={5} border="1px solid" borderRadius={5} w="100%">
+                  <HStack justifyContent="space-between">
+                    <HStack alignItems="start" justify="start">
+                      <Image
+                        src={`http://localhost:3000${cat.img}`}
+                        boxSize="75px"
+                        alt={`${cat.name} - http://localhost:3000${cat.img}`}
+                        onError={(e) => {
+                          e.currentTarget.src = imageLoading
+                        }}
+                      />
 
-                    <Stack>
-                      <Heading size="sm" lineHeight={2} display="flex" gap={4}>
-                        {cat.name}
-                        {cat.subcat.length > 0 && <DiceThreeIcon size={24} />}
-                      </Heading>
-                      <SemiSafeContent rawContent={cat.description} />
-                    </Stack>
+                      <Stack>
+                        <Heading size="sm" lineHeight={2} display="flex" gap={4}>
+                          {cat.name}
+                          {cat.subcat.length > 0 && <DiceThreeIcon size={24} />}
+                        </Heading>
+                        <SemiSafeContent rawContent={cat.description} />
+                      </Stack>
+                    </HStack>
+                    <HStack gap={2}>
+                      <IconButton
+                        aria-label="Delete category"
+                        size="sm"
+                        padding={2}
+                        recipe={buttonRecipe}
+                        value={cat.id}
+                        onClick={() => doDelete(cat.id)}
+                      >
+                        <TrashIcon />
+                      </IconButton>
+                      <IconButton
+                        aria-label="Edit category"
+                        size="sm"
+                        padding={2}
+                        recipe={buttonRecipe}
+                        value={cat.id}
+                        onClick={() => toggleCatForm(cat.id)}
+                      >
+                        <PencilIcon />
+                      </IconButton>
+                    </HStack>
                   </HStack>
-                  <HStack gap={2}>
-                    <IconButton
-                      aria-label="Delete category"
-                      size="sm"
-                      padding={2}
-                      recipe={buttonRecipe}
-                      value={cat.id}
-                      onClick={() => doDelete(cat.id)}
-                    >
-                      <TrashIcon />
-                    </IconButton>
-                    <IconButton
-                      aria-label="Edit category"
-                      size="sm"
-                      padding={2}
-                      recipe={buttonRecipe}
-                      value={cat.id}
-                      onClick={() => toggleCatForm(cat.id)}
-                    >
-                      <PencilIcon />
-                    </IconButton>
-                  </HStack>
-                </HStack>
-              </Box>
-            ))}
+                </Box>
+              ))}
             <Center>
               <Button recipe={buttonRecipe} value="newcat" onClick={() => toggleCatForm(null)}>
                 {showCatForm ? 'Never mind' : 'Add one'}

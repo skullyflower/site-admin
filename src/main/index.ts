@@ -9,6 +9,7 @@ import {
   Menu
 } from 'electron'
 import path, { join } from 'path'
+import { spawn } from 'child_process'
 import { electronApp, optimizer } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 
@@ -136,6 +137,26 @@ ipcMain.handle('select-site-directory', () => {
       return result.filePaths[0].replace(`${app.getPath('home')}`, '')
     return undefined
   })
+})
+ipcMain.handle('run-dev-server', async () => {
+  try {
+    const configJson = getAdminConfig()
+    const config = JSON.parse(configJson)
+    if (!config.success || !config.data?.pathToSite) {
+      return JSON.stringify({ success: false, message: 'No site path configured.' })
+    }
+    const sitePath = join(app.getPath('home'), config.data.pathToSite)
+    const yarnBin = process.platform === 'win32' ? 'yarn.cmd' : 'yarn'
+    const child = spawn(yarnBin, ['dev', '--port', '3000'], {
+      cwd: sitePath,
+      detached: true,
+      stdio: 'ignore'
+    })
+    child.unref()
+    return JSON.stringify({ success: true, message: `Dev server launched in ${sitePath}` })
+  } catch (err: unknown) {
+    return JSON.stringify({ success: false, message: `Failed to launch dev server: ${err}` })
+  }
 })
 // Blog API functions
 ipcMain.handle('get-blogs', getBlog)
