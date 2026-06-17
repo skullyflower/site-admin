@@ -149,13 +149,13 @@ ipcMain.handle('run-dev-server', async () => {
       return JSON.stringify({ success: false, message: 'No site path configured.' })
     }
     const sitePath = join(app.getPath('home'), config.data.pathToSite)
-    const yarnBin = process.platform === 'win32' ? 'yarn.cmd' : 'yarn'
-    const child = spawn(yarnBin, ['dev', '--port', '3000'], {
+    const child = spawn('/bin/zsh', ['-lc', 'yarn dev --port 3000'], {
       cwd: sitePath,
       detached: true,
       stdio: 'ignore'
     })
     devServerPid = child.pid ?? null
+    console.log('[server pid] ', devServerPid)
     child.unref()
     return JSON.stringify({ success: true, message: `Dev server launched in ${sitePath}` })
   } catch (err: unknown) {
