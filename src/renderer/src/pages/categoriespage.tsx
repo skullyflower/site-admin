@@ -135,10 +135,11 @@ const CategoriesPage = (): React.JSX.Element => {
                         e.currentTarget.src = imageLoading
                       }}
                     />
-                    {cat.subcat.length > 0 && <DiceThreeIcon size={24} />}
+
                     <Stack>
-                      <Heading size="sm" lineHeight={2}>
+                      <Heading size="sm" lineHeight={2} display="flex" gap={4}>
                         {cat.name}
+                        {cat.subcat.length > 0 && <DiceThreeIcon size={24} />}
                       </Heading>
                       <SemiSafeContent rawContent={cat.description} />
                     </Stack>

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
-import { Box, Button, Center, HStack, Heading, Skeleton, Stack } from '@chakra-ui/react'
+import { Box, Button, Center, Heading, Skeleton, Stack } from '@chakra-ui/react'
 import EditProduct from '../forms/producteditor'
 import PageLayout from '../components/layout/PageLayout'
 import OneProduct from '../components/oneProduct'
@@ -7,6 +7,8 @@ import { CategoryType, ProductType, Subject } from 'src/shared/types'
 import { buttonRecipe } from '@renderer/themeRecipes'
 import FormContainer from '@renderer/components/formcontainer'
 import { newprodId } from '@renderer/forms/producteditor'
+import ButtonSelector from '../components/inputs/ButtonSelector'
+
 type ShopData = {
   products: ProductType[]
   categories: CategoryType[]
@@ -162,32 +164,16 @@ const ProductsPage = (): React.JSX.Element => {
             </FormContainer>
           )}
           <Stack gap={4}>
-            <HStack wrap="wrap" alignItems="flex-start" justifyContent="center">
-              <Heading size="sm">Filter by category</Heading>
-              {shopData?.categories &&
-                Array.isArray(shopData.categories) &&
-                shopData.categories.length > 0 &&
-                shopData.categories.map((cat) => (
-                  <Button
-                    key={cat.id}
-                    size="xs"
-                    minW="fit-content"
-                    recipe={buttonRecipe}
-                    onClick={() => doFilterProducts(cat.id)}
-                    value={cat.id}
-                  >
-                    {cat.name}
-                  </Button>
-                ))}
-              <Button
-                size="sm"
-                recipe={buttonRecipe}
-                onClick={() => doFilterProducts(null)}
-                value={''}
-              >
-                Show All
-              </Button>
-            </HStack>
+            <ButtonSelector
+              dataList={shopData?.categories ?? []}
+              sortProp="name"
+              valueProp="id"
+              labelText="Show Products from category"
+              onChange={doFilterProducts}
+            />
+            {filter && (
+              <Heading size="md">{shopData?.categories.find((c) => c.id === filter)?.name}</Heading>
+            )}
             <Stack>
               {filteredFroducts?.map((product) => (
                 <OneProduct

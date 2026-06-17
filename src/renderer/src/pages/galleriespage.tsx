@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
-import { useForm } from 'react-hook-form'
-import { Button, Field, HStack, Heading, NativeSelect, Skeleton, Stack } from '@chakra-ui/react'
+import { Button, HStack, Heading, Skeleton, Stack } from '@chakra-ui/react'
 import UploadInput from '../components/inputs/upload-input'
+import ButtonSelector from '../components/inputs/ButtonSelector'
 import FloatingFormWrapper from '../components/floatingformwrap'
 import GalleryGrid from '../components/galleryGrid'
 import EditGallery from '../forms/galleryeditor'
@@ -61,7 +61,6 @@ const GalleryPage: React.FC = () => {
   const [showUpload, setShowUpload] = useState(false)
   const [showAddEdit, setShowAddEdit] = useState(false)
   const [loading, setLoading] = useState(false)
-  const { register } = useForm()
   const [imageCount, setImageCount] = useState(0)
 
   const selectGallery = (galleryId: string): void => {
@@ -170,25 +169,15 @@ const GalleryPage: React.FC = () => {
       <Stack className="content">
         {galleries && galleries.length > 0 && (
           <Stack textAlign="center">
-            <Field.Root p={4}>
-              <HStack>
-                <Field.Label w={40}>Select a gallery:</Field.Label>
-                <NativeSelect.Root>
-                  <NativeSelect.Field
-                    placeholder="Select a gallery"
-                    {...register('dest')}
-                    onChange={(e) => selectGallery(e.target.value)}
-                  >
-                    {galleries.map((gallery) => (
-                      <option key={gallery.id} value={gallery.id}>
-                        {gallery.title}
-                      </option>
-                    ))}
-                  </NativeSelect.Field>
-                  <NativeSelect.Indicator />
-                </NativeSelect.Root>
-              </HStack>
-            </Field.Root>
+            <ButtonSelector
+              dataList={galleries}
+              sortProp="title"
+              valueProp="id"
+              labelText="Select a gallery:"
+              onChange={(id) => {
+                if (id !== null) selectGallery(id)
+              }}
+            />
             {/* Edit images in one gallery */}
             {!!activeGallery && !loading && (
               <Stack>
