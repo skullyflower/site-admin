@@ -10,6 +10,7 @@ import {
 } from 'electron'
 import path, { join } from 'path'
 import { spawn } from 'child_process'
+import net from 'net'
 import { electronApp, optimizer } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 
@@ -122,6 +123,8 @@ app.on('window-all-closed', () => {
   app.quit()
 })
 
+let devServerPid: number | null = null
+
 // In this file you can include the   rest of your app's specific main process
 // Config API functions
 ipcMain.handle('get-admin-config', getAdminConfig)
@@ -152,10 +155,42 @@ ipcMain.handle('run-dev-server', async () => {
       detached: true,
       stdio: 'ignore'
     })
+    devServerPid = child.pid ?? null
     child.unref()
     return JSON.stringify({ success: true, message: `Dev server launched in ${sitePath}` })
   } catch (err: unknown) {
     return JSON.stringify({ success: false, message: `Failed to launch dev server: ${err}` })
+  }
+})
+ipcMain.handle('get-dev-server-status', () => {
+  return new Promise<string>((resolve) => {
+    const client = net.createConnection({ port: 3000, host: 'localhost' })
+    const timeout = setTimeout(() => {
+      client.destroy()
+      resolve(JSON.stringify({ success: true, data: false }))
+    }, 1000)
+    client.once('connect', () => {
+      clearTimeout(timeout)
+      client.destroy()
+      resolve(JSON.stringify({ success: true, data: true }))
+    })
+    client.once('error', () => {
+      clearTimeout(timeout)
+      resolve(JSON.stringify({ success: true, data: false }))
+    })
+  })
+})
+ipcMain.handle('stop-dev-server', () => {
+  if (devServerPid === null) {
+    return JSON.stringify({ success: false, message: 'No dev server process tracked.' })
+  }
+  try {
+    process.kill(-devServerPid, 'SIGTERM')
+    devServerPid = null
+    return JSON.stringify({ success: true, message: 'Dev server stopped.' })
+  } catch (err: unknown) {
+    devServerPid = null
+    return JSON.stringify({ success: false, message: `Failed to stop dev server: ${err}` })
   }
 })
 // Blog API functions

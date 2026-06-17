@@ -20,6 +20,14 @@ const api = {
     const response = await ipcRenderer.invoke('run-dev-server')
     return JSON.parse(response)
   },
+  getDevServerStatus: async () => {
+    const response = await ipcRenderer.invoke('get-dev-server-status')
+    return JSON.parse(response)
+  },
+  stopDevServer: async () => {
+    const response = await ipcRenderer.invoke('stop-dev-server')
+    return JSON.parse(response)
+  },
   // Site Info API functions
   getSiteInfo: async () => {
     const response = await ipcRenderer.invoke('get-site-info')

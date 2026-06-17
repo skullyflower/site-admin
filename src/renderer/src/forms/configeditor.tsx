@@ -2,7 +2,7 @@ import { Box, Button, Field, HStack, Text } from '@chakra-ui/react'
 import { Stack } from '@chakra-ui/react'
 import { AdminConfig } from 'src/shared/types'
 import { buttonRecipe } from '@renderer/themeRecipes'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 const ConfigForm = ({
   formData,
@@ -14,6 +14,14 @@ const ConfigForm = ({
   onSubmit: () => void
 }): React.ReactNode => {
   const [changed, setChanged] = useState<boolean>(false)
+  const [serverRunning, setServerRunning] = useState<boolean | null>(null)
+
+  useEffect(() => {
+    window.api
+      .getDevServerStatus()
+      .then((data) => setServerRunning(data.success ? (data.data ?? false) : false))
+      .catch(() => setServerRunning(false))
+  }, [])
   const updateSiteDirectory = (): void => {
     window.api
       .selectSiteDirectory()
@@ -36,6 +44,7 @@ const ConfigForm = ({
     window.api
       .runDevServer()
       .then((data) => {
+        if (data.success) setServerRunning(true)
         alert(
           data.success
             ? data.message || 'Dev server launched!'
@@ -44,6 +53,22 @@ const ConfigForm = ({
       })
       .catch((err: Error) => {
         alert(err.message || 'Failed to launch dev server.')
+      })
+  }
+
+  const stopDevServer = (): void => {
+    window.api
+      .stopDevServer()
+      .then((data) => {
+        if (data.success) setServerRunning(false)
+        alert(
+          data.success
+            ? data.message || 'Dev server stopped.'
+            : data.message || 'Failed to stop dev server.'
+        )
+      })
+      .catch((err: Error) => {
+        alert(err.message || 'Failed to stop dev server.')
       })
   }
   return (
@@ -63,12 +88,26 @@ const ConfigForm = ({
         </Field.Root>
       </Box>
       <HStack justifyContent="end">
-        <Button recipe={buttonRecipe} disabled={!formData?.pathToSite} onClick={launchDevServer}>
-          Launch Dev Server
-        </Button>
         <Button disabled={!changed} recipe={buttonRecipe} onClick={() => onSubmit()}>
           Submit Changes
         </Button>
+      </HStack>
+      <HStack justifyContent="center">
+        {serverRunning !== null && (
+          <Text fontSize="sm" color={serverRunning ? 'green.500' : 'gray.400'}>
+            Dev Server: {serverRunning ? 'Running: ' : 'Stopped: '}
+          </Text>
+        )}
+        {formData?.pathToSite &&
+          (serverRunning !== true ? (
+            <Button recipe={buttonRecipe} onClick={launchDevServer}>
+              Launch Dev Server
+            </Button>
+          ) : (
+            <Button recipe={buttonRecipe} disabled={!serverRunning} onClick={stopDevServer}>
+              Stop Dev Server
+            </Button>
+          ))}
       </HStack>
     </Stack>
   )

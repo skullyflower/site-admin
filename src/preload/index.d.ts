@@ -24,6 +24,8 @@ export interface Api {
   setAdminConfig: (config: AdminConfig) => Promise<ApiResponse>
   selectSiteDirectory: () => Promise<string[] | undefined>
   runDevServer: () => Promise<ApiResponse>
+  getDevServerStatus: () => Promise<ApiResponse<boolean>>
+  stopDevServer: () => Promise<ApiResponse>
   getSiteInfo: () => Promise<ApiResponse<SiteInfo>>
   updateSiteInfo: (values: SiteInfo) => Promise<ApiResponse>
   // Content Page API functions
