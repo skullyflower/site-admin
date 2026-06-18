@@ -44,7 +44,7 @@ const Sale = (): React.JSX.Element => {
       setMessages={setMessages}
       messageType={messageType}
       title="Set Sale"
-      button={{ action: onSubmit, text: 'Update', value: '' }}
+      button={{ action: onSubmit, text: 'Save', value: '' }}
     >
       <SaleForm saleValue={sale} onSubmit={onSubmit} />
     </PageLayout>

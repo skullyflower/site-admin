@@ -63,7 +63,7 @@ const ConfigPage = (): React.ReactNode => {
       setMessages={setMessages}
       messageType={messageType}
       title="Set Config"
-      button={{ action: onSubmit, text: 'Update', value: '' }}
+      button={{ action: onSubmit, text: 'Save', value: '' }}
     >
       <FormContainer>
         <ConfigForm

@@ -2,7 +2,8 @@ import { Box, Button, Field, HStack, Text } from '@chakra-ui/react'
 import { Stack } from '@chakra-ui/react'
 import { AdminConfig } from 'src/shared/types'
 import { buttonRecipe } from '@renderer/themeRecipes'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
+import useRunServer from '@renderer/hooks/useRunServer'
 
 const ConfigForm = ({
   formData,
@@ -14,14 +15,8 @@ const ConfigForm = ({
   onSubmit: () => void
 }): React.ReactNode => {
   const [changed, setChanged] = useState<boolean>(false)
-  const [serverRunning, setServerRunning] = useState<boolean | null>(null)
+  const { launchDevServer, stopDevServer, serverRunning } = useRunServer()
 
-  useEffect(() => {
-    window.api
-      .getDevServerStatus()
-      .then((data) => setServerRunning(data.success ? (data.data ?? false) : false))
-      .catch(() => setServerRunning(false))
-  }, [])
   const updateSiteDirectory = (): void => {
     window.api
       .selectSiteDirectory()
@@ -40,37 +35,7 @@ const ConfigForm = ({
         alert(err.message || 'Failed to select directory')
       })
   }
-  const launchDevServer = (): void => {
-    window.api
-      .runDevServer()
-      .then((data) => {
-        if (data.success) setServerRunning(true)
-        alert(
-          data.success
-            ? data.message || 'Dev server launched!'
-            : data.message || 'Failed to launch dev server.'
-        )
-      })
-      .catch((err: Error) => {
-        alert(err.message || 'Failed to launch dev server.')
-      })
-  }
 
-  const stopDevServer = (): void => {
-    window.api
-      .stopDevServer()
-      .then((data) => {
-        if (data.success) setServerRunning(false)
-        alert(
-          data.success
-            ? data.message || 'Dev server stopped.'
-            : data.message || 'Failed to stop dev server.'
-        )
-      })
-      .catch((err: Error) => {
-        alert(err.message || 'Failed to stop dev server.')
-      })
-  }
   return (
     <Stack alignItems="center" justifyContent="center" gap={4}>
       <Text paddingInline={4}>
