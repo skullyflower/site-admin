@@ -163,10 +163,7 @@ const BlogPage = (): React.JSX.Element => {
                         <Stack flexGrow={1}>
                           <Heading size="md">{blog.title}</Heading>
                           <div>
-                            <a
-                              href={`http://localhost:3000/blogentry/${blog.id}`}
-                              target="blogwindow"
-                            >
+                            <a href={`http://localhost:3000/blog/${blog.id}`} target="blogwindow">
                               {blog.heading}
                             </a>
                             <p>{blog.date}</p>
