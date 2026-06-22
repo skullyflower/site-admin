@@ -123,6 +123,17 @@ app.on('window-all-closed', () => {
   app.quit()
 })
 
+app.on('before-quit', () => {
+  if (devServerPid !== null) {
+    try {
+      process.kill(-devServerPid, 'SIGTERM')
+    } catch {
+      // process may have already exited
+    }
+    devServerPid = null
+  }
+})
+
 let devServerPid: number | null = null
 
 // In this file you can include the   rest of your app's specific main process

@@ -12,12 +12,12 @@ import {
 } from '@chakra-ui/react'
 import EditCategory from '../forms/categoryeditor'
 import PageLayout from '../components/layout/PageLayout'
-import { CategoryType } from 'src/shared/types'
+import { CategoryType } from '../../../shared/types'
 import { buttonRecipe } from '@renderer/themeRecipes'
 import imageLoading from '@renderer/assets/image-loading.svg'
 import SemiSafeContent from '../components/SemiSafeContent'
 import FormContainer from '../components/formcontainer'
-import { DiceThreeIcon, PencilIcon, TrashIcon } from '@phosphor-icons/react'
+import { UmbrellaSimpleIcon, PencilIcon, TrashIcon } from '@phosphor-icons/react'
 
 const getCategories = (
   setCategories: (categories: CategoryType[]) => void,
@@ -141,7 +141,7 @@ const CategoriesPage = (): React.JSX.Element => {
                       <Stack>
                         <Heading size="sm" lineHeight={2} display="flex" gap={4}>
                           {cat.name}
-                          {cat.subcat.length > 0 && <DiceThreeIcon size={24} />}
+                          {cat.subcat.length > 0 && <UmbrellaSimpleIcon size={24} />}
                         </Heading>
                         <SemiSafeContent rawContent={cat.description} />
                       </Stack>
