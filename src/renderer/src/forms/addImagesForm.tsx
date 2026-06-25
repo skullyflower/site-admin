@@ -1,6 +1,6 @@
-import UploadInput from '../components/inputs/upload-input'
+import UploadInput from '@renderer/components/inputs/upload-input'
 import { Heading, Button, Stack } from '@chakra-ui/react'
-import FloatingFormWrapper from '../components/floatingformwrap'
+import FloatingFormWrapper from '@renderer/components/floatingformwrap'
 import { buttonRecipe } from '@renderer/themeRecipes/button.recipe'
 
 export default function AddImagesForm({

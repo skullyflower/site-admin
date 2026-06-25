@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
-import PageLayout from '../components/layout/PageLayout'
+import PageLayout from '@renderer/components/layout/PageLayout'
 import ConfigForm from '@renderer/forms/configeditor'
-import { AdminConfig } from 'src/shared/types'
+import { AdminConfig } from '../../../../src/shared/types'
 import FormContainer from '@renderer/components/formcontainer'
 import { useAdminConfig } from '@renderer/context/AdminConfigContext'
 const getConfig = (

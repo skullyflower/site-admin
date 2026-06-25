@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import InfoBubble from '../components/info-bubble'
+import InfoBubble from '@renderer/components/info-bubble'
 import {
   Box,
   Button,
@@ -11,10 +11,10 @@ import {
   Input,
   Heading
 } from '@chakra-ui/react'
-import FloatingFormWrapper from '../components/floatingformwrap'
+import FloatingFormWrapper from '@renderer/components/floatingformwrap'
 import { useForm, useWatch } from 'react-hook-form'
-import { newGalleryId } from '../pages/galleriespage'
-import { GalleryInfo } from 'src/shared/types'
+import { newGalleryId } from '@renderer/pages/galleriespage'
+import { GalleryInfo } from '@renderer/../../src/shared/types'
 import StyledInput from '@renderer/components/inputs/StyledInput'
 import { buttonRecipe } from '@renderer/themeRecipes'
 

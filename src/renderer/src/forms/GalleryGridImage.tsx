@@ -9,10 +9,10 @@ import {
   useDisclosure,
   Text
 } from '@chakra-ui/react'
-import ConfirmDelete from '../components/ConfirmDelete'
+import ConfirmDelete from '@renderer/components/ConfirmDelete'
 import { useState } from 'react'
 import { buttonRecipe } from '@renderer/themeRecipes'
-import { GalleryImage } from 'src/shared/types'
+import { GalleryImage } from '@renderer/../../../src/shared/types'
 
 interface GalleryGridImageProps {
   oneImage: GalleryImage

@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
-import { PageInfo } from 'src/shared/types'
+import { PageInfo } from '@renderer/../../src/shared/types'
 import { Box, Button, Field, HStack, Heading, Input, Center, Stack } from '@chakra-ui/react'
-import InfoBubble from '../components/info-bubble'
+import InfoBubble from '@renderer/components/info-bubble'
 import StyledInput from '@renderer/components/inputs/StyledInput'
 import { buttonRecipe } from '@renderer/themeRecipes/button.recipe'
 

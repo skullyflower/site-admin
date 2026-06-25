@@ -13,11 +13,11 @@ import {
   Stack,
   For
 } from '@chakra-ui/react'
-import InfoBubble from '../components/info-bubble'
-import UploadInput from '../components/inputs/upload-input'
+import InfoBubble from '@renderer/components/info-bubble'
+import UploadInput from '@renderer/components/inputs/upload-input'
 import StyledInput from '@renderer/components/inputs/StyledInput'
 import { buttonRecipe, inputRecipe } from '@renderer/themeRecipes'
-import { Feature, SiteInfo } from 'src/shared/types'
+import { Feature, SiteInfo } from '@renderer/../../../src/shared/types'
 import imageLoading from '@renderer/assets/image-loading.svg'
 
 const options = ['blog', 'content', 'galleries', 'products', 'categories', 'subjects', 'sale']

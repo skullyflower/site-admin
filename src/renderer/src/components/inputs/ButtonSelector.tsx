@@ -20,7 +20,7 @@ function ButtonSelector<T extends object>({
   return (
     <Collapsible.Root>
       <Collapsible.Trigger>
-        <Heading size="sm" display="flex">
+        <Heading size="sm" display="flex" alignItems="center" recipe={buttonRecipe}>
           {labelText}{' '}
           <Collapsible.Indicator transition="transform 0.2s" _open={{ transform: 'rotate(90deg)' }}>
             <LuChevronRight />

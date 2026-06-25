@@ -1,11 +1,11 @@
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
-import FloatingFormWrapper from '../components/floatingformwrap'
-import InfoBubble from '../components/info-bubble'
+import FloatingFormWrapper from '@renderer/components/floatingformwrap'
+import InfoBubble from '@renderer/components/info-bubble'
 import { Box, Button, Field, Input, HStack, Center, Heading } from '@chakra-ui/react'
 import { buttonRecipe } from '@renderer/themeRecipes'
 import StyledInput from '@renderer/components/inputs/StyledInput'
-import { Subject } from 'src/shared/types'
+import { Subject } from '@renderer/../../../src/shared/types'
 
 const newcat: Subject = { id: '', name: '', description: '', subcat: [] }
 

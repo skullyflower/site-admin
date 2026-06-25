@@ -1,12 +1,13 @@
 import { useCallback, useEffect, useState } from 'react'
 import { Box, Button, Center, HStack, Heading, IconButton, Skeleton, Stack } from '@chakra-ui/react'
-import { Subject } from 'src/shared/types'
+import { Subject } from '../../../../src/shared/types'
 import EditSubject from '../forms/subjectseditor'
 import PageLayout from '../components/layout/PageLayout'
 import { buttonRecipe } from '@renderer/themeRecipes'
 import SemiSafeContent from '../components/SemiSafeContent'
 import FormContainer from '@renderer/components/formcontainer'
 import { PencilIcon, TrashIcon } from '@phosphor-icons/react'
+import useSearchBox from '@renderer/hooks/useSearchBox'
 
 const getSubjects = (
   setSubjects: (subjects: Subject[]) => void,
@@ -40,6 +41,7 @@ const SubjectsPage = (): React.JSX.Element => {
   const [showCatForm, setShowCatForm] = useState(false)
   const [activeCat, setActiveCat] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
+  const { filteredData, searchBox } = useSearchBox(subjects ?? [], (s: Subject) => s.name)
 
   const onSubmit = (values: Subject): void => {
     setLoading(true)
@@ -110,7 +112,8 @@ const SubjectsPage = (): React.JSX.Element => {
             </FormContainer>
           )}
           <Stack>
-            {subjects?.map((cat) => (
+            {searchBox}
+            {filteredData?.map((cat) => (
               <Box key={cat.id} p={5} border="1px solid" borderRadius={5} w="100%">
                 <HStack justifyContent="space-between">
                   <Stack>

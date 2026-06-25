@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
-import PageLayout from '../components/layout/PageLayout'
+import PageLayout from '@renderer/components/layout/PageLayout'
 import { Button, Center, Field, HStack, Input, InputGroup, Stack } from '@chakra-ui/react'
-import InfoBubble from '../components/info-bubble'
+import InfoBubble from '@renderer/components/info-bubble'
 import { buttonRecipe } from '@renderer/themeRecipes'
 
 const Sale = (): React.JSX.Element => {

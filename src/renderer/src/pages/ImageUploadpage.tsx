@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
-import AddImagesForm from '../forms/addImagesForm'
+import AddImagesForm from '@renderer/forms/addImagesForm'
 import {
   Button,
   Checkbox,

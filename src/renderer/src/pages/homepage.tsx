@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react'
 import { Skeleton, Stack } from '@chakra-ui/react'
-import PageLayout from '../components/layout/PageLayout'
-import HomePageForm from '../forms/homepageForm'
-import HomePagePreview from '../forms/homepagePreview'
-import { SiteInfo } from 'src/shared/types'
+import PageLayout from '@renderer/components/layout/PageLayout'
+import HomePageForm from '@renderer/forms/homepageForm'
+import HomePagePreview from '@renderer/forms/homepagePreview'
+import { SiteInfo } from '../../../../src/shared/types'
 import FormContainer from '@renderer/components/formcontainer'
 
 const getSiteData = async (

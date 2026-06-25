@@ -1,13 +1,13 @@
 import { useCallback, useEffect, useState } from 'react'
 import { Box, Button, Center, Heading, Skeleton, Stack } from '@chakra-ui/react'
-import EditProduct from '../forms/producteditor'
-import PageLayout from '../components/layout/PageLayout'
-import OneProduct from '../components/oneProduct'
-import { CategoryType, ProductType, Subject } from 'src/shared/types'
+import EditProduct from '@renderer/forms/producteditor'
+import PageLayout from '@renderer/components/layout/PageLayout'
+import OneProduct from '@renderer/components/oneProduct'
+import { CategoryType, ProductType, Subject } from '../../../../src/shared/types'
 import { buttonRecipe } from '@renderer/themeRecipes'
 import FormContainer from '@renderer/components/formcontainer'
 import { newprodId } from '@renderer/forms/producteditor'
-import ButtonSelector from '../components/inputs/ButtonSelector'
+import ButtonSelector from '@renderer/components/inputs/ButtonSelector'
 
 type ShopData = {
   products: ProductType[]

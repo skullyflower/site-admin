@@ -1,15 +1,21 @@
 .editor-content {
-
-  p {font-family: "Pangolin", "Comic Sans MS";
-  margin-bottom: 1em;}
+  p {
+    font-family: 'Pangolin', 'Comic Sans MS';
+    margin-bottom: 1em;
+  }
   a {
     font-family: 'Slackey';
     color: green.500;
     &:hover {
-      color: orange.600;  
+      color: orange.600;
     }
   }
-  h1, h2, h3, h4, h5, h6 {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     font-family: 'Luckiest Guy', sans-serif;
     text-shadow: 2px 2px 5px black;
     font-weight: normal;

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Button, HStack, Heading, Skeleton, Stack } from '@chakra-ui/react'
-import PageLayout from '../components/layout/PageLayout'
-import { PageInfo } from 'src/shared/types'
+import PageLayout from '@renderer/components/layout/PageLayout'
+import { PageInfo } from '../../../../src/shared/types'
 import FormContainer from '@renderer/components/formcontainer'
 import PageForm from '@renderer/forms/contentpageeditor'
 

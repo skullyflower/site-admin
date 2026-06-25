@@ -1,4 +1,4 @@
-import { SiteInfo, BlogInfo, BlogEntry } from './types'
+import { SiteInfo, BlogInfo, BlogEntry } from '@renderer/../../src/shared/types'
 
 export const defaultSitePath = '/Sites/spa-shop-with-admin/spa-shop'
 export const configFile = 'config.json'

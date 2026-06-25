@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect, useCallback } from 'react'
-import { AdminConfig } from 'src/shared/types'
+import { AdminConfig } from '@renderer/../../src/shared/types'
 
 interface AdminConfigContextValue {
   adminConfig: AdminConfig | null
@@ -11,7 +11,11 @@ const AdminConfigContext = createContext<AdminConfigContextValue>({
   refreshAdminConfig: () => {}
 })
 
-export function AdminConfigProvider({ children }: { children: React.ReactNode }): React.JSX.Element {
+export function AdminConfigProvider({
+  children
+}: {
+  children: React.ReactNode
+}): React.JSX.Element {
   const [adminConfig, setAdminConfig] = useState<AdminConfig | null>(null)
 
   const refreshAdminConfig = useCallback(() => {
@@ -31,4 +35,5 @@ export function AdminConfigProvider({ children }: { children: React.ReactNode })
   )
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useAdminConfig = (): AdminConfigContextValue => useContext(AdminConfigContext)

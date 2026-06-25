@@ -6,7 +6,7 @@ import {
   numberInputRecipe,
   textareaRecipe,
   headingRecipe
-} from './themeRecipes'
+} from '@renderer/themeRecipes'
 
 const colors = {
   green: {

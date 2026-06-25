@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
-import UploadInput from '../components/inputs/upload-input'
-import InfoBubble from '../components/info-bubble'
+import UploadInput from '@renderer/components/inputs/upload-input'
+import InfoBubble from '@renderer/components/info-bubble'
 import {
   Box,
   Button,
@@ -13,12 +13,12 @@ import {
   Heading,
   Switch
 } from '@chakra-ui/react'
-import FloatingFormWrapper from '../components/floatingformwrap'
+import FloatingFormWrapper from '@renderer/components/floatingformwrap'
 import { FieldArrayPath, useFieldArray, useForm, useWatch } from 'react-hook-form'
-import { convertDate } from '../components/datetimebit'
+import { convertDate } from '@renderer/components/datetimebit'
 import { buttonRecipe } from '@renderer/themeRecipes'
 const today = new Date()
-import { ProductType, CategoryType, Subject } from 'src/shared/types'
+import { ProductType, CategoryType, Subject } from '@renderer/../../../src/shared/types'
 import StyledInput from '@renderer/components/inputs/StyledInput'
 import TagSelector from '@renderer/components/inputs/TagSelector'
 import imageLoading from '@renderer/assets/image-loading.svg'

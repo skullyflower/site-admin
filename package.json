@@ -1,6 +1,6 @@
 {
   "name": "site-admin",
-  "productName": "WebSite Config",
+  "productName": "WebSite Admin",
   "version": "1.0.0",
   "description": "An application to manage small websites.",
   "main": "./out/main/index.js",

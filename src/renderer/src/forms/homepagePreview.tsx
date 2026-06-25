@@ -1,6 +1,6 @@
 import { Box, Image, HStack, Text, Stack, Badge } from '@chakra-ui/react'
-import SemiSafeContent from '../components/SemiSafeContent'
-import { SiteInfo } from 'src/shared/types'
+import SemiSafeContent from '@renderer/components/SemiSafeContent'
+import { SiteInfo } from '@renderer/../../src/shared/types'
 
 function HomePagePreview({ pageData }: { pageData: SiteInfo }): React.JSX.Element {
   if (!pageData) {

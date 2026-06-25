@@ -1,7 +1,7 @@
 import { Button, Stack } from '@chakra-ui/react'
 import { useEffect, useState } from 'react'
 import { useLocation, useMatch, useNavigate } from 'react-router-dom'
-import { SiteInfo } from 'src/shared/types'
+import { SiteInfo } from '@renderer/../../src/shared/types'
 import { useAdminConfig } from '@renderer/context/AdminConfigContext'
 import {
   CatIcon,

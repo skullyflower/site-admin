@@ -1,6 +1,6 @@
 import { Box, Button, Field, HStack, Text } from '@chakra-ui/react'
 import { Stack } from '@chakra-ui/react'
-import { AdminConfig } from 'src/shared/types'
+import { AdminConfig } from '../../../../src/shared/types'
 import { buttonRecipe } from '@renderer/themeRecipes'
 import { useState } from 'react'
 import useRunServer from '@renderer/hooks/useRunServer'

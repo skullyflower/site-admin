@@ -10,14 +10,15 @@ import {
   Skeleton,
   Stack
 } from '@chakra-ui/react'
-import EditCategory from '../forms/categoryeditor'
-import PageLayout from '../components/layout/PageLayout'
-import { CategoryType } from '../../../shared/types'
+import EditCategory from '@renderer/forms/categoryeditor'
+import PageLayout from '@renderer/components/layout/PageLayout'
+import { CategoryType } from '@renderer/../../shared/types'
 import { buttonRecipe } from '@renderer/themeRecipes'
 import imageLoading from '@renderer/assets/image-loading.svg'
-import SemiSafeContent from '../components/SemiSafeContent'
-import FormContainer from '../components/formcontainer'
+import SemiSafeContent from '@renderer/components/SemiSafeContent'
+import FormContainer from '@renderer/components/formcontainer'
 import { UmbrellaSimpleIcon, PencilIcon, TrashIcon } from '@phosphor-icons/react'
+import useSearchBox from '@renderer/hooks/useSearchBox'
 
 const getCategories = (
   setCategories: (categories: CategoryType[]) => void,
@@ -52,6 +53,7 @@ const CategoriesPage = (): React.JSX.Element => {
   const [showCatForm, setShowForm] = useState(false)
   const [activeCat, setActiveCat] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
+  const { filteredData, searchBox } = useSearchBox(categories ?? [], (c: CategoryType) => c.name)
 
   const onSubmit = (values: CategoryType): void => {
     setLoading(true)
@@ -123,7 +125,8 @@ const CategoriesPage = (): React.JSX.Element => {
             </FormContainer>
           )}
           <Stack>
-            {categories
+            {searchBox}
+            {filteredData
               ?.toSorted((c1, c2) => c1.name.localeCompare(c2.name))
               .map((cat) => (
                 <Box key={cat.id} p={5} border="1px solid" borderRadius={5} w="100%">

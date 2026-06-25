@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react'
 import { Button, HStack, Heading, Skeleton, Stack } from '@chakra-ui/react'
-import UploadInput from '../components/inputs/upload-input'
-import ButtonSelector from '../components/inputs/ButtonSelector'
-import FloatingFormWrapper from '../components/floatingformwrap'
-import GalleryGrid from '../components/galleryGrid'
-import EditGallery from '../forms/galleryeditor'
-import PageLayout from '../components/layout/PageLayout'
-import { GalleryInfo, GalleryImage } from 'src/shared/types'
+import UploadInput from '@renderer/components/inputs/upload-input'
+import ButtonSelector from '@renderer/components/inputs/ButtonSelector'
+import FloatingFormWrapper from '@renderer/components/floatingformwrap'
+import GalleryGrid from '@renderer/components/galleryGrid'
+import EditGallery from '@renderer/forms/galleryeditor'
+import PageLayout from '@renderer/components/layout/PageLayout'
+import { GalleryInfo, GalleryImage } from '../../../../src/shared/types'
 import { buttonRecipe } from '@renderer/themeRecipes'
 
 export const newGalleryId = 'new-gallery'
@@ -168,7 +168,7 @@ const GalleryPage: React.FC = () => {
     >
       <Stack className="content">
         {galleries && galleries.length > 0 && (
-          <Stack textAlign="center">
+          <Stack>
             <ButtonSelector
               dataList={galleries}
               sortProp="title"
@@ -181,7 +181,9 @@ const GalleryPage: React.FC = () => {
             {/* Edit images in one gallery */}
             {!!activeGallery && !loading && (
               <Stack>
-                <Heading size="sm">Update Gallery: {activeGallery.title}</Heading>
+                <Heading w="full" textAlign="center">
+                  Active Gallery: {activeGallery.title}
+                </Heading>
                 <HStack justifyContent="center">
                   <Button onClick={toggleShowForm}>Add Images</Button>
                   <Button onClick={() => doResetGallery(activeGallery as GalleryInfo)}>

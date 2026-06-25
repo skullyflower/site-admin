@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Box, FileUpload, Icon, HStack, Stack } from '@chakra-ui/react'
-import ImagePreview from '../image-preview'
+import ImagePreview from '@renderer/components/image-preview'
 //import backgroundImage from '@renderer/assets/image-loading.svg'
 import { UploadIcon } from '@phosphor-icons/react'
 

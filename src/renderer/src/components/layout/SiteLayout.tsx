@@ -75,7 +75,7 @@ function SiteLayoutInner(): React.JSX.Element {
           overflowY={'auto'}
         >
           <Link to="/" style={{ minWidth: '20px', display: 'block' }}>
-            <Image src={logo} className="App-logo" alt="WebSite Config" maxW="120px" w="100%" />
+            <Image src={logo} className="App-logo" alt="WebSite Admin" maxW="120px" w="100%" />
           </Link>
           <IconButton aria-label="Toggle sidebar" size="sm" variant="ghost" onClick={toggleSidebar}>
             {sidebarOpen === true ? <LuChevronLeft /> : <LuMenu />}

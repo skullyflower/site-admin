@@ -1,7 +1,7 @@
 //import { useState } from 'react'
-//import { modules, formats } from '../components/quillbits'
+//import { modules, formats } from '@renderer/components/quillbits'
 import { useForm, UseFormReturn } from 'react-hook-form'
-import InfoBubble from '../components/info-bubble'
+import InfoBubble from '@renderer/components/info-bubble'
 import {
   Accordion,
   Box,
@@ -14,7 +14,7 @@ import {
   Stack
 } from '@chakra-ui/react'
 import { buttonRecipe } from '@renderer/themeRecipes/button.recipe'
-import { BlogInfo } from 'src/shared/types'
+import { BlogInfo } from '@renderer/../../src/shared/types'
 import StyledInput from '@renderer/components/inputs/StyledInput'
 
 const EditBlogData = ({
