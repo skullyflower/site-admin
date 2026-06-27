@@ -6,11 +6,13 @@ import { UploadIcon } from '@phosphor-icons/react'
 
 interface UploadInputProps {
   setImageCount?: (count: number) => void
+  basePath?: string
   multiple: boolean
   onUpload: (filePaths: string[]) => void
 }
 const UploadInput = ({
   setImageCount,
+  basePath,
   onUpload,
   multiple = true
 }: UploadInputProps): React.ReactNode => {
@@ -36,6 +38,7 @@ const UploadInput = ({
         <HStack alignItems="stretch" justifyContent="space-evenly" wrap="wrap">
           <ImagePreview
             images={previewImages}
+            basePath={basePath}
             updateImages={(images: string[]) => setPreviewImages(images)}
           />
         </HStack>

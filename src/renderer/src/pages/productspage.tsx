@@ -83,6 +83,8 @@ const ProductsPage = (): React.JSX.Element => {
       .then((response) => {
         setMessageType(response.success ? 'success' : 'error')
         setMessages(response.message || '')
+      })
+      .then(() => {
         getShopData(setShopData, setMessages, setLoading, setMessageType)
         if (filter && shopData?.products) {
           setFilteredProducts(

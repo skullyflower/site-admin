@@ -31,7 +31,7 @@ export const updateProduct = async (product: ProductType): Promise<ApiResponse> 
         }
       }
       checkFile(shopfilepath, { products: [] })
-      checkFile(shopfilepath.replace('public', 'build'), { products: [] })
+      checkFile(shopfilepath.replace('public', 'dist'), { products: [] })
       const oldShopDataString = fs.readFileSync(shopfilepath, 'utf8')
       const oldShopData = JSON.parse(oldShopDataString)
       const productArray = oldShopData.products
@@ -44,7 +44,7 @@ export const updateProduct = async (product: ProductType): Promise<ApiResponse> 
 
       const newShopData = { products: productArray }
       fs.writeFileSync(shopfilepath, JSON.stringify(newShopData))
-      fs.writeFileSync(shopfilepath.replace('public', 'build'), JSON.stringify(newShopData))
+      fs.writeFileSync(shopfilepath.replace('public', 'dist'), JSON.stringify(newShopData))
       return okMessage('Updated Products!')
     } catch (err) {
       console.log(err)

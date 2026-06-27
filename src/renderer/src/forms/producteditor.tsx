@@ -8,6 +8,7 @@ import {
   Image,
   Input,
   InputGroup,
+  Group,
   HStack,
   Center,
   Heading,
@@ -24,6 +25,7 @@ import TagSelector from '@renderer/components/inputs/TagSelector'
 import imageLoading from '@renderer/assets/image-loading.svg'
 
 export const newprodId = 'new-prod-id'
+const basePath = '/images/shop/products/'
 
 const newproduct = {
   id: newprodId,
@@ -104,11 +106,11 @@ export default function EditProduct({
     (paths: string[]): void => {
       if (paths.length > 0) {
         if (key === 'img') {
-          const prodImage = `/images/shop/products/${paths[0].split('/').pop()}`
+          const prodImage = `${paths[0].split('/').pop()}`
           setValue('img', prodImage)
         } else {
           const altimgs = getValues('altimgs')
-          const newAltImgs = paths.map((path) => `/images/shop/products/${path.split('/').pop()}`)
+          const newAltImgs = paths.map((path) => `${path.split('/').pop()}`)
           setValue('altimgs', [...altimgs, ...newAltImgs])
         }
       }
@@ -196,7 +198,11 @@ export default function EditProduct({
             <Field.Root>
               <Field.Label w={40}>Upload New Image</Field.Label>
               <HStack alignItems="top" width={'100%'}>
-                <UploadInput multiple={false} onUpload={handleImageUpload('img')} />
+                <UploadInput
+                  multiple={false}
+                  onUpload={handleImageUpload('img')}
+                  basePath={basePath}
+                />
               </HStack>
             </Field.Root>
             <Field.Root p={1} invalid={errors.img ? true : false}>
@@ -212,7 +218,7 @@ export default function EditProduct({
                   width={'100%'}
                 />
                 <Image
-                  src={`http://localhost:3000${thumb}`}
+                  src={`http://localhost:3000${basePath}${thumb}`}
                   boxSize="100px"
                   onError={(e) => {
                     e.currentTarget.src = imageLoading
@@ -226,18 +232,19 @@ export default function EditProduct({
       <Field.Root p={1}>
         <HStack alignItems="center" width={'100%'}>
           <Field.Label w={40}>Alt Images:</Field.Label>
-          <UploadInput multiple={true} onUpload={handleImageUpload('altimgs')} />
+          <UploadInput
+            multiple={true}
+            onUpload={handleImageUpload('altimgs')}
+            basePath={basePath}
+          />
           {fields.map((field, index) => (
             <span key={field.id}>
-              <InputGroup
-                startElement={
-                  <Button recipe={buttonRecipe} onClick={() => remove(index)}>
-                    X
-                  </Button>
-                }
-              >
+              <Group>
+                <Button recipe={buttonRecipe} onClick={() => remove(index)}>
+                  X
+                </Button>
                 <Input type="text" {...register(`altimgs.${index}`)} />
-              </InputGroup>
+              </Group>
             </span>
           ))}
           <div>

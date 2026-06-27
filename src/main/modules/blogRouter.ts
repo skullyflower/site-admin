@@ -54,6 +54,7 @@ export const updateBlogInfo = (blogInfo: BlogInfo): string => {
 export const updateBlogPost = (entry: BlogEntry): string => {
   const { blogfilepath, blogRSSpath, blogImagesPath, tempPath } = getPaths()
   if (entry) {
+    console.log(entry.date)
     try {
       checkFile(blogfilepath, defaultBlogInfo)
       const blogObject: BlogInfo = JSON.parse(getBlog()).data as BlogInfo

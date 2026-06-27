@@ -21,7 +21,7 @@ const PreviewImage = ({
         <Image
           className="image"
           src={`http://localhost:3000${image}`}
-          alt={'Image'}
+          alt={`http://localhost:3000${image}`}
           width={150}
           style={{ padding: '10px' }}
         />
@@ -33,16 +33,21 @@ const PreviewImage = ({
 
 interface ImagePreviewProps {
   images: string[]
+  basePath?: string
   updateImages: (images: string[]) => void
 }
-const ImagePreview = ({ images, updateImages }: ImagePreviewProps): React.ReactNode => {
+const ImagePreview = ({ images, basePath, updateImages }: ImagePreviewProps): React.ReactNode => {
   const deleteImage = (image: string): void => {
     updateImages(images.filter((img) => img !== image))
   }
   return (
     <>
       {images.map((image, i) => (
-        <PreviewImage key={`${image}${i}`} image={image} deleteImage={deleteImage} />
+        <PreviewImage
+          key={`${image}${i}`}
+          image={`${basePath}${image}`}
+          deleteImage={deleteImage}
+        />
       ))}
     </>
   )

@@ -3,6 +3,7 @@ import ConfirmDelete from './ConfirmDelete'
 import { RiDeleteBin6Line } from 'react-icons/ri'
 import { buttonRecipe } from '@renderer/themeRecipes'
 import { PencilIcon, CopyIcon } from '@phosphor-icons/react'
+import SemiSafeContent from './SemiSafeContent'
 
 interface OneProductProps {
   product: {
@@ -44,14 +45,7 @@ const OneProduct = ({ product, toggleForm, doDelete }: OneProductProps): React.R
             {product.name}
           </a>
         </h3>
-        <div
-          style={{ textAlign: 'left', verticalAlign: 'top' }}
-          dangerouslySetInnerHTML={{ __html: product.desc }}
-        />
-        <div
-          style={{ textAlign: 'left', verticalAlign: 'top' }}
-          dangerouslySetInnerHTML={{ __html: product.desc_long }}
-        />
+        <SemiSafeContent rawContent={`${product.desc}\n${product.desc_long}`} />
       </div>
       <HStack gap={2}>
         <IconButton

@@ -1,4 +1,4 @@
-import { Button, HStack, Stack, Text } from '@chakra-ui/react'
+import { Button, Stack, Text } from '@chakra-ui/react'
 import { useEffect, useState } from 'react'
 import PageLayout from '../components/layout/PageLayout'
 import { SiteInfo } from '../../../../src/shared/types'
@@ -60,7 +60,7 @@ const WelcomePage = (): React.JSX.Element => {
               Launch Dev Server
             </Button>
           ) : (
-            <HStack>
+            <>
               <Text>
                 <a href="http://localhost:3000/" target="localDev">
                   Open Local Dev Site
@@ -69,7 +69,7 @@ const WelcomePage = (): React.JSX.Element => {
               <Button recipe={buttonRecipe} disabled={!serverRunning} onClick={stopDevServer}>
                 Stop Dev Server
               </Button>
-            </HStack>
+            </>
           )}
         </Stack>
       </PageLayout>
