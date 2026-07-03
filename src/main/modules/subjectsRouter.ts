@@ -15,7 +15,7 @@ export const updateSubject = async (subject): Promise<ApiResponse> => {
   if (subject) {
     try {
       checkFile(subjectFilePath, { subjects: [] })
-      checkFile(subjectFilePath.replace('public', 'build'), { subjects: [] })
+      checkFile(subjectFilePath.replace('public', 'dist'), { subjects: [] })
       const oldShopDataString = fs.readFileSync(subjectFilePath, 'utf8')
       const oldShopObject = JSON.parse(oldShopDataString)
       const newCategories = [...oldShopObject.subjects]
@@ -27,7 +27,7 @@ export const updateSubject = async (subject): Promise<ApiResponse> => {
       }
       const newShopData = { subjects: newCategories }
       fs.writeFileSync(subjectFilePath, JSON.stringify(newShopData))
-      fs.writeFileSync(subjectFilePath.replace('public', 'build'), JSON.stringify(newShopData))
+      fs.writeFileSync(subjectFilePath.replace('public', 'dist'), JSON.stringify(newShopData))
       return okMessage('Updated Shop Subjects!')
     } catch (err) {
       console.log(err)

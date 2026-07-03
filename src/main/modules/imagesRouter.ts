@@ -34,6 +34,7 @@ export const getPreviewImages = async (files: string[]): Promise<ApiResponse<str
         files.map(async (file) => {
           const newFilePath = join(tempPath, file.split('/').pop() || '')
           fs.copyFileSync(file, newFilePath)
+          fs.renameSync(file, newFilePath.replace('public', 'dist'))
           return newFilePath.replace(pathToPublic, '') // relative URL
         })
       )
@@ -134,6 +135,8 @@ export const moveImages = (filesToMove: string[], destination: string): string =
     const smallDestPath = join(pathToPublic, 'images', destination, 'smaller')
     checkPath(smallDestPath)
     checkPath(bigDestPath)
+    checkPath(smallDestPath.replace('public', 'dist'))
+    checkPath(bigDestPath.replace('public', 'dist'))
     let message = ''
     let smallfiles: string[] = []
     try {
@@ -145,12 +148,20 @@ export const moveImages = (filesToMove: string[], destination: string): string =
     filearray.forEach((file) => {
       try {
         fs.renameSync(join(bigSourcePath, file), join(bigDestPath, file))
+        fs.renameSync(
+          join(bigSourcePath.replace('public', 'dist'), file),
+          join(bigDestPath.replace('public', 'dist'), file)
+        )
       } catch (err) {
         message += `Failed to move big ${bigSourcePath}${file} to  ${bigDestPath}${file}:${err}\n`
       }
       if (smallfiles.includes(file)) {
         try {
           fs.renameSync(join(smallSourcePath, file), join(smallDestPath, file))
+          fs.renameSync(
+            join(smallSourcePath.replace('public', 'dist'), file),
+            join(smallDestPath.replace('public', 'dist'), file)
+          )
         } catch (err) {
           console.log(err, `Failed to copy small ${file} file\n`)
           message += `Failed to copy small ${file} file\n`
@@ -185,9 +196,18 @@ export const renameImage = (imageurl, newname): string => {
         join(pathToPublic, path.dirname(relativePath), newname)
       )
       fs.renameSync(
+        join(pathToPublic.replace('public', 'dist'), relativePath),
+        join(pathToPublic.replace('public', 'dist'), path.dirname(relativePath), newname)
+      )
+      fs.renameSync(
         join(pathToPublic, smallerRelativePath),
         join(pathToPublic, path.dirname(smallerRelativePath), newname)
       )
+      fs.renameSync(
+        join(pathToPublic.replace('public', 'dist'), smallerRelativePath),
+        join(pathToPublic.replace('public', 'dist'), path.dirname(smallerRelativePath), newname)
+      )
+
       return JSON.stringify(okMessage(`Successfully renamed ${imageurl}`))
     } catch (error) {
       return JSON.stringify(fail(`Failed to rename ${imageurl}: ${error}`))

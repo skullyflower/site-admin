@@ -34,13 +34,13 @@ const processRss = (blogData: BlogInfo): string => {
   <channel>
   <title>${blog_data.page_title}</title>
   <description>${blog_data.page_description}s</description>
-  <generator>${sitedata.sitetitle}</generator>
-  <link>${sitedata.siteurl}/</link>
-  <atom:link href="${sitedata.siteurl}/blog.rss" rel="self" type="application/rss+xml" />
+  <generator>${sitedata.company_name}</generator>
+  <link>${sitedata.live_site_url}/</link>
+  <atom:link href="${sitedata.live_site_url}/blog.rss" rel="self" type="application/rss+xml" />
   <dc:language>en-en</dc:language>    
   <dc:rights>Copyright 2005-${year}</dc:rights>`
   blogData.entries.forEach((entry) => {
-    const entrylink = `${sitedata.siteurl}/blog/entry/${entry.id}`
+    const entrylink = `${sitedata.live_site_url}/blog/entry/${entry.id}`
     const imageLink = entry.imagelink || entrylink
     const pubDate = new Date(entry.date)
 

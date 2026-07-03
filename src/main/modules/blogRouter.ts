@@ -76,16 +76,21 @@ export const updateBlogPost = (entry: BlogEntry): string => {
           } else if (bigResult.relativeUrl) {
             console.log('Big file uploaded to ', blogImagesPath)
           }
-          fs.unlinkSync(join(tempPath, file))
+          fs.renameSync(join(tempPath, file), blogImagesPath.replace('public', 'dist'))
         } else {
           console.log(`File ${file} not found in entry.image`)
         }
       })
 
       writeFileSync(blogfilepath, JSON.stringify({ ...blogObject, entries }))
+      fs.writeFileSync(
+        blogfilepath.replace('public', 'dist'),
+        JSON.stringify({ ...blogObject, entries })
+      )
 
       const RSS = processRss(blogObject)
       fs.writeFileSync(blogRSSpath, RSS)
+      fs.writeFileSync(blogRSSpath.replace('public', 'dist'), RSS)
       return JSON.stringify(okMessage('Updated Blog!'))
     } catch (error) {
       console.log(error)
@@ -101,6 +106,9 @@ export const deletEntry = (blogid: string): string => {
   try {
     checkFile(blogfilepath, defaultBlogInfo)
     checkFile(blogRSSpath, '')
+    checkFile(blogfilepath.replace('public', 'dist'), defaultBlogInfo)
+    checkFile(blogRSSpath.replace('public', 'dist'), '')
+
     const blogJSONString = fs.readFileSync(blogfilepath)
     const blogData: BlogInfo = JSON.parse(blogJSONString.toString()) as BlogInfo
     const entryToDelete = blogData.entries.find((entry) => entry.id === blogid)

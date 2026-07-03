@@ -35,6 +35,7 @@ const updatePagesData = (): void => {
     return { page_id: pageObject.page_id, page_title: pageObject.page_title }
   })
   writeFileSync(pagesFile, JSON.stringify(pagesData))
+  writeFileSync(pagesFile.replace('public', 'dist'), JSON.stringify(pagesData))
 }
 
 export const getPages = (): string => {
@@ -76,6 +77,7 @@ export const updatePage = (page, body): string => {
       const oldpageObject = JSON.parse(oldpageDataString)
       const newpageData = { ...oldpageObject, ...body }
       writeFileSync(pagefilepath, JSON.stringify(newpageData))
+      writeFileSync(pagefilepath.replace('public', 'dist'), JSON.stringify(newpageData))
       updatePagesData()
       return JSON.stringify(okMessage('Updated page!'))
     } catch (err) {
@@ -98,6 +100,7 @@ export const createPage = (pageId: string): string => {
     page_content: ''
   }
   writeFileSync(pagefilepath, JSON.stringify(pageData))
+  writeFileSync(pagefilepath.replace('public', 'dist'), JSON.stringify(pageData))
   updatePagesData()
   return JSON.stringify(okMessage('Page created!'))
 }
@@ -107,6 +110,7 @@ export const deletePage = (pageId: string): string => {
   const pagefilepath = join(rootdir, `${pageId}-page.json`)
   if (existsSync(pagefilepath)) {
     unlinkSync(pagefilepath)
+    unlinkSync(pagefilepath.replace('public', 'build'))
     updatePagesData()
     return JSON.stringify(okMessage('Page deleted!'))
   } else {

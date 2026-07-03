@@ -31,6 +31,7 @@ export const updateSiteInfo = (siteInfo): string => {
       const oldHomeObject = JSON.parse(oldHomeDataString)
       const newHomeData = { ...oldHomeObject, ...values }
       fs.writeFileSync(homefilepath, JSON.stringify(newHomeData))
+      fs.writeFileSync(homefilepath.replace('public', 'dist'), JSON.stringify(newHomeData))
       return JSON.stringify(okMessage('Updated Homepage data!'))
     } catch (err) {
       console.log(err)

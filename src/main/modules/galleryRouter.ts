@@ -67,7 +67,9 @@ export const resetGallery = (galleryId: string): string => {
     })
     try {
       checkFile(json_file, {})
+      checkFile(json_file.replace('public', 'dist'), {})
       writeFileSync(json_file, JSON.stringify(img_files))
+      writeFileSync(json_file.replace('public', 'dist'), JSON.stringify(img_files))
       return JSON.stringify({ success: true, message: 'Success!', data: img_files })
     } catch (err) {
       return JSON.stringify(fail(`Failed to write gallery images to ${json_file}: ${err}`))
@@ -104,6 +106,7 @@ export const updateGallery = (gallery): string => {
       } else {
         galleries.push(gallery)
         writeFileSync(join(pathToPublic, json_path), JSON.stringify({}))
+        writeFileSync(join(pathToPublic.replace('public', 'dist'), json_path), JSON.stringify({}))
       }
       writeFileSync(`${galleries_json}`, JSON.stringify({ galleries: galleries }))
       return JSON.stringify(okMessage(`Updated gallery; ${gallery.title}!`))

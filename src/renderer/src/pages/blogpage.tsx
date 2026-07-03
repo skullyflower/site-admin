@@ -88,11 +88,10 @@ const BlogPage = (): React.JSX.Element => {
       setMessageType('error')
     }
   }
-  const doDelete = useCallback(async (e) => {
+  const doDelete = useCallback(async (blogId: string) => {
     if (window.confirm('Are you sure you want to do this?')) {
-      const blogid = e?.target?.value
       try {
-        const json = await window.api.deleteBlogEntry(blogid)
+        const json = await window.api.deleteBlogEntry(blogId)
         setMessages(json.message || '')
         setMessageType(json.success ? 'success' : 'error')
         getBlogEntries(setBlogEntries, setMessages, setBlogInfo)
@@ -176,8 +175,7 @@ const BlogPage = (): React.JSX.Element => {
                             padding={2}
                             size="sm"
                             recipe={buttonRecipe}
-                            value={blog.id}
-                            onClick={doDelete}
+                            onClick={() => doDelete(blog.id)}
                           >
                             <TrashIcon />
                           </IconButton>

@@ -80,7 +80,7 @@ export const deleteProduct = (prodId): string => {
       const newShopObj = { ...shop, products: allproducts }
       const newShopData = JSON.stringify(newShopObj)
       fs.writeFileSync(shopfilepath, newShopData)
-      fs.writeFileSync(shopfilepath.replace('public', 'build'), JSON.stringify(newShopData))
+      fs.writeFileSync(shopfilepath.replace('public', 'dist'), JSON.stringify(newShopData))
       return JSON.stringify(okMessage(`Successfully deleted ${prodToDelete}`))
     }
     return JSON.stringify(fail(`Couldn't find ${prodId} in the list.`))

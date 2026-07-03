@@ -16,6 +16,7 @@ export const setSale = (sale: number): string => {
       checkFile(salefilepath, { sale: 0 })
       const newShopData = { sale: Number(sale) }
       fs.writeFileSync(salefilepath, JSON.stringify(newShopData))
+      fs.writeFileSync(salefilepath.replace('public', 'dist'), JSON.stringify(newShopData))
       return JSON.stringify(okMessage('Updated Sale!'))
     } catch (err) {
       console.log(err)

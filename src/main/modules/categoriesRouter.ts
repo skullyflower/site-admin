@@ -15,7 +15,7 @@ export const updateCategories = (category: CategoryType): string => {
   if (category) {
     try {
       checkFile(shopfilepath, { categories: [] })
-      checkFile(shopfilepath.replace('public', 'build'), { categories: [] })
+      checkFile(shopfilepath.replace('public', 'dist'), { categories: [] })
       const oldShopDataString = fs.readFileSync(shopfilepath)
       const oldShopObject = JSON.parse(oldShopDataString.toString())
       const newCategories = [...oldShopObject.categories]
@@ -27,7 +27,7 @@ export const updateCategories = (category: CategoryType): string => {
       }
       const newShopData = { categories: newCategories }
       fs.writeFileSync(shopfilepath, JSON.stringify(newShopData))
-      fs.writeFileSync(shopfilepath.replace('public', 'build'), JSON.stringify(newShopData))
+      fs.writeFileSync(shopfilepath.replace('public', 'dist'), JSON.stringify(newShopData))
       return JSON.stringify(okMessage('Updated Shop Categories!'))
     } catch (err) {
       console.log(err)
