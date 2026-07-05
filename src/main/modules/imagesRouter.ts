@@ -34,7 +34,6 @@ export const getPreviewImages = async (files: string[]): Promise<ApiResponse<str
         files.map(async (file) => {
           const newFilePath = join(tempPath, file.split('/').pop() || '')
           fs.copyFileSync(file, newFilePath)
-          fs.renameSync(file, newFilePath.replace('public', 'dist'))
           return newFilePath.replace(pathToPublic, '') // relative URL
         })
       )
