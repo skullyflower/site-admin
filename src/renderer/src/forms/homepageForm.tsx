@@ -11,16 +11,26 @@ import {
   Center,
   Textarea,
   Stack,
-  For
+  For,
+  Heading
 } from '@chakra-ui/react'
 import InfoBubble from '@renderer/components/info-bubble'
 import UploadInput from '@renderer/components/inputs/upload-input'
 import StyledInput from '@renderer/components/inputs/StyledInput'
 import { buttonRecipe, inputRecipe } from '@renderer/themeRecipes'
-import { Feature, SiteInfo } from '@renderer/../../../src/shared/types'
+import { ExternalLink, Feature, SiteInfo } from '@renderer/../../../src/shared/types'
 import imageLoading from '@renderer/assets/image-loading.svg'
+import LinkForm from './linkForm'
 
 const options = ['blog', 'content', 'galleries', 'products', 'categories', 'subjects', 'sale']
+
+const createNewLink = (): ExternalLink => ({
+  id: crypto.randomUUID(),
+  icon: '',
+  text: '',
+  url: 'https://',
+  isMine: false
+})
 
 const HomePageForm = ({
   pageData,
@@ -40,6 +50,25 @@ const HomePageForm = ({
 
   const page_content = useWatch({ control, name: 'page_content' })
   const features = useWatch({ control, name: 'features' })
+  const extrnLinks = useWatch({ control, name: 'links' }) || []
+
+  const updateLink = (linkupdate: ExternalLink): void => {
+    const indexToUpdate = extrnLinks.findIndex((lnk) => lnk.id === linkupdate.id)
+    if (indexToUpdate !== -1) {
+      setValue('links', extrnLinks.toSpliced(indexToUpdate, 1, linkupdate))
+    }
+  }
+
+  const deleteLink = (id: string): void => {
+    setValue(
+      'links',
+      extrnLinks.filter((lnk) => lnk.id !== id)
+    )
+  }
+
+  const addLink = (): void => {
+    setValue('links', [...extrnLinks, createNewLink()])
+  }
 
   const handleLogoUpload = async (paths: string[]): Promise<string[]> => {
     if (paths.length > 0) {
@@ -55,10 +84,10 @@ const HomePageForm = ({
   }
   return (
     <Box p={5}>
-      <Stack gap={4} width="100%" alignItems="stretch">
-        <Field.Root p={4} invalid={errors.page_title ? true : false}>
+      <Stack gap={1} width="100%" alignItems="stretch">
+        <Field.Root p={1} invalid={errors.page_title ? true : false}>
           <HStack alignItems="center" gap={4} width="100%">
-            <label>Home Page Title:</label>
+            <Field.Label w={40}>Home Page Title:</Field.Label>
             <Input
               recipe={inputRecipe}
               _invalid={{ borderColor: 'red.300' }}
@@ -67,48 +96,13 @@ const HomePageForm = ({
             />
           </HStack>
         </Field.Root>
-        <Field.Root p={4} invalid={errors.company_name ? true : false}>
+        <Field.Root p={1} invalid={errors.page_description ? true : false}>
           <HStack alignItems="center" width="100%">
             <Box w={48}>
-              <label>
-                Company Name:{' '}
-                <InfoBubble message="This is the simple, short name of your site or shop. " />
-              </label>
-            </Box>
-            <Input
-              recipe={inputRecipe}
-              _invalid={{ borderColor: 'red.300' }}
-              type="text"
-              {...register('company_name', { required: true, validate: (value) => value !== '' })}
-            />
-          </HStack>
-        </Field.Root>
-        <Field.Root p={4} invalid={errors.live_site_url ? true : false}>
-          <HStack alignItems="center" width="100%">
-            <Box w={48}>
-              <label>
-                Live Url:{' '}
-                <InfoBubble message="You know, that domain name you baught. example: https://www.yoursitename.com " />
-              </label>
-            </Box>
-            <Input
-              recipe={inputRecipe}
-              _invalid={{ borderColor: 'red.300' }}
-              type="url"
-              {...register('live_site_url', {
-                required: true,
-                validate: (value) => value !== ''
-              })}
-            />
-          </HStack>
-        </Field.Root>
-        <Field.Root p={4} invalid={errors.page_description ? true : false}>
-          <HStack alignItems="center" width="100%">
-            <Box w={48}>
-              <label>
+              <Field.Label w={40}>
                 Homepage SEO Page Description:{' '}
                 <InfoBubble message="Short description that will show in Google searches. " />
-              </label>
+              </Field.Label>
             </Box>
             <Textarea
               width="100%"
@@ -121,9 +115,19 @@ const HomePageForm = ({
             />
           </HStack>
         </Field.Root>
-        <Field.Root p={4}>
+        <Field.Root p={1}>
+          <Stack gap={2} justifyContent={'stretch'} width={'100%'}>
+            <Field.Label w={40}>Home Page Content:</Field.Label>
+            <StyledInput
+              value={page_content}
+              onChange={(value) => setValue('page_content', value)}
+              placeholder="Add Content Here..."
+            />
+          </Stack>
+        </Field.Root>
+        <Field.Root p={1}>
           <Stack gap={2} alignItems="stretch" width="100%">
-            <label>Site Logo:</label>
+            <Field.Label w={40}>Site Logo:</Field.Label>
             <Box
               flexGrow={3}
               borderWidth={1}
@@ -135,17 +139,17 @@ const HomePageForm = ({
             >
               <Field.Root>
                 <HStack alignItems="top" width="100%">
-                  <label>Upload New Image</label>
+                  <Field.Label w={40}>Upload New Image</Field.Label>
                   <UploadInput multiple={false} onUpload={handleLogoUpload} />
                 </HStack>
               </Field.Root>
-              <Field.Root p={4} invalid={errors.sitelogo ? true : false}>
+              <Field.Root p={1} invalid={errors.sitelogo ? true : false}>
                 <HStack alignItems="center" width="100%">
                   <Box w={48}>
-                    <label>
+                    <Field.Label w={40}>
                       Or edit image url:{' '}
                       <InfoBubble message="You can edit the image url to be a different image you have uploaded in the past. You can also use an image from a different website. (This value will be overwritten if you select an image to upload.)" />
-                    </label>
+                    </Field.Label>
                   </Box>
                   <Input
                     recipe={inputRecipe}
@@ -165,16 +169,63 @@ const HomePageForm = ({
             </Box>
           </Stack>
         </Field.Root>
-        <Field.Root p={4}>
-          <Stack gap={2} justifyContent={'stretch'} width={'100%'}>
-            <label>Home Page Top Content:</label>
-            <StyledInput
-              value={page_content}
-              onChange={(value) => setValue('page_content', value)}
-              placeholder="Add Content Here..."
+        <Heading>Site Settings</Heading>
+        <Field.Root p={1} invalid={errors.brand_name ? true : false}>
+          <HStack alignItems="center" width="100%">
+            <Box w={48}>
+              <Field.Label w={40}>
+                Brand or Company:{' '}
+                <InfoBubble message="This is the simple, short name of your site or shop. " />
+              </Field.Label>
+            </Box>
+            <Input
+              recipe={inputRecipe}
+              _invalid={{ borderColor: 'red.300' }}
+              type="text"
+              {...register('brand_name', { required: true, validate: (value) => value !== '' })}
             />
-          </Stack>
+          </HStack>
         </Field.Root>
+        <Field.Root p={1} invalid={errors.live_site_url ? true : false}>
+          <HStack alignItems="center" width="100%">
+            <Box w={48}>
+              <Field.Label w={40}>
+                Live Url:{' '}
+                <InfoBubble message="You know, that domain name you baught. example: https://www.your-brand-name.com " />
+              </Field.Label>
+            </Box>
+            <Input
+              recipe={inputRecipe}
+              _invalid={{ borderColor: 'red.300' }}
+              type="url"
+              {...register('live_site_url', {
+                required: true,
+                validate: (value) => value !== ''
+              })}
+            />
+          </HStack>
+        </Field.Root>
+        <Fieldset.Root p={4}>
+          <Stack>
+            <HStack justify={'space-between'}>
+              <Fieldset.Legend>Manage External Links:</Fieldset.Legend>
+              <Button onClick={addLink} size="sm">
+                Add One
+              </Button>
+            </HStack>
+            <Fieldset.Content>
+              {extrnLinks &&
+                extrnLinks.map((link) => (
+                  <LinkForm
+                    key={link.id}
+                    link={link}
+                    updateLink={updateLink}
+                    deleteLink={deleteLink}
+                  />
+                ))}
+            </Fieldset.Content>
+          </Stack>
+        </Fieldset.Root>
         <Fieldset.Root p={4}>
           <Fieldset.Legend>Select Features to Enable:</Fieldset.Legend>
           <Fieldset.Content>

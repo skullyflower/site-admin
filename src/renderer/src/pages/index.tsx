@@ -8,7 +8,7 @@ import { buttonRecipe } from '@renderer/themeRecipes'
 import useRunServer from '@renderer/hooks/useRunServer'
 
 const WelcomePage = (): React.JSX.Element => {
-  const [sitename, setSitename] = useState('Spa-Shop')
+  const [brand_name, setbrand_name] = useState('My Site')
   const [messages, setMessages] = useState<string | null>(null)
   const [messageType, setMessageType] = useState<'info' | 'warning' | 'error' | 'success'>('info')
   const [pathToSite, setPathToSite] = useState<string | null>(null)
@@ -28,10 +28,12 @@ const WelcomePage = (): React.JSX.Element => {
   useEffect(() => {
     if (pathToSite) {
       window.api.getSiteInfo().then((response) => {
-        if (response.success && response.data && 'sitename' in response.data) {
-          setSitename((response.data as SiteInfo & { sitename?: string }).sitename || 'Spa-Shop')
+        if (response.success && response.data && 'brand_name' in response.data) {
+          setbrand_name(
+            (response.data as SiteInfo & { brand_name?: string }).brand_name || 'Spa-Shop'
+          )
         } else {
-          setSitename('Spa-Shop')
+          setbrand_name('My Site')
           if (!response.success) {
             setMessageType('error')
             setMessages(response.message || '')
@@ -51,7 +53,7 @@ const WelcomePage = (): React.JSX.Element => {
       >
         <Stack>
           <Text>
-            <em>Currently editing:</em> {sitename} at {pathToSite}
+            <em>Currently editing:</em> {brand_name} at {pathToSite}
           </Text>
           <Text>Start the local dev server so that you can see your changes and images.</Text>
 
@@ -78,7 +80,7 @@ const WelcomePage = (): React.JSX.Element => {
     // If the config does not exist, show the config form
     return (
       <PageLayout
-        title={`Welcome to the ${sitename} Admin`}
+        title={`Welcome to the ${brand_name} Admin`}
         messages={messages}
         setMessages={setMessages}
         messageType={messageType}

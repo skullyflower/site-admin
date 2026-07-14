@@ -84,7 +84,7 @@ const SideBar = ({ minimized }: { minimized?: boolean }): React.ReactNode => {
       )}
       {config?.features?.includes('content') && (
         <NavButton path="/content" icon={<FileTextIcon weight="fill" />} minimized={minimized}>
-          Content Pages
+          Pages
         </NavButton>
       )}
       {config?.features?.includes('galleries') && (
@@ -113,7 +113,7 @@ const SideBar = ({ minimized }: { minimized?: boolean }): React.ReactNode => {
         </NavButton>
       )}
       <NavButton icon={<ImageIcon weight="fill" />} path="/images" minimized={minimized}>
-        Image Upload
+        Images
       </NavButton>
       <NavButton icon={<GearIcon weight="fill" />} path="/config" minimized={minimized}>
         Config

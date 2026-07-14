@@ -34,7 +34,7 @@ const processRss = (blogData: BlogInfo): string => {
   <channel>
   <title>${blog_data.page_title}</title>
   <description>${blog_data.page_description}s</description>
-  <generator>${sitedata.company_name}</generator>
+  <generator>${sitedata.brand_name}</generator>
   <link>${sitedata.live_site_url}/</link>
   <atom:link href="${sitedata.live_site_url}/blog.rss" rel="self" type="application/rss+xml" />
   <dc:language>en-en</dc:language>    

@@ -44,11 +44,9 @@ const PageLayout = ({
       w={'auto'}
       maxW={'98%'}
       height={'88vh'}
-      overflowY={'auto'}
-      marginInline={'auto'}
     >
       <Card.Header>
-        <Stack gap={4}>
+        <Stack gap={2}>
           <HStack align="center" justifyContent="space-between">
             <Heading textAlign="center" size="lg">
               {title}
@@ -90,7 +88,7 @@ const PageLayout = ({
           )}
         </Stack>
       </Card.Header>
-      <Card.Body>
+      <Card.Body overflowY={'auto'} marginInline={'auto'}>
         <ScrollArea.Root height="inherit">
           <ScrollArea.Viewport>
             <ScrollArea.Content>{children}</ScrollArea.Content>

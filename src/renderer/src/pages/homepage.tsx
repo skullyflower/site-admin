@@ -39,10 +39,12 @@ const emptySiteInfo: SiteInfo = {
   page_title: '',
   page_description: '',
   page_content: '',
-  company_name: '',
+  brand_name: '',
   site_theme: '',
   live_site_url: '',
-  sitelogo: ''
+  sitelogo: '',
+  links: [],
+  features: []
 }
 export default function HomePage(): React.JSX.Element {
   const [messages, setMessages] = useState<string | null>(null)
@@ -81,7 +83,7 @@ export default function HomePage(): React.JSX.Element {
       messages={messages}
       setMessages={setMessages}
       messageType={messageType}
-      button={{ text: showForm ? 'Show Preview' : 'Show Form', action: toggleForm, value: '' }}
+      button={{ text: showForm ? 'View' : 'Edit', action: toggleForm, value: '' }}
     >
       {loading ? (
         <Stack>

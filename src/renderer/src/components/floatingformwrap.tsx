@@ -33,15 +33,15 @@ const FloatingFormWrapper = ({
             backgroundColor="gray.800"
             color="slate.100"
             maxH={'88vh'}
-            overflow={'auto'}
-            className="content"
           >
             <Dialog.CloseTrigger asChild position="fixed" top={4} right={4}>
               <IconButton recipe={buttonRecipe} onClick={onClose} p={2} aria-label="Close form">
                 <XIcon />
               </IconButton>
             </Dialog.CloseTrigger>
-            <Dialog.Body>{children}</Dialog.Body>
+            <Dialog.Body overflow={'auto'} className="content">
+              {children}
+            </Dialog.Body>
           </Dialog.Content>
         </Dialog.Positioner>
       </Portal>

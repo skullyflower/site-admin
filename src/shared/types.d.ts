@@ -2,13 +2,16 @@ export type Feature =
   | 'blog'
   | 'content'
   | 'galleries'
+  | 'links'
   | 'products'
   | 'categories'
   | 'subjects'
   | 'sale'
+
 export interface AdminConfig {
   pathToSite: string
 }
+
 export interface BlogInfo {
   page_title: string
   page_description: string
@@ -36,17 +39,28 @@ export interface BlogResponse {
   entries: BlogEntry[]
   message?: string
 }
+
 export interface PageInfo {
   page_id: string
   page_title: string
   page_description: string
   page_content: string
 }
+
+export interface ExternalLink {
+  id: string
+  icon?: string
+  text: string
+  url: string
+  isMine: boolean
+}
+
 export interface SiteInfo extends PageInfo {
-  company_name: string
+  brand_name: string
   site_theme: string
   live_site_url: string
   sitelogo: string
+  links?: ExternalLink[]
   features?: Feature[]
 }
 
@@ -58,20 +72,24 @@ export interface CategoryType {
   subcat: string[]
   newImage: File[]
 }
+
 export interface CategoryResponse {
   categories: CategoryType[]
   message?: string
 }
+
 export interface Subject {
   id: string
   name: string
   description: string
   subcat: string[]
 }
+
 export interface SubjectResponse {
   subjects: Subject[]
   message?: string
 }
+
 export interface GalleryInfo {
   id: string
   json_path: string
@@ -81,6 +99,7 @@ export interface GalleryInfo {
   linked_prod: string
   isStory: boolean
 }
+
 export interface GalleryResponse {
   galleries: GalleryInfo[]
 }

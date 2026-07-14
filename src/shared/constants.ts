@@ -11,10 +11,11 @@ export const defaultSiteData: SiteInfo = {
   page_title: '',
   page_description: '',
   page_content: '',
-  company_name: '',
+  brand_name: '',
   site_theme: '',
   live_site_url: '',
   sitelogo: '',
+  links: [],
   features: []
 }
 export const defaultBlogInfo: BlogInfo = {
