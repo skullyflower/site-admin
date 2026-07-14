@@ -1,7 +1,7 @@
 import { useMemo, ReactNode, useState } from 'react'
 import { ChangeEvent } from 'react'
 import CloseButton from '@renderer/components/ui/CloseButton'
-import { HStack } from '@chakra-ui/react'
+import { HStack, Input } from '@chakra-ui/react'
 
 const useSearchBox = <T,>(
   data?: T[],
@@ -19,9 +19,9 @@ const useSearchBox = <T,>(
   }
 
   const searchBox = (
-    <HStack gap={2}>
-      <label htmlFor="search-box">Search:</label>{' '}
-      <input name="search-box" onChange={handleChange} value={searchTerm} />
+    <HStack gap={2} w="full" paddingInline={4}>
+      <label htmlFor="search-box">Search:</label>
+      <Input name="search-box" onChange={handleChange} value={searchTerm} width="100%" />
       <CloseButton
         onClick={() => handleChange({ target: { value: '' } } as ChangeEvent<HTMLInputElement>)}
       />

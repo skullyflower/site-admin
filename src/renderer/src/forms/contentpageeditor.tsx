@@ -47,7 +47,7 @@ export default function PageForm({
         <Field.Root p={1} invalid={errors.page_id ? true : false}>
           <HStack alignItems="center" width={'100%'}>
             <Field.Label w={40}>
-              Page ID:{' '}
+              Page ID:
               <InfoBubble
                 message={`This is the page id, it must be unique and cannot be changed.`}
               />
@@ -65,8 +65,8 @@ export default function PageForm({
       )}
       <Field.Root p={1} invalid={errors.page_title ? true : false}>
         <HStack alignItems="center" width={'100%'}>
-          <Field.Label w={48}>
-            Page Title:{' '}
+          <Field.Label w={40}>
+            Page Title:
             <InfoBubble message={`This is the SEO page title for the ${pageId} page.`} />
           </Field.Label>
           <Input
@@ -78,8 +78,8 @@ export default function PageForm({
       </Field.Root>
       <Field.Root p={1} invalid={errors.page_description ? true : false}>
         <HStack alignItems="center" width={'100%'}>
-          <Field.Label w={48}>
-            {pageId} SEO Page Description:{' '}
+          <Field.Label w={40}>
+            SEO Description:
             <InfoBubble message="Short description that will show in Google searches. " />
           </Field.Label>
           <Input
@@ -123,7 +123,9 @@ export default function PageForm({
       </Field.Root>
       <Center>
         <HStack gap={4}>
-          <Button onClick={onCancel}>Done</Button>
+          <Button recipe={buttonRecipe} onClick={onCancel}>
+            Cancel
+          </Button>
           <Button recipe={buttonRecipe} onClick={() => onSubmit(id, getValues() as PageInfo)}>
             Submit Changes
           </Button>

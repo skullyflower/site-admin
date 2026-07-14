@@ -38,7 +38,7 @@ export const GalleryGridImage = ({
     <>
       <Box
         minW="200px"
-        w={{ sm: '100%', md: '200px' }}
+        w={{ sm: 'auto', md: '30%' }}
         backgroundColor="blackAlpha.200"
         p={2}
         m={2}
@@ -49,12 +49,12 @@ export const GalleryGridImage = ({
           <Button alignSelf="right" variant="ghost" size={'sm'} onClick={onOpenDelete}>
             delete
           </Button>
-          <Image src={`${imageurl}`} alt={oneImage.imgtitle} boxSize={48} />
+          <Image src={`${imageurl}`} alt={oneImage.imgtitle} />
           <Text fontSize={'xs'}>
             {oneImage.imgtitle}
             <span className="smaller"> {' ©' + oneImage.imgyear}</span>
           </Text>
-          <Accordion.Root>
+          <Accordion.Root collapsible>
             <Accordion.Item value="1">
               <Accordion.ItemTrigger>
                 <Box as="span" flex="1" textAlign="left">

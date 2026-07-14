@@ -60,7 +60,9 @@ export default function EditGallery({
       <Box>
         <Flex justifyContent="space-between">
           <Heading size="md">Add/Edit Gallery Information</Heading>
-          <Button onClick={toggleForm}>Never mind</Button>
+          <Button recipe={buttonRecipe} onClick={toggleForm}>
+            Never mind
+          </Button>
         </Flex>
         <Field.Root p={4} invalid={errors.id ? true : false}>
           <HStack>

@@ -8,6 +8,7 @@ import { buttonRecipe } from '@renderer/themeRecipes'
 import FormContainer from '@renderer/components/formcontainer'
 import { newprodId } from '@renderer/forms/producteditor'
 import ButtonSelector from '@renderer/components/inputs/ButtonSelector'
+import useSearchBox from '@renderer/hooks/useSearchBox'
 
 type ShopData = {
   products: ProductType[]
@@ -62,8 +63,8 @@ const ProductsPage = (): React.JSX.Element => {
   const [showForm, setShowForm] = useState(false)
   const [activeProd, setActiveProd] = useState<string | null>(null)
 
-  const [filteredFroducts, setFilteredProducts] = useState<ProductType[]>(shopData?.products || [])
-  const [filter, setFilter] = useState<string | null>(null)
+  const [categoryProducts, setCategoryProducts] = useState<ProductType[]>(shopData?.products || [])
+  const [category, setCategory] = useState<string | null>(null)
 
   const onSubmit = (values: ProductType): void => {
     setLoading(true)
@@ -86,9 +87,9 @@ const ProductsPage = (): React.JSX.Element => {
       })
       .then(() => {
         getShopData(setShopData, setMessages, setLoading, setMessageType)
-        if (filter && shopData?.products) {
-          setFilteredProducts(
-            shopData.products.filter((prod: ProductType) => prod.cat.includes(filter as string))
+        if (category && shopData?.products) {
+          setCategoryProducts(
+            shopData.products.filter((prod: ProductType) => prod.cat.includes(category as string))
           )
         }
         toggleForm(null)
@@ -104,17 +105,17 @@ const ProductsPage = (): React.JSX.Element => {
       setMessageType(json.success ? 'success' : 'error')
       setMessages(json.message || '')
       getShopData(setShopData, setMessages, setLoading, setMessageType)
-      if (filter && shopData?.products) {
-        setFilteredProducts(shopData.products.filter((prod) => prod.cat.includes(filter)))
+      if (category && shopData?.products) {
+        setCategoryProducts(shopData.products.filter((prod) => prod.cat.includes(category)))
       }
     })
   }
 
-  const doFilterProducts = useCallback(
+  const getCategoryProducts = useCallback(
     (filtercat: string | null) => {
       if (shopData?.products) {
-        setFilter(filtercat)
-        setFilteredProducts(
+        setCategory(filtercat)
+        setCategoryProducts(
           filtercat
             ? shopData.products.filter((prod: ProductType) =>
                 prod.cat.includes(filtercat as string)
@@ -123,7 +124,7 @@ const ProductsPage = (): React.JSX.Element => {
         )
       }
     },
-    [setFilter, shopData, setFilteredProducts]
+    [setCategory, shopData, setCategoryProducts]
   )
 
   const toggleForm = (productId: string | null): void => {
@@ -136,6 +137,10 @@ const ProductsPage = (): React.JSX.Element => {
       getShopData(setShopData, setMessages, setLoading, setMessageType)
     }
   }, [shopData, messages, setShopData, setMessages, setLoading])
+  const { filteredData, searchBox } = useSearchBox(
+    categoryProducts ?? shopData?.products,
+    (i: ProductType) => i.name
+  )
 
   return (
     <PageLayout
@@ -171,13 +176,16 @@ const ProductsPage = (): React.JSX.Element => {
               sortProp="name"
               valueProp="id"
               labelText="Show Products from category"
-              onChange={doFilterProducts}
+              onChange={getCategoryProducts}
             />
-            {filter && (
-              <Heading size="md">{shopData?.categories.find((c) => c.id === filter)?.name}</Heading>
+            {category && (
+              <Heading size="md">
+                {shopData?.categories.find((c) => c.id === category)?.name}
+              </Heading>
             )}
             <Stack>
-              {filteredFroducts?.map((product) => (
+              {searchBox}
+              {filteredData?.map((product) => (
                 <OneProduct
                   key={product.id}
                   product={product}

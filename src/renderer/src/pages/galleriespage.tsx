@@ -184,7 +184,7 @@ const GalleryPage: React.FC = () => {
                 <Heading w="full" textAlign="center">
                   Active Gallery: {activeGallery.title}
                 </Heading>
-                <HStack justifyContent="center">
+                <HStack justifyContent="center" wrap={'wrap'}>
                   <Button onClick={toggleShowForm}>Add Images</Button>
                   <Button onClick={() => doResetGallery(activeGallery as GalleryInfo)}>
                     Reset Json File

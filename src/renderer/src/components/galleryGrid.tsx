@@ -23,8 +23,8 @@ const GalleryGrid = ({
   const imgDir = `/images/${dir}`
 
   return (
-    <Stack align="stretch">
-      {searchBox}
+    <Stack alignItems="stretch">
+      <div>{searchBox}</div>
       {filteredData?.length > 0 && (
         <Flex wrap="wrap">
           {filteredData.map((oneImage) => (
