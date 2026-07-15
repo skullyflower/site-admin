@@ -65,6 +65,7 @@ export interface Api {
     destination?: string
   ) => Promise<ApiResponse<{ relativeUrl: string; filename: string }>>
   uploadImages: (files: string[], destination: string) => Promise<ApiResponse<ProcessedImage[]>>
+  uploadBlogImage: (filePath: string, destination?: string) => Promise<ApiResponse<ProcessedImage>>
   processUploadedImages: (
     fileDataArray: File[]
   ) => Promise<ApiResponse<{ previewUrls: string[]; filePaths: string[] }>>
