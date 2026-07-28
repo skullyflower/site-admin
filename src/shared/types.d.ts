@@ -108,6 +108,7 @@ export interface GalleryImage {
   imgfile: string
   imgtitle: string
   imgyear: string
+  tags?: string[]
 }
 export interface GalleryImages extends Record<string, GalleryImage> {}
 

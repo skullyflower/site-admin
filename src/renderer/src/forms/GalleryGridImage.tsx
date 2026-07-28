@@ -13,25 +13,28 @@ import ConfirmDelete from '@renderer/components/ConfirmDelete'
 import { useState } from 'react'
 import { buttonRecipe } from '@renderer/themeRecipes'
 import { GalleryImage } from '@renderer/../../../src/shared/types'
+import TagSelector from '@renderer/components/inputs/TagSelector'
 
 interface GalleryGridImageProps {
   oneImage: GalleryImage
   imgDir: string
   deleteImage: (imageurl: string) => void
-  updateImage: (imageurl: string, date: string, name: string) => void
+  updateImage: (imageurl: string, date: string, name: string, tags: string[]) => void
+  showDetail: (string) => void
 }
 
 export const GalleryGridImage = ({
   oneImage,
   imgDir,
   deleteImage,
-  updateImage
+  updateImage,
+  showDetail
 }: GalleryGridImageProps): React.ReactNode => {
   const [title, setTitle] = useState(oneImage.imgtitle)
   const [date, setDate] = useState(oneImage.imgfile?.substring(0, 8) ?? '')
   const imageurl = `http://localhost:3000${imgDir}/${oneImage.imgfile ?? ''}`
-
   const imagePath = imageurl.replace('http://localhost:3000/', '')
+  const [imageTags, setImageTags] = useState(oneImage.tags)
   const { open, onOpen: onOpenDelete, onClose: onCloseDelete } = useDisclosure()
 
   return (
@@ -49,11 +52,14 @@ export const GalleryGridImage = ({
           <Button alignSelf="right" variant="ghost" size={'sm'} onClick={onOpenDelete}>
             delete
           </Button>
-          <Image src={`${imageurl}`} alt={oneImage.imgtitle} />
+          <div onClick={() => showDetail(imageurl || '')}>
+            <Image src={`${imageurl}`} alt={oneImage.imgtitle} />
+          </div>
           <Text fontSize={'xs'}>
             {oneImage.imgtitle}
             <span className="smaller"> {' ©' + oneImage.imgyear}</span>
           </Text>
+          <Text fontSize={'xs'}>{imageTags?.join(', ')}</Text>
           <Accordion.Root collapsible>
             <Accordion.Item value="1">
               <Accordion.ItemTrigger>
@@ -78,13 +84,14 @@ export const GalleryGridImage = ({
                     }}
                     placeholder="YYYYMMDD"
                   />
+                  <TagSelector value={imageTags || []} onChange={setImageTags} />
                   <Button
                     alignSelf="right"
                     recipe={buttonRecipe}
                     size={'sm'}
-                    onClick={() => updateImage(imagePath, date, title)}
+                    onClick={() => updateImage(imagePath, date, title, imageTags || [])}
                   >
-                    Rename
+                    Update
                   </Button>
                 </Stack>
               </Accordion.ItemContent>

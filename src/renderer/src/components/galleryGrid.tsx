@@ -1,7 +1,9 @@
+import { useState } from 'react'
 import { GalleryImage } from '@renderer/../../src/shared/types'
 import { GalleryGridImage } from '@renderer/forms/GalleryGridImage'
 import { Flex, Stack } from '@chakra-ui/react'
 import useSearchBox from '@renderer/hooks/useSearchBox'
+import ImageDetail from './ImageDetail'
 
 interface GalleryGridProps {
   gallery: {
@@ -9,7 +11,7 @@ interface GalleryGridProps {
   }
   images: GalleryImage[]
   deleteImage: (imageurl: string) => void
-  updateImage: (imageurl: string, date: string, name: string) => void
+  updateImage: (imageurl: string, date: string, name: string, tags: string[]) => void
 }
 
 const GalleryGrid = ({
@@ -18,7 +20,11 @@ const GalleryGrid = ({
   deleteImage,
   updateImage
 }: GalleryGridProps): React.ReactNode => {
-  const { filteredData, searchBox } = useSearchBox(images, (i) => i.imgtitle)
+  const [selectedImage, setSelectedImage] = useState<string | null>(null)
+  const { filteredData, searchBox } = useSearchBox(
+    images,
+    (i) => `${i.imgtitle} ${i.tags?.join(' ')}`
+  )
   const dir = gallery.path
   const imgDir = `/images/${dir}`
 
@@ -34,10 +40,17 @@ const GalleryGrid = ({
               oneImage={oneImage}
               deleteImage={deleteImage}
               updateImage={updateImage}
+              showDetail={setSelectedImage}
             />
           ))}
         </Flex>
       )}
+      <ImageDetail
+        isOpen={!!selectedImage}
+        src={selectedImage || ''}
+        alt={selectedImage || ''}
+        close={() => setSelectedImage(null)}
+      />
     </Stack>
   )
 }

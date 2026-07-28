@@ -1,6 +1,6 @@
 import { contextBridge, ipcRenderer, webUtils } from 'electron'
 import { electronAPI /* , WebUtils */ } from '@electron-toolkit/preload'
-import { BlogEntry, CategoryType, PageInfo, ProductType } from '../shared/types'
+import { BlogEntry, CategoryType, GalleryImage, PageInfo, ProductType } from '../shared/types'
 
 // Custom APIs for renderer
 const api = {
@@ -132,6 +132,19 @@ const api = {
   },
   getGalleryImages: async (gallery_path: string) => {
     const response = await ipcRenderer.invoke('get-gallery-images', gallery_path)
+    return JSON.parse(response)
+  },
+  updateGalleryImage: async (
+    galleryId: string,
+    newImageData: GalleryImage,
+    oldImageKey?: string
+  ) => {
+    const response = await ipcRenderer.invoke(
+      'update-gallery-image',
+      galleryId,
+      newImageData,
+      oldImageKey
+    )
     return JSON.parse(response)
   },
   resetGallery: async (galleryId: string) => {

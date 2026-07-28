@@ -38,6 +38,43 @@ body {
   background-size: cover;
   user-select: none;
 }
+.opaque {
+ opacity: 1;
+}
+.translucent {
+ opacity: 0;
+ visibility: hidden;
+}
+
+.popover-window {
+  transition: 0.65s ease-out all;
+  position: fixed;
+  width: 95vw;
+  max-width: 750px;
+  z-index: 3000;
+  left: 50%;
+  top: 50%;
+  padding: 20px;
+  border-radius: 20px;
+  background-color:black;
+  transform: translate(-50%, -50%);
+  .popover-window{
+    width:100%;
+    height:inherit;
+  }
+  & .popover-content > div {
+    max-height: 84vh;
+    overflow: auto;
+  }
+  #overlay{
+    display:none;
+  }
+}
+@starting-style {
+  .popover-window {
+    opacity: 0;
+  }
+}
 
 code {
   font-weight: 600;

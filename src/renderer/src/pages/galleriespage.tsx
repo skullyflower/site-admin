@@ -115,20 +115,29 @@ const GalleryPage: React.FC = () => {
     setShowUpload(false)
   }
 
-  function updateImage(imageurl: string, date: string, name: string): void {
-    const extention = imageurl.split('.').pop()
+  function updateImage(imageurl: string, date: string, name: string, tags?: string[]): void {
+    const parts = imageurl.split('.')
+    const extention = parts.pop()
+    const oldKey = parts.join('.')
     const newName = `${date}${name.replaceAll(' ', '')}.${extention}`
-    window.api
-      .renameImage(imageurl, newName)
-      .then((res) => {
-        setMessageType(res.success ? 'success' : 'error')
-        setMessages(res.message || '')
-        doResetGallery(activeGallery as GalleryInfo)
-      })
-      .catch((err) => {
-        setMessageType('error')
-        setMessages(err.message || 'There was a problem.')
-      })
+    const newImageObject = {
+      imgfile: newName,
+      imgtitle: name,
+      imgyear: date.substring(0, 4),
+      tags: tags
+    }
+    if (activeGallery)
+      window.api
+        .renameImage(imageurl, newName)
+        .then((res) => {
+          setMessageType(res.success ? 'success' : 'error')
+          setMessages(res.message || '')
+          window.api.updateGalleryImage(activeGallery?.id, newImageObject, oldKey)
+        })
+        .catch((err) => {
+          setMessageType('error')
+          setMessages(err.message || 'There was a problem.')
+        })
   }
 
   const deleteImage = (imageurl: string): void => {

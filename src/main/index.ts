@@ -19,7 +19,8 @@ import { getSiteInfo, updateSiteInfo } from './modules/homeRouter'
 import { getSale, setSale } from './modules/saleRouter'
 import {
   getGalleries,
-  updateGallery,
+  updateGalleryList,
+  updateGalleryImage,
   resetGallery,
   getGalleryImages
 } from './modules/galleryRouter'
@@ -38,7 +39,15 @@ import {
 } from './modules/imagesRouter'
 import { registerRoute } from '../lib/electron-router-dom'
 import { getAdminConfig, updateAdminConfig } from './modules/configRouter'
-import { BlogEntry, BlogInfo, CategoryType, PageInfo, ProductType, Subject } from '../shared/types'
+import {
+  BlogEntry,
+  BlogInfo,
+  CategoryType,
+  GalleryImage,
+  PageInfo,
+  ProductType,
+  Subject
+} from '../shared/types'
 import { deleteSubject, getSubjects, updateSubject } from './modules/subjectsRouter'
 import { deleteProduct, getProducts, updateProduct } from './modules/productsRouter'
 import { getAllCategories, updateCategories } from './modules/categoriesRouter'
@@ -223,7 +232,12 @@ ipcMain.handle('delete-page', (_event, pageId: string) => deletePage(pageId))
 // Gallery API functions
 ipcMain.handle('get-galleries', getGalleries)
 ipcMain.handle('get-gallery-images', (_event, gallery_id: string) => getGalleryImages(gallery_id))
-ipcMain.handle('update-gallery', (_event, gallery: string) => updateGallery(gallery))
+ipcMain.handle(
+  'update-gallery-image',
+  (_event, gallery_id: string, imageData: GalleryImage, oldKey: string | undefined) =>
+    updateGalleryImage(gallery_id, imageData, oldKey)
+)
+ipcMain.handle('update-gallery', (_event, gallery: string) => updateGalleryList(gallery))
 ipcMain.handle('reset-gallery', (_event, gallery: string) => resetGallery(gallery))
 ipcMain.handle('get-staged-images', getStagedImages)
 ipcMain.handle('process-uploaded-images', (_event, fileDataArray: Array<string>) =>

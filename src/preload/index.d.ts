@@ -54,6 +54,11 @@ export interface Api {
   // Gallery API functions
   getGalleries: () => Promise<ApiResponse<GalleryInfo[]>>
   getGalleryImages: (gallery_id: string) => Promise<ApiResponse<GalleryImages>>
+  updateGalleryImage: (
+    galleryId: string,
+    newImageData: GalleryImage,
+    oldImageKey?: string
+  ) => Promise<ApiResponse>
   updateGallery: (gallery: GalleryInfo) => Promise<ApiResponse>
   resetGallery: (galleryId: string) => Promise<ApiResponse<GalleryImages>>
   // Image API functions
