@@ -225,7 +225,6 @@ export const deleteImage = (imageurl): string => {
       path.basename(relativePath)
     )
     try {
-      console.log(relativePath)
       if (relativePath.includes('files')) {
         fs.rmSync(`./public${relativePath}`)
         return JSON.stringify(okMessage(`Successfully removed ${imageurl}`))
