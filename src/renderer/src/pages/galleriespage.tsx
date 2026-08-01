@@ -132,7 +132,10 @@ const GalleryPage: React.FC = () => {
         .then((res) => {
           setMessageType(res.success ? 'success' : 'error')
           setMessages(res.message || '')
-          window.api.updateGalleryImage(activeGallery?.id, newImageObject, oldKey)
+          window.api.updateGalleryImage(activeGallery?.id, newImageObject, oldKey).then((res) => {
+            setMessageType(res.success ? 'success' : 'error')
+            setMessages(res.message || '')
+          })
         })
         .catch((err) => {
           setMessageType('error')

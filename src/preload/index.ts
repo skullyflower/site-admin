@@ -134,6 +134,10 @@ const api = {
     const response = await ipcRenderer.invoke('get-gallery-images', gallery_path)
     return JSON.parse(response)
   },
+  getAllTags: async () => {
+    const response = await ipcRenderer.invoke('get-tags')
+    return JSON.parse(response)
+  },
   updateGalleryImage: async (
     galleryId: string,
     newImageData: GalleryImage,

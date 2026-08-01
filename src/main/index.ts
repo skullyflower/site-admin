@@ -52,6 +52,7 @@ import { deleteSubject, getSubjects, updateSubject } from './modules/subjectsRou
 import { deleteProduct, getProducts, updateProduct } from './modules/productsRouter'
 import { getAllCategories, updateCategories } from './modules/categoriesRouter'
 import { createPage, deletePage, getPage, getPages, updatePage } from './modules/contentPageRouter'
+import { getTags } from './modules/tagsRouter'
 
 function createWindow(): void {
   // Create the browser window.
@@ -113,9 +114,6 @@ app.whenReady().then(() => {
     optimizer.watchWindowShortcuts(window)
   })
 
-  // IPC test
-  ipcMain.on('ping', () => console.log('pong'))
-
   createWindow()
 
   app.on('activate', function () {
@@ -151,6 +149,7 @@ ipcMain.handle('get-admin-config', getAdminConfig)
 ipcMain.handle('set-admin-config', (_event, config: { pathToSite: string }) =>
   updateAdminConfig(config)
 )
+
 ipcMain.handle('select-site-directory', () => {
   const directory: Promise<OpenDialogReturnValue> = dialog.showOpenDialog({
     properties: ['openDirectory']
@@ -232,6 +231,7 @@ ipcMain.handle('delete-page', (_event, pageId: string) => deletePage(pageId))
 // Gallery API functions
 ipcMain.handle('get-galleries', getGalleries)
 ipcMain.handle('get-gallery-images', (_event, gallery_id: string) => getGalleryImages(gallery_id))
+ipcMain.handle('get-tags', getTags)
 ipcMain.handle(
   'update-gallery-image',
   (_event, gallery_id: string, imageData: GalleryImage, oldKey: string | undefined) =>

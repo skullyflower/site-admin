@@ -7,7 +7,9 @@ import {
   Spacer,
   Stack,
   useDisclosure,
-  Text
+  Text,
+  HStack,
+  Badge
 } from '@chakra-ui/react'
 import ConfirmDelete from '@renderer/components/ConfirmDelete'
 import { useState } from 'react'
@@ -21,6 +23,7 @@ interface GalleryGridImageProps {
   deleteImage: (imageurl: string) => void
   updateImage: (imageurl: string, date: string, name: string, tags: string[]) => void
   showDetail: (string) => void
+  tagList?: string[]
 }
 
 export const GalleryGridImage = ({
@@ -28,7 +31,8 @@ export const GalleryGridImage = ({
   imgDir,
   deleteImage,
   updateImage,
-  showDetail
+  showDetail,
+  tagList
 }: GalleryGridImageProps): React.ReactNode => {
   const [title, setTitle] = useState(oneImage.imgtitle)
   const [date, setDate] = useState(oneImage.imgfile?.substring(0, 8) ?? '')
@@ -59,7 +63,13 @@ export const GalleryGridImage = ({
             {oneImage.imgtitle}
             <span className="smaller"> {' ©' + oneImage.imgyear}</span>
           </Text>
-          <Text fontSize={'xs'}>{imageTags?.join(', ')}</Text>
+          <HStack gap={2} wrap={'wrap'}>
+            {imageTags?.map((t) => (
+              <Badge key={`${imageurl}-${t}`} size="xs">
+                {t}
+              </Badge>
+            ))}
+          </HStack>
           <Accordion.Root collapsible>
             <Accordion.Item value="1">
               <Accordion.ItemTrigger>
@@ -84,15 +94,21 @@ export const GalleryGridImage = ({
                     }}
                     placeholder="YYYYMMDD"
                   />
-                  <TagSelector value={imageTags || []} onChange={setImageTags} />
-                  <Button
-                    alignSelf="right"
-                    recipe={buttonRecipe}
-                    size={'sm'}
-                    onClick={() => updateImage(imagePath, date, title, imageTags || [])}
-                  >
-                    Update
-                  </Button>
+                  <TagSelector
+                    value={imageTags || []}
+                    defaultOptions={tagList || []}
+                    onChange={setImageTags}
+                  />
+                  <Accordion.ItemTrigger>
+                    <Button
+                      alignSelf="right"
+                      recipe={buttonRecipe}
+                      size={'sm'}
+                      onClick={() => updateImage(imagePath, date, title, imageTags || [])}
+                    >
+                      Update
+                    </Button>
+                  </Accordion.ItemTrigger>
                 </Stack>
               </Accordion.ItemContent>
             </Accordion.Item>

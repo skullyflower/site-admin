@@ -27,9 +27,9 @@ const TagSelector = ({
   placeholder = 'Add tag...'
 }: TagSelectorProps): React.JSX.Element => {
   const { contains } = useFilter({ sensitivity: 'base' })
-
+  const allTagsList = defaultOptions || []
   const { collection, filter } = useListCollection({
-    initialItems: (defaultOptions || []).filter((item): item is string => item != null),
+    initialItems: allTagsList,
     filter: contains
   })
 
@@ -87,8 +87,8 @@ const TagSelector = ({
         <Combobox.Positioner>
           <Combobox.Content>
             <Combobox.Empty>No tags found</Combobox.Empty>
-            {collection.items.map((item) => (
-              <Combobox.Item item={item} key={item}>
+            {collection.items.map((item, index) => (
+              <Combobox.Item item={item} key={`${item}-${index}`}>
                 <Combobox.ItemText>{item}</Combobox.ItemText>
                 <Combobox.ItemIndicator />
               </Combobox.Item>
