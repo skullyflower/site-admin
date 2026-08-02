@@ -15,7 +15,7 @@ export const getTags = (): string => {
     checkFile(tags_json, [])
     const tagsData = readFileSync(tags_json, 'utf8')
     const tags = JSON.parse(tagsData)
-    return JSON.stringify(ok(Array.isArray(tags) ? tags.sort() : []))
+    return JSON.stringify(ok(Array.isArray(tags) ? tags.sort((a, b) => a.localeCompare(b)) : []))
   } catch (err) {
     return JSON.stringify(fail(`Couldn't read tags list file. : ${err}`))
   }
@@ -28,7 +28,8 @@ export const updateTagsList = (someTags: string[]): string => {
     if (!Array.isArray(tags)) {
       throw new Error('Cannot Get Tags')
     }
-    const newTagList = Array.from(new Set([...tags.concat(someTags)]))
+    const cleanTags = someTags.map((tag) => tag.trim()).filter((tag) => tag.length > 0)
+    const newTagList = Array.from(new Set([...tags.concat(cleanTags)]))
     checkFile(tags_json, [])
     writeFileSync(tags_json, JSON.stringify(newTagList))
     return JSON.stringify(okMessage(`Updated tagsList!`))

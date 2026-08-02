@@ -12,7 +12,7 @@ const getPaths = (): { pathToPublic: string; galleries_json: string } => {
   return { pathToPublic, galleries_json }
 }
 
-function getImagesFromFiles(path): string[] {
+function getImagesFromFiles(path: string): string[] {
   const { pathToPublic } = getPaths()
   const images_path = join(pathToPublic, 'images', path)
   checkPath(images_path)
@@ -33,6 +33,7 @@ export const resetGallery = (galleryId: string): string => {
   }
   const { json_path, path, isStory } = gallery
   const json_file = join(pathToPublic, json_path)
+  checkFile(json_file, {})
   const imageData = readFileSync(json_file, 'utf8')
   //read in any existing data (to preserve tags)
   const files_data = JSON.parse(imageData) || {}
@@ -56,9 +57,7 @@ export const resetGallery = (galleryId: string): string => {
         const imagename = imgPattern.test(onefile) ? onefile.split('.')[0] : ''
         if (imagename) {
           //maintain old data (tags)
-          if (files_data[imagename]) {
-            new_data_files[imagename] = files_data[imagename]
-          }
+          new_data_files[imagename] = files_data[imagename] ? files_data[imagename] : {}
           // build from new data inputs
           //filename
           new_data_files[imagename].imgfile = onefile
@@ -158,8 +157,10 @@ export const updateGalleryImage = (
         throw new Error('Cannot Get Gallery')
       }
       //get list of existing image objects for gallery
-      const galleryFile = gallery?.json_path ?? galleries[0].json_path
-      const json_file = join(pathToPublic, galleryFile)
+      if (!gallery.json_path) {
+        return JSON.stringify(fail(`Gallery ${galleryId} has no json_path.`))
+      }
+      const json_file = join(pathToPublic, gallery.json_path)
 
       checkFile(json_file, {})
       const gallery_json = readFileSync(json_file, 'utf8')
@@ -176,9 +177,11 @@ export const updateGalleryImage = (
       if (oldImageKey && oldImageKey !== newImageKey && gallerData[oldImageKey]) {
         const oldfilepath = join(gallery.path, gallerData[oldImageKey].imgfile)
         deleteImage(oldfilepath)
-        gallerData[oldImageKey] = undefined
+        delete gallerData[oldImageKey]
       }
+      checkFile(json_file.replace('public', 'dist'), {})
       writeFileSync(json_file, JSON.stringify(gallerData))
+      writeFileSync(json_file.replace('public', 'dist'), JSON.stringify(gallerData))
       return JSON.stringify(okMessage(`Updated image; ${newImageData.imgtitle}!`))
     } catch (error) {
       return JSON.stringify(fail(`Failed to update image: ${error}`))
@@ -198,10 +201,12 @@ export const getGalleryImages = (galleryId): string => {
     if (gallery === undefined) {
       throw new Error('Cannot Get Gallery')
     }
+    if (!gallery.json_path) {
+      throw new Error(`Gallery ${galleryId} has no json_path`)
+    }
 
-    const galleryFile = gallery?.json_path ?? galleries[0].json_path
-    checkFile(join(pathToPublic, galleryFile), {})
-    const gallery_json = readFileSync(join(pathToPublic, galleryFile), 'utf8')
+    checkFile(join(pathToPublic, gallery.json_path), {})
+    const gallery_json = readFileSync(join(pathToPublic, gallery.json_path), 'utf8')
     return JSON.stringify(ok(JSON.parse(gallery_json)))
   } catch (err) {
     return JSON.stringify(fail(`Couldn't read file for ${galleryId} ${err}`))

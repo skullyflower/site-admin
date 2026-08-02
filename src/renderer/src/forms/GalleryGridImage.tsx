@@ -40,6 +40,7 @@ export const GalleryGridImage = ({
   const imagePath = imageurl.replace('http://localhost:3000/', '')
   const [imageTags, setImageTags] = useState(oneImage.tags)
   const { open, onOpen: onOpenDelete, onClose: onCloseDelete } = useDisclosure()
+  const [editOpen, setEditOpen] = useState(false)
 
   return (
     <>
@@ -70,7 +71,11 @@ export const GalleryGridImage = ({
               </Badge>
             ))}
           </HStack>
-          <Accordion.Root collapsible>
+          <Accordion.Root
+            collapsible
+            value={editOpen ? ['1'] : []}
+            onValueChange={(details) => setEditOpen(details.value.includes('1'))}
+          >
             <Accordion.Item value="1">
               <Accordion.ItemTrigger>
                 <Box as="span" flex="1" textAlign="left">
@@ -79,37 +84,39 @@ export const GalleryGridImage = ({
                 <Accordion.ItemIndicator />
               </Accordion.ItemTrigger>
               <Accordion.ItemContent>
-                <Stack justifyContent="stretch">
-                  <Input
-                    value={title}
-                    onChange={(e) => {
-                      setTitle(e.target.value)
-                    }}
-                  />
-                  <Input
-                    name="date"
-                    value={date}
-                    onChange={(e) => {
-                      setDate(e.target.value)
-                    }}
-                    placeholder="YYYYMMDD"
-                  />
-                  <TagSelector
-                    value={imageTags || []}
-                    defaultOptions={tagList || []}
-                    onChange={setImageTags}
-                  />
-                  <Accordion.ItemTrigger>
-                    <Button
-                      alignSelf="right"
-                      recipe={buttonRecipe}
-                      size={'sm'}
-                      onClick={() => updateImage(imagePath, date, title, imageTags || [])}
-                    >
-                      Update
-                    </Button>
-                  </Accordion.ItemTrigger>
-                </Stack>
+                {editOpen && (
+                  <Stack justifyContent="stretch">
+                    <Input
+                      value={title}
+                      onChange={(e) => {
+                        setTitle(e.target.value)
+                      }}
+                    />
+                    <Input
+                      name="date"
+                      value={date}
+                      onChange={(e) => {
+                        setDate(e.target.value)
+                      }}
+                      placeholder="YYYYMMDD"
+                    />
+                    <TagSelector
+                      value={imageTags || []}
+                      defaultOptions={tagList || []}
+                      onChange={setImageTags}
+                    />
+                    <Accordion.ItemTrigger>
+                      <Button
+                        alignSelf="right"
+                        recipe={buttonRecipe}
+                        size={'sm'}
+                        onClick={() => updateImage(imagePath, date, title, imageTags || [])}
+                      >
+                        Update
+                      </Button>
+                    </Accordion.ItemTrigger>
+                  </Stack>
+                )}
               </Accordion.ItemContent>
             </Accordion.Item>
           </Accordion.Root>
