@@ -1,34 +1,7 @@
-# site-admin
+# Website Admin
 
-An Electron application with React and TypeScript
+A Headless CMS Electron application with React and TypeScript
 
-## Recommended IDE Setup
+<img width="1312" height="762" alt="image" src="https://github.com/user-attachments/assets/4d44f51e-b4f3-4c4c-b1dd-6a36953a7b45" />
 
-- [VSCode](https://code.visualstudio.com/) + [ESLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint) + [Prettier](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode)
-
-## Project Setup
-
-### Install
-
-```bash
-$ yarn
-```
-
-### Development
-
-```bash
-$ yarn dev
-```
-
-### Build
-
-```bash
-# For windows
-$ yarn build:win
-
-# For macOS
-$ yarn build:mac
-
-# For Linux
-$ yarn build:linux
-```
+WIP
