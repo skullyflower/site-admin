@@ -12,22 +12,25 @@ import { useId, useRef } from 'react'
 
 interface TagSelectorProps {
   onChange: (tags: string[]) => void
-  value: string[]
+  tags: string[]
   defaultOptions?: string[]
   label?: string
   placeholder?: string
   allowCustomValue?: boolean
 }
+
 const TagSelector = ({
   label,
-  value,
+  tags: currentTags,
   defaultOptions,
   onChange,
-  allowCustomValue = true,
+  allowCustomValue = false,
   placeholder = 'Add tag...'
 }: TagSelectorProps): React.JSX.Element => {
   const { contains } = useFilter({ sensitivity: 'base' })
-  const allTagsList = defaultOptions || []
+  const allTagsList = Array.from(
+    new Set((defaultOptions || []).filter((t): t is string => Boolean(t)))
+  )
   const { collection, filter } = useListCollection({
     initialItems: allTagsList,
     filter: contains
@@ -38,7 +41,7 @@ const TagSelector = ({
 
   const tags = useTagsInput({
     ids: { input: inputId },
-    defaultValue: value || [],
+    defaultValue: currentTags || [],
     onValueChange: (details) => {
       onChange(details.value)
     }
@@ -55,7 +58,7 @@ const TagSelector = ({
         return controlRef.current!.getBoundingClientRect()
       }
     },
-    value: value,
+    value: currentTags,
     allowCustomValue: allowCustomValue,
     onValueChange: (e: { value: string[] }) => {
       if (e.value[0]) {

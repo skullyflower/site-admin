@@ -101,9 +101,10 @@ export const GalleryGridImage = ({
                       placeholder="YYYYMMDD"
                     />
                     <TagSelector
-                      value={imageTags || []}
+                      tags={imageTags || []}
                       defaultOptions={tagList || []}
                       onChange={setImageTags}
+                      allowCustomValue
                     />
                     <Accordion.ItemTrigger>
                       <Button

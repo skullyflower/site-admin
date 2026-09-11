@@ -88,8 +88,8 @@ const PageLayout = ({
           )}
         </Stack>
       </Card.Header>
-      <Card.Body overflowY={'auto'} marginInline={'auto'}>
-        <ScrollArea.Root height="inherit">
+      <Card.Body overflowY={'auto'} marginInline={'auto'} width="100%" maxWidth="1500px">
+        <ScrollArea.Root height="inherit" width="inherit">
           <ScrollArea.Viewport>
             <ScrollArea.Content>{children}</ScrollArea.Content>
           </ScrollArea.Viewport>

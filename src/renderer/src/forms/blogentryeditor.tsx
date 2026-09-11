@@ -184,7 +184,7 @@ const EditBlogEntry = ({
       </Field.Root>
       <Field.Root p={1}>
         <TagSelector
-          value={thisEntry?.tags || []}
+          tags={thisEntry?.tags || []}
           onChange={(values: string[]) => setValue('tags', values)}
           allowCustomValue
         />

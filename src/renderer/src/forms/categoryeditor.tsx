@@ -158,9 +158,8 @@ export default function EditCategory({
           <TagSelector
             label="Sub-Categories:"
             defaultOptions={categories.filter((c) => c.id !== cat.id).map((c) => c.id)}
-            value={cat.subcat}
+            tags={cat.subcat}
             onChange={(values: string[]) => setValue('subcat', values)}
-            allowCustomValue
           />
         </HStack>
       </Field.Root>

@@ -40,12 +40,13 @@ const newproduct = {
   design: [],
   weight: 0,
   handling: 0,
-  newImage: []
+  newImage: [],
+  tags: []
 }
 
 interface EditProductProps {
   isOpen: boolean
-  prodId: string | null
+  prodId?: string
   products: ProductType[]
   categories: CategoryType[]
   subjects: Subject[]
@@ -287,7 +288,7 @@ export default function EditProduct({
           <Field.Label w={40}>Categories:</Field.Label>
           <TagSelector
             onChange={(tags: string[]) => setValue('cat', tags)}
-            value={prodCategories}
+            tags={prodCategories}
             defaultOptions={categories.map((c) => c.id)}
             placeholder="Add category Id..."
           />
@@ -298,7 +299,7 @@ export default function EditProduct({
           <Field.Label w={40}>Subjects:</Field.Label>
           <TagSelector
             onChange={(tags: string[]) => setValue('design', tags)}
-            value={prodSubjects}
+            tags={prodSubjects}
             defaultOptions={subjects.map((c) => c.id)}
             placeholder="Add subject Id..."
           />
