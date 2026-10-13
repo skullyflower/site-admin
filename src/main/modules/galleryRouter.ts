@@ -3,7 +3,6 @@ import { join } from 'path'
 import getPathsFromConfig, { checkFile, checkPath } from '../utilities/pathData'
 import { ok, okMessage, fail } from '../utilities/apiResponse'
 import { GalleryImage } from '../../shared/types'
-import { deleteImage } from './imagesRouter'
 import { updateTagsList } from './tagsRouter'
 
 const getPaths = (): { pathToPublic: string; galleries_json: string } => {
@@ -77,7 +76,7 @@ export const resetGallery = (galleryId: string): string => {
                 ?.replace(/([A-Z])/g, ' $1')
                 ?.replace(/_/g, ' ')
                 ?.trim() ?? ''
-            new_data_files[imagename].imgyear = 2007
+            new_data_files[imagename].imgyear = String(new Date().getFullYear())
           }
           // tags
           if (new_data_files[imagename].tags) {
@@ -174,14 +173,21 @@ export const updateGalleryImage = (
       } else {
         console.error('No tags in Data')
       }
-      if (oldImageKey && oldImageKey !== newImageKey && gallerData[oldImageKey]) {
-        const oldfilepath = join(gallery.path, gallerData[oldImageKey].imgfile)
-        deleteImage(oldfilepath)
-        delete gallerData[oldImageKey]
+      if (oldImageKey) {
+        // keys are bare file names without extension; the renamer already moved the files
+        const oldKey = oldImageKey.split('/').pop() ?? ''
+        if (oldKey && oldKey !== newImageKey) delete gallerData[oldKey]
       }
+      // keep the same ordering resetGallery uses so a renamed image doesn't jump to the end
+      const sortedKeys = Object.keys(gallerData).sort((a, b) =>
+        (gallerData[a].imgfile ?? a).localeCompare(gallerData[b].imgfile ?? b)
+      )
+      if (!gallery.isStory) sortedKeys.reverse()
+      const sortedData = {}
+      sortedKeys.forEach((k) => (sortedData[k] = gallerData[k]))
       checkFile(json_file.replace('public', 'dist'), {})
-      writeFileSync(json_file, JSON.stringify(gallerData))
-      writeFileSync(json_file.replace('public', 'dist'), JSON.stringify(gallerData))
+      writeFileSync(json_file, JSON.stringify(sortedData))
+      writeFileSync(json_file.replace('public', 'dist'), JSON.stringify(sortedData))
       return JSON.stringify(okMessage(`Updated image; ${newImageData.imgtitle}!`))
     } catch (error) {
       return JSON.stringify(fail(`Failed to update image: ${error}`))

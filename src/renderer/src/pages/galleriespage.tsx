@@ -118,8 +118,9 @@ const GalleryPage: React.FC = () => {
   function updateImage(imageurl: string, date: string, name: string, tags?: string[]): void {
     const parts = imageurl.split('.')
     const extention = parts.pop()
-    const oldKey = parts.join('.')
-    const newName = `${date}${name.replaceAll(' ', '')}.${extention}`
+    const oldKey = parts.join('.').split('/').pop() ?? ''
+    // keep file names URL-safe: only letters, digits, - and _
+    const newName = `${date}${name.replace(/[^A-Za-z0-9_-]/g, '')}.${extention}`
     const newImageObject = {
       imgfile: newName,
       imgtitle: name,
@@ -132,10 +133,14 @@ const GalleryPage: React.FC = () => {
         .then((res) => {
           setMessageType(res.success ? 'success' : 'error')
           setMessages(res.message || '')
-          window.api.updateGalleryImage(activeGallery?.id, newImageObject, oldKey).then((res) => {
-            setMessageType(res.success ? 'success' : 'error')
-            setMessages(res.message || '')
-          })
+          if (!res.success) return
+          return window.api
+            .updateGalleryImage(activeGallery.id, newImageObject, oldKey)
+            .then((res) => {
+              setMessageType(res.success ? 'success' : 'error')
+              setMessages(res.message || '')
+              getGalleryImages(activeGallery.id, setImages, setMessages, setMessageType)
+            })
         })
         .catch((err) => {
           setMessageType('error')

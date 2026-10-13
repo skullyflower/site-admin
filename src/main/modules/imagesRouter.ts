@@ -179,6 +179,12 @@ export const moveImages = (filesToMove: string[], destination: string): string =
   return JSON.stringify(fail('You must fill out all fields.'))
 }
 
+/** Local date as YYYYMMDD. */
+export const todayStamp = (): string => {
+  const d = new Date()
+  return `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, '0')}${String(d.getDate()).padStart(2, '0')}`
+}
+
 export const renameImage = (imageurl, newname): string => {
   const { pathToPublic } = getPaths()
   if (imageurl && newname) {
@@ -190,6 +196,23 @@ export const renameImage = (imageurl, newname): string => {
       path.basename(relativePath)
     )
     try {
+      if (path.basename(relativePath) === newname) {
+        return JSON.stringify(okMessage(`${imageurl} already has that name.`))
+      }
+      const distPublic = pathToPublic.replace('public', 'dist')
+      const sources = [
+        join(pathToPublic, relativePath),
+        join(pathToPublic, smallerRelativePath),
+        join(distPublic, relativePath),
+        join(distPublic, smallerRelativePath)
+      ]
+      const missing = sources.find((f) => !fs.existsSync(f))
+      if (missing) {
+        return JSON.stringify(fail(`Failed to rename ${imageurl}: ${missing} not found.`))
+      }
+      if (fs.existsSync(join(pathToPublic, path.dirname(relativePath), newname))) {
+        return JSON.stringify(fail(`Failed to rename ${imageurl}: ${newname} already exists.`))
+      }
       fs.renameSync(
         join(pathToPublic, relativePath),
         join(pathToPublic, path.dirname(relativePath), newname)
@@ -323,14 +346,17 @@ export const uploadImages = async (
 
     for (const filePath of filePaths) {
       try {
-        const result1 = await processFile(join(tempPath, filePath), 750, bigDestPath)
+        // files without a leading YYYYMMDD date get the upload date as a prefix
+        const parsedName = path.parse(filePath).name
+        const newName = /^\d{8}/.test(parsedName) ? undefined : `${todayStamp()}${parsedName}`
+        const result1 = await processFile(join(tempPath, filePath), 750, bigDestPath, newName)
         if (typeof result1 === 'string') {
           console.error(`Wrong Big File type.`)
         } else if (result1.relativeUrl) {
           console.log('Big file uploaded to ', tempPath)
           processedImages.push(result1)
         }
-        const result2 = await processFile(join(tempPath, filePath), 450, smallDestPath)
+        const result2 = await processFile(join(tempPath, filePath), 450, smallDestPath, newName)
         if (typeof result2 === 'string') {
           console.error(`Wrong Small File type.`)
         } else if (result2.relativeUrl) {

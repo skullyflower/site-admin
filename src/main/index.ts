@@ -260,9 +260,16 @@ ipcMain.handle(
 ipcMain.handle('upload-image', (_event, filePath: string, destination: string) =>
   uploadImage(filePath, destination)
 )
-ipcMain.handle('upload-images', (_event, filePaths: string[], destination: string) =>
-  uploadImages(filePaths, destination)
-)
+ipcMain.handle('upload-images', async (_event, filePaths: string[], destination: string) => {
+  const result = await uploadImages(filePaths, destination)
+  // if the destination is a gallery folder, rewrite that gallery's json
+  if (result.success && destination) {
+    const galleries = JSON.parse(getGalleries()).data
+    const gallery = Array.isArray(galleries) && galleries.find((g) => g.path === destination)
+    if (gallery) resetGallery(gallery.id)
+  }
+  return result
+})
 ipcMain.handle('get-preview-images', (_event, images: string[]) => getPreviewImages(images))
 // Shop API functions
 ipcMain.handle('get-products', getProducts)

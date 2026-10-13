@@ -26,6 +26,11 @@ interface GalleryGridImageProps {
   tagList?: string[]
 }
 
+const todayStamp = (): string => {
+  const d = new Date()
+  return `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, '0')}${String(d.getDate()).padStart(2, '0')}`
+}
+
 export const GalleryGridImage = ({
   oneImage,
   imgDir,
@@ -35,9 +40,11 @@ export const GalleryGridImage = ({
   tagList
 }: GalleryGridImageProps): React.ReactNode => {
   const [title, setTitle] = useState(oneImage.imgtitle)
-  const [date, setDate] = useState(oneImage.imgfile?.substring(0, 8) ?? '')
-  const imageurl = `http://localhost:3000${imgDir}/${oneImage.imgfile ?? ''}`
-  const imagePath = imageurl.replace('http://localhost:3000/', '')
+  const [date, setDate] = useState(
+    /^\d{8}/.test(oneImage.imgfile ?? '') ? oneImage.imgfile.substring(0, 8) : todayStamp()
+  )
+  const imageurl = `http://localhost:3000${imgDir}/${encodeURIComponent(oneImage.imgfile ?? '')}`
+  const imagePath = `${imgDir}/${oneImage.imgfile ?? ''}`.replace(/^\//, '')
   const [imageTags, setImageTags] = useState(oneImage.tags)
   const { open, onOpen: onOpenDelete, onClose: onCloseDelete } = useDisclosure()
   const [editOpen, setEditOpen] = useState(false)
@@ -94,11 +101,12 @@ export const GalleryGridImage = ({
                     />
                     <Input
                       name="date"
-                      value={date}
+                      type="date"
+                      value={`${date.slice(0, 4)}-${date.slice(4, 6)}-${date.slice(6, 8)}`}
                       onChange={(e) => {
-                        setDate(e.target.value)
+                        // empty while the user is mid-edit; keep the last valid date
+                        if (e.target.value) setDate(e.target.value.replaceAll('-', ''))
                       }}
-                      placeholder="YYYYMMDD"
                     />
                     <TagSelector
                       tags={imageTags || []}
@@ -111,6 +119,7 @@ export const GalleryGridImage = ({
                         alignSelf="right"
                         recipe={buttonRecipe}
                         size={'sm'}
+                        disabled={!/^\d{8}$/.test(date)}
                         onClick={() => updateImage(imagePath, date, title, imageTags || [])}
                       >
                         Update
