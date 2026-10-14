@@ -45,7 +45,7 @@ const ImagePreview = ({ images, basePath, updateImages }: ImagePreviewProps): Re
       {images.map((image, i) => (
         <PreviewImage
           key={`${image}${i}`}
-          image={`${basePath}${image}`}
+          image={`${basePath ?? ''}${image}`}
           deleteImage={deleteImage}
         />
       ))}
