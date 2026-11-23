@@ -8,6 +8,13 @@ import fs from 'fs'
 const htmlEncodeString = (string): string =>
   string.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
 
+// MDXEditor serializes trailing spaces as &#x20; — turn those back into plain spaces
+const stripSpaceEntities = (s: string): string =>
+  s.replace(/(?:&amp;)?&?#?x20;|(?:&amp;)?&#32;/gi, ' ')
+
+const cleanMarkdown = (text: string): string =>
+  stripSpaceEntities(text ?? '').replace(/[ \t]+$/gm, '')
+
 const year = new Date().getUTCFullYear()
 
 const processRss = (blogData: BlogInfo): string => {
@@ -40,7 +47,7 @@ const processRss = (blogData: BlogInfo): string => {
   <dc:language>en-en</dc:language>    
   <dc:rights>Copyright 2005-${year}</dc:rights>`
   blogData.entries.forEach((entry) => {
-    const entrylink = `${sitedata.live_site_url}/blog/entry/${entry.id}`
+    const entrylink = `${sitedata.live_site_url}/blog/${entry.id}`
     const imageLink = entry.imagelink || entrylink
     const pubDate = new Date(entry.date)
 
@@ -51,7 +58,7 @@ const processRss = (blogData: BlogInfo): string => {
     <p>${entry.imgcaption}</p>
     </div>
     <h3>${entry.heading}</h3>
-    ${convertToHTML(entry.text)}`
+    ${stripSpaceEntities(convertToHTML(cleanMarkdown(entry.text)))}`
 
     rssString += `
     <item>
